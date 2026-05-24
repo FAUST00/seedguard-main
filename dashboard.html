@@ -7,22 +7,24 @@
   <title>SeedGuard | Dashboard</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: #0a0a0a url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?q=80&w=2070') center/cover fixed;
+      background: #0a0a0a;
       color: #e5e5e5;
       margin: 0;
       min-height: 100vh;
+      background-image: linear-gradient(rgba(10,10,25,0.85), rgba(10,10,25,0.85)), url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?q=80&w=2070');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
     .neon-cyan { color: #22d3ee; text-shadow: 0 0 10px #22d3ee, 0 0 20px #22d3ee; }
     .neon-pink { color: #f472b6; text-shadow: 0 0 10px #f472b6, 0 0 20px #f472b6; }
     .card {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid #6366f1;
       border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+      padding: 20px;
     }
   </style>
 </head>
@@ -30,24 +32,22 @@
 
   <aside class="w-64 p-6 border-r border-zinc-800 bg-black/70 hidden md:block">
     <h1 class="text-3xl font-bold neon-pink mb-10">SEEDGUARD</h1>
-    <nav>
-      <a href="dashboard.html" class="block px-4 py-3 bg-zinc-900 rounded-xl text-white mb-2">📊 Dashboard</a>
-      <a href="history.html" class="block px-4 py-3 hover:bg-zinc-900 rounded-xl text-zinc-400">📖 History</a>
-    </nav>
+    <a href="dashboard.html" class="block px-4 py-3 bg-zinc-900 rounded-xl text-white mb-2">📊 Dashboard</a>
+    <a href="history.html" class="block px-4 py-3 hover:bg-zinc-900 rounded-xl text-zinc-400">📖 History</a>
   </aside>
 
   <main class="flex-1 p-8">
     <h1 class="text-5xl font-bold neon-cyan mb-2">DASHBOARD</h1>
     <p class="text-zinc-400 mb-8">Austo™ • Beta v0.4</p>
 
-    <!-- Streak -->
+    <!-- Current Streak -->
     <div class="card mb-8">
-      <h2 class="text-xl mb-6 neon-cyan">⏳ CURRENT STREAK</h2>
+      <h2 class="text-xl mb-4 neon-cyan">⏳ CURRENT STREAK</h2>
       <div class="text-center">
         <div id="days" class="text-8xl font-bold neon-pink">42</div>
         <div class="text-sm text-zinc-400">DAYS</div>
       </div>
-      <button onclick="resetStreak()" class="mt-8 w-full py-4 bg-red-600 hover:bg-red-700 rounded-xl">I'M RELAPSING</button>
+      <button onclick="resetStreak()" class="mt-6 w-full py-4 bg-red-600 hover:bg-red-700 rounded-xl">I'M RELAPSING</button>
     </div>
 
     <!-- Milestones -->
@@ -58,6 +58,9 @@
   </main>
 
   <script>
+    // Your streak data
+    let streak = localStorage.getItem('seedguardStreak') || 42;
+
     const milestones = [
       {days:7, title:"The Awakening", benefits:"Increased awareness, motivation surge, better sleep"},
       {days:21, title:"Dopamine Reset", benefits:"Clearer thinking, reduced cravings"},
@@ -67,17 +70,15 @@
       {days:90, title:"Identity Integration", benefits:"Deep clarity, unbreakable discipline"}
     ];
 
-    let streak = localStorage.getItem('seedguardStreak') || 42;
-
-    function renderMilestones() {
+    function render() {
       document.getElementById('days').textContent = streak;
       const container = document.getElementById('milestones');
       container.innerHTML = milestones.map(m => `
         <div class="card p-6 ${streak >= m.days ? 'border-green-500' : ''}">
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between">
             <div>
-              <span class="text-4xl font-bold ${streak >= m.days ? 'text-green-400' : ''}">${m.days}</span>
-              <span class="ml-3 text-xl">${m.title}</span>
+              <span class="text-4xl font-bold ${streak >= m.days ? 'text-green-400' : 'text-zinc-400'}">${m.days}</span>
+              <span class="ml-4 text-xl">${m.title}</span>
             </div>
             ${streak >= m.days ? '🏆' : ''}
           </div>
@@ -90,11 +91,11 @@
       if (confirm("Reset streak?")) {
         streak = 0;
         localStorage.setItem('seedguardStreak', '0');
-        renderMilestones();
+        render();
       }
     }
 
-    renderMilestones();
+    render();
   </script>
 </body>
 </html>
