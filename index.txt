@@ -1,48 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SeedGuard | PMO Freedom Tracker</title>
-  <style>
-    body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #e5e5e5; margin: 0; }
-    .neon-cyan { text-shadow: 0 0 10px #22d3ee, 0 0 20px #22d3ee; }
-    .neon-pink { text-shadow: 0 0 10px #f472b6, 0 0 20px #f472b6; }
-    .card { background: rgba(30,30,40,0.8); border: 1px solid #4f46e5; border-radius: 16px; }
-  </style>
-</head>
-<body class="min-h-screen bg-zinc-950 text-zinc-50 flex flex-col items-center p-6">
-  <div class="max-w-2xl w-full text-center">
-    <h1 class="text-6xl font-bold neon-cyan mt-12">SEEDGUARD</h1>
-    <p class="text-2xl text-cyan-400 mt-2">Reclaim Your Power • Build Your Legacy</p>
-    
-    <div class="mt-8 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-3 rounded-xl text-sm">
-      ⚠️ <strong>STILL IN BETA</strong> — More features coming soon
-    </div>
-
-    <a href="/dashboard" 
-       class="mt-10 inline-block bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-xl px-12 py-6 rounded-2xl hover:scale-105 transition-all">
-      OPEN DASHBOARD
-    </a>
-
-    <div class="mt-16 text-left card p-8">
-      <h2 class="text-2xl font-bold mb-6 neon-pink">Latest Updates</h2>
-      <ul class="space-y-3 text-zinc-300">
-        <li>✅ Detailed <strong>Streak Milestones & Benefits</strong> added</li>
-        <li>✅ Achievement system with visual rewards</li>
-        <li>✅ Core Philosophy & Journey Guide</li>
-        <li>🔄 Social features (Accounts, Friends, Leaderboard) — Coming Soon</li>
-      </ul>
-    </div>
-
-    <div class="mt-12 card p-8 text-left">
-      <h3 class="text-xl font-bold mb-4">Core Philosophy</h3>
-      <p class="text-zinc-400 leading-relaxed">
-        Retention is about <strong>rebuilding your identity</strong> — not just resisting urges. 
-        Replace old habits with powerful rituals: exercise, cold showers, meditation, journaling, 
-        sunlight, and healthy eating. Discipline becomes who you are.
-      </p>
-    </div>
+<div class="max-w-4xl mx-auto px-6 py-12 text-zinc-300">
+  <div class="text-center mb-12">
+    <span class="px-4 py-1.5 bg-yellow-500/10 text-yellow-400 text-sm font-medium rounded-full border border-yellow-500/30">
+      ⚠️ STILL IN BETA
+    </span>
+    <h2 class="text-4xl font-bold mt-6 neon-text-cyan">Austo™ SeedGuard</h2>
+    <p class="text-xl mt-3">Rebuild Your Identity Through Retention</p>
   </div>
-</body>
-</html>
+
+  <div class="prose prose-invert max-w-none">
+    <h3>Latest Patch Notes</h3>
+    <ul>
+      <li>✅ Added detailed <strong>Streak Milestones & Benefits</strong></li>
+      <li>✅ New Achievement System with badges</li>
+      <li>🔄 Improved UI/UX + motivational design</li>
+      <li>🚧 Social features (accounts, friends, leaderboard) — Coming soon</li>
+    </ul>
+
+    <h3>Core Philosophy</h3>
+    <p><strong>Retention is about rebuilding your identity</strong> — not just resisting urges. Replace old habits with powerful rituals like exercise, cold showers, meditation, journaling, sunlight, and healthy eating.</p>
+  </div>
+</div>
