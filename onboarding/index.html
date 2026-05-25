@@ -1,7 +1,14 @@
 <!DOCTYPE html><html lang="en" class="geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable dark antialiased"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" href="/seedgaurd-tracker/_next/static/media/797e433ab948586e-s.p.09zddjkbdep5a.woff2" as="font" crossorigin="" type="font/woff2"/><link rel="preload" href="/seedgaurd-tracker/_next/static/media/caa3a2e1cccd8315-s.p.09~u27dqhyhd6.woff2" as="font" crossorigin="" type="font/woff2"/><link rel="stylesheet" href="/seedgaurd-tracker/_next/static/chunks/128ilsc9y-b.v.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/seedgaurd-tracker/_next/static/chunks/0ze4gu236oq96.js"/><script src="/seedgaurd-tracker/_next/static/chunks/118rq75310nnb.js" async=""></script><script src="/seedgaurd-tracker/_next/static/chunks/07lhk_q6pmm3r.js" async=""></script><script src="/seedgaurd-tracker/_next/static/chunks/00lnpp02cldjw.js" async=""></script><script src="/seedgaurd-tracker/_next/static/chunks/0pqt~8bl3ukh4.js" async=""></script><script src="/seedgaurd-tracker/_next/static/chunks/turbopack-0ypxr7yo-kk4o.js" async=""></script><script src="/seedgaurd-tracker/_next/static/chunks/01xlw8hd842-c.js" async=""></script><script src="/seedgaurd-tracker/_next/static/chunks/0d3shmwh5_nmn.js" async=""></script><script src="/seedgaurd-tracker/_next/static/chunks/0vwf2fql1xwh1.js" async=""></script><script src="/seedgaurd-tracker/_next/static/chunks/08ksuch4~rz_-.js" async=""></script><meta name="next-size-adjust" content=""/><title>SeedGuard | PMO Freedom Tracker</title><meta name="description" content="Track your progress, build discipline, and reclaim your freedom."/><link rel="icon" href="/seedgaurd-tracker/favicon.ico?favicon.0x3dzn~oxb6tn.ico" sizes="256x256" type="image/x-icon"/><script src="/seedgaurd-tracker/_next/static/chunks/03~yq9q893hmn.js" noModule=""></script></head><body class="min-h-screen bg-background text-foreground flex flex-col" style="background: url('/seedgaurd-tracker/synthwave-city.jpg') center/cover no-repeat fixed; background-color: #000;"><div hidden=""><!--$--><!--/$--></div><div class="relative flex min-h-screen flex-col items-center justify-center p-4 text-zinc-50">
   <div class="pointer-events-none absolute inset-0 bg-black/75"></div>
   <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(2,247,255,0.18),_transparent_28%)]"></div>
-  <div class="relative z-10 w-full max-w-3xl">
+  <div class="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-4">
+    <a href="/seedgaurd-tracker/" class="text-sm uppercase tracking-[0.35em] text-cyan-300 font-semibold">SeedGuard</a>
+    <div class="flex items-center gap-3">
+      <button id="loginTopBtn" class="rounded-full border border-cyan-400/30 bg-zinc-950/60 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-400/15 transition">Login</button>
+      <button id="signupTopBtn" class="rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-cyan-300 transition">Create Account</button>
+    </div>
+  </div>
+  <div class="relative z-10 w-full max-w-3xl pt-16">
     <div class="rounded-[2rem] border border-white/10 bg-zinc-950/95 shadow-[0_0_120px_rgba(0,0,0,0.5)] backdrop-blur-xl">
       <div class="grid gap-8 lg:grid-cols-[1.2fr_0.95fr] p-8">
         <div class="space-y-6">
@@ -44,6 +51,8 @@
     const currentUserKey = 'seedguard_current_user';
     const loginTab = document.getElementById('loginTab');
     const signupTab = document.getElementById('signupTab');
+    const loginTopBtn = document.getElementById('loginTopBtn');
+    const signupTopBtn = document.getElementById('signupTopBtn');
     const authContent = document.getElementById('authContent');
     const apiBase = '/api';
 
@@ -199,10 +208,18 @@
       signupTab.classList.toggle('bg-cyan-400/20', activeMode === 'signup');
       signupTab.classList.toggle('text-zinc-100', activeMode === 'signup');
       signupTab.classList.toggle('text-zinc-200', activeMode !== 'signup');
+      loginTopBtn.classList.toggle('bg-cyan-400/20', activeMode === 'login');
+      loginTopBtn.classList.toggle('text-zinc-100', activeMode === 'login');
+      loginTopBtn.classList.toggle('text-zinc-200', activeMode !== 'login');
+      signupTopBtn.classList.toggle('bg-cyan-400/20', activeMode === 'signup');
+      signupTopBtn.classList.toggle('text-zinc-100', activeMode === 'signup');
+      signupTopBtn.classList.toggle('text-zinc-200', activeMode !== 'signup');
     }
 
     loginTab.addEventListener('click', function () { updateTabs('login'); renderAuth('login'); });
     signupTab.addEventListener('click', function () { updateTabs('signup'); renderAuth('signup'); });
+    loginTopBtn.addEventListener('click', function () { updateTabs('login'); renderAuth('login'); });
+    signupTopBtn.addEventListener('click', function () { updateTabs('signup'); renderAuth('signup'); });
 
     updateTabs('login');
     renderAuth('login');
