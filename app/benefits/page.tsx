@@ -1,214 +1,180 @@
-import { CheckCircle, Heart, Brain, Zap, Eye, Trophy } from 'lucide-react';
+import { CheckCircle, Brain, Zap, Eye, Heart, Trophy, Shield } from 'lucide-react';
 
 interface Benefit {
   icon: React.ReactNode;
   title: string;
   description: string;
   timeline: string;
+  color: 'primary' | 'secondary' | 'accent';
 }
 
-const benefits: Benefit[] = [
+const weekBenefits: Benefit[] = [
   {
-    icon: <Brain className="w-8 h-8" />,
+    icon: <Brain className="w-7 h-7" />,
     title: 'Mental Clarity',
-    description: 'Your mind becomes sharper as dopamine receptors reset and normalize.',
-    timeline: '2-4 weeks',
+    description:
+      'Brain fog lifts as dopamine receptors begin resetting. Thoughts become sharper and decision-making improves noticeably.',
+    timeline: 'Week 2–4',
+    color: 'primary',
   },
   {
-    icon: <Heart className="w-8 h-8" />,
-    title: 'Emotional Stability',
-    description: 'Mood swings decrease and emotional resilience increases.',
-    timeline: '1-3 months',
-  },
-  {
-    icon: <Zap className="w-8 h-8" />,
+    icon: <Zap className="w-7 h-7" />,
     title: 'Increased Energy',
-    description: 'Physical energy and motivation return as your brain chemistry rebalances.',
-    timeline: '3-6 weeks',
+    description:
+      'Physical energy and motivation return as your brain chemistry rebalances. Morning fatigue decreases dramatically.',
+    timeline: 'Week 3–6',
+    color: 'secondary',
   },
   {
-    icon: <Eye className="w-8 h-8" />,
+    icon: <Eye className="w-7 h-7" />,
     title: 'Better Focus',
-    description: 'Concentration improves dramatically as your attention span recovers.',
-    timeline: '2-8 weeks',
-  },
-  {
-    icon: <Heart className="w-8 h-8" />,
-    title: 'Relationship Healing',
-    description: 'Trust rebuilds and connections deepen with those close to you.',
-    timeline: '2-6 months',
-  },
-  {
-    icon: <Trophy className="w-8 h-8" />,
-    title: 'Self-Respect',
-    description: 'Genuine confidence returns as you honor your commitments.',
-    timeline: '1-3 months',
+    description:
+      'Concentration and attention span recover. Tasks that felt impossible now feel manageable and even enjoyable.',
+    timeline: 'Week 2–8',
+    color: 'accent',
   },
 ];
 
-export default function Benefits() {
+const monthBenefits: Benefit[] = [
+  {
+    icon: <Heart className="w-7 h-7" />,
+    title: 'Emotional Stability',
+    description:
+      'Mood swings level out and emotional resilience builds. Anxiety and irritability fade as your nervous system stabilizes.',
+    timeline: 'Month 1–3',
+    color: 'primary',
+  },
+  {
+    icon: <Trophy className="w-7 h-7" />,
+    title: 'Self-Respect',
+    description:
+      'Genuine, earned confidence returns as you keep your commitments to yourself. Pride replaces shame, day by day.',
+    timeline: 'Month 1–3',
+    color: 'secondary',
+  },
+  {
+    icon: <Shield className="w-7 h-7" />,
+    title: 'Relationship Healing',
+    description:
+      'Trust rebuilds and emotional connections deepen. You show up fully present for the people who matter most.',
+    timeline: 'Month 2–6',
+    color: 'accent',
+  },
+];
+
+const colorMap = {
+  primary: {
+    border: 'border-primary/20 hover:border-primary/50',
+    icon: 'bg-primary/10 text-primary group-hover:bg-primary/20',
+    badge: 'bg-primary/10 text-primary neon-text-pink',
+    check: 'text-primary',
+    glow: 'hover:shadow-primary/10',
+  },
+  secondary: {
+    border: 'border-secondary/20 hover:border-secondary/50',
+    icon: 'bg-secondary/10 text-secondary group-hover:bg-secondary/20',
+    badge: 'bg-secondary/10 text-secondary neon-text-cyan',
+    check: 'text-secondary',
+    glow: 'hover:shadow-secondary/10',
+  },
+  accent: {
+    border: 'border-accent/20 hover:border-accent/50',
+    icon: 'bg-accent/10 text-accent group-hover:bg-accent/20',
+    badge: 'bg-accent/10 text-accent',
+    check: 'text-accent',
+    glow: 'hover:shadow-accent/10',
+  },
+};
+
+function BenefitCard({ benefit, delay }: { benefit: Benefit; delay: number }) {
+  const c = colorMap[benefit.color];
   return (
-    <div className="container mx-auto p-4 md:p-8 max-w-6xl space-y-12 page-entry">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-widest uppercase italic neon-text-cyan text-secondary">
-          The Retention Journey
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Discover the transformative benefits of recovery. Every day matters. Every milestone counts.
-        </p>
-      </div>
-
-      {/* Timeline Section */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold uppercase tracking-wider text-primary neon-text-pink">
-          Your Path to Freedom
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {benefits.map((benefit, index) => (
-            <div
-              key={index}
-              className="group relative overflow-hidden rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-6 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 animate-scale-in"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
-              <div className="relative">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="rounded-lg bg-primary/10 p-3 text-primary group-hover:scale-110 transition-transform">
-                    {benefit.icon}
-                  </div>
-                  <span className="text-xs font-semibold text-primary neon-text-pink bg-primary/10 px-3 py-1 rounded-full whitespace-nowrap">
-                    {benefit.timeline}
-                  </span>
-                </div>
-
-                <h3 className="font-bold text-lg mb-2 uppercase tracking-wider">
-                  {benefit.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {benefit.description}
-                </p>
-
-                <div className="mt-4 pt-4 border-t border-primary/10">
-                  <div className="flex items-center gap-2 text-sm text-primary font-medium">
-                    <CheckCircle className="w-4 h-4" />
-                    Verified improvement
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+    <div
+      className={`group relative overflow-hidden rounded-xl border ${c.border} bg-background/50 backdrop-blur-sm p-6 transition-all duration-300 hover:shadow-lg ${c.glow} animate-scale-in`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="relative flex flex-col gap-4">
+        <div className="flex items-start justify-between">
+          <div className={`rounded-xl p-3 transition-all duration-300 ${c.icon}`}>
+            {benefit.icon}
+          </div>
+          <span className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${c.badge}`}>
+            {benefit.timeline}
+          </span>
+        </div>
+        <div>
+          <h3 className="font-bold text-base uppercase tracking-wider mb-2">{benefit.title}</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+        </div>
+        <div className="pt-2 border-t border-muted/20">
+          <div className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${c.check}`}>
+            <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" />
+            Verified improvement
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Phases Section */}
-      <div className="space-y-8">
-        <h2 className="text-2xl font-bold uppercase tracking-wider text-secondary neon-text-cyan">
-          Recovery Phases
-        </h2>
+export default function Benefits() {
+  return (
+    <div className="container mx-auto p-4 md:p-8 max-w-5xl page-entry">
+      <div className="text-center mb-12 space-y-3">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-widest uppercase italic neon-text-cyan text-secondary">The Retention Journey</h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">Every milestone you reach unlocks real, measurable changes in your mind and body. Here is exactly what to expect — week by week, then month by month.</p>
+      </div>
+      <section className="mb-14">
+        <div className="flex items-center gap-4 mb-6"><h2 className="text-2xl font-bold uppercase tracking-wider text-primary neon-text-pink">Week by Week</h2><div className="flex-1 h-px bg-primary/20"/><span className="text-xs text-muted-foreground uppercase tracking-widest font-medium whitespace-nowrap">Days 1–60</span></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">{weekBenefits.map((b,i)=>(<BenefitCard key={b.title} benefit={b} delay={i*60}/>))}</div>
+      </section>
+      <section className="mb-14">
+        <div className="flex items-center gap-4 mb-6"><h2 className="text-2xl font-bold uppercase tracking-wider text-secondary neon-text-cyan">Month by Month</h2><div className="flex-1 h-px bg-secondary/20"/><span className="text-xs text-muted-foreground uppercase tracking-widest font-medium whitespace-nowrap">Month 1+</span></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">{monthBenefits.map((b,i)=>(<BenefitCard key={b.title} benefit={b} delay={i*60}/>))}</div>
+      </section>��────────── */}
+      <section className="mb-14">
+        <div className="flex items-center gap-4 mb-8">
+          <h2 className="text-2xl font-bold uppercase tracking-wider text-accent">
+            Recovery Phases
+          </h2>
+          <div className="flex-1 h-px bg-accent/20" />
+        </div>
 
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Phase 1 */}
-          <div className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-8 hover:border-primary/50 transition-all animate-scale-in">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 rounded-full bg-primary/20 p-3 text-primary font-bold text-lg w-12 h-12 flex items-center justify-center neon-text-pink">
-                1
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-2 uppercase tracking-wider">Days 1-7: Detox Phase</h3>
-                <p className="text-muted-foreground mb-4">
-                  The hardest part. Intense urges and withdrawal-like symptoms are common. Your brain is starting to heal.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Sleep disruption</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Intense urges</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Irritability</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Anxiety</div>
-                </div>
+          <div className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-6 hover:border-primary/40 transition-all animate-scale-in">
+            <div className="flex items-start gap-5">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center font-extrabold text-lg text-primary neon-text-pink">1</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-2 flex-wrap"><h3 className="font-bold text-lg uppercase tracking-wider">Days 1–7: Detox Phase</h3><span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase font-semibold tracking-wider">Hardest phase</span></div>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-4">Intense urges and withdrawal-like symptoms are common. Your brain is beginning to heal. White-knuckle through this — it gets significantly easier after day 7.</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">{'Sleep disruption,Intense urges,Irjitability,Anxiety'.split(',').map(s=>(<div key={s} className="rounded-lg bg-primary/8 border border-primary/15 px-3 py-2 text-primary font-medium">{s}</div>))}</div>
               </div>
             </div>
           </div>
-
-          {/* Phase 2 */}
-          <div className="rounded-xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-8 hover:border-secondary/50 transition-all animate-scale-in [animation-delay:100ms]">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 rounded-full bg-secondary/20 p-3 text-secondary font-bold text-lg w-12 h-12 flex items-center justify-center neon-text-cyan">
-                2
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-2 uppercase tracking-wider">Weeks 2-4: Adjustment Phase</h3>
-                <p className="text-muted-foreground mb-4">
-                  Urges decrease but flatness/anhedonia may hit. You&apos;re on the right path. Exercise and social connection help enormously.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                  <div className="rounded-lg bg-secondary/10 px-3 py-2 text-secondary font-medium">Lower urges</div>
-                  <div className="rounded-lg bg-secondary/10 px-3 py-2 text-secondary font-medium">Flatness</div>
-                  <div className="rounded-lg bg-secondary/10 px-3 py-2 text-secondary font-medium">Better sleep</div>
-                  <div className="rounded-lg bg-secondary/10 px-3 py-2 text-secondary font-medium">Energy returns</div>
+          <div className="rounded-xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-6 hover:border-secondary/40 transition-all animate-scale-in [animation-delay:80ms]">
+            <div className="flex items-start gap-5">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-secondary/15 flex items-center justify-center font-extrabold text-lg text-secondary neon-text-cyan">2</div>
+              <div className="flex-1 min-w-0"><div className="flex items-center gap-3 mb-2"><h3 className="font-bold text-lg uppercase tracking-wider">Weeks 2–4: Adjustment Phase</h3><span className="text-xs bg-secondary/10 text-secondary px-2 py-0.5 rounded-full uppercase font-semibold tracking-wider">Fog clears</span></div><p className="text-muted-foreground text-sm leading-relaxed mb-4">Urges decrease but flatness and anhedonia may hit hard. You&apos;re on the right path. Exercise and social connection are your best tools here.</p><div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">{'Lower urges,Flatness,Better sleep,Energy returns'.split(',').map(s=>(<div key={s} className="rounded-lg bg-secondary/8 border border-secondary/15 px-3 py-2 text-secondary font-medium">{s}</div>))}</div></div></div></div>er sleep', 'Energy returns'].map((s) => (
+                    <div key={s} className="rounded-lg bg-secondary/8 border border-secondary/15 px-3 py-2 text-secondary font-medium">
+                      {s}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
 
           {/* Phase 3 */}
-          <div className="rounded-xl border border-accent/20 bg-background/50 backdrop-blur-sm p-8 hover:border-accent/50 transition-all animate-scale-in [animation-delay:200ms]">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 rounded-full bg-accent/20 p-3 text-accent font-bold text-lg w-12 h-12 flex items-center justify-center">
-                3
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-2 uppercase tracking-wider">Months 2-3: Rewiring Phase</h3>
-                <p className="text-muted-foreground mb-4">
-                  Confidence builds. Urges become easier to resist. Dopamine reward system begins to normalize. Life feels more enjoyable again.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                  <div className="rounded-lg bg-accent/10 px-3 py-2 text-accent font-medium">Improved mood</div>
-                  <div className="rounded-lg bg-accent/10 px-3 py-2 text-accent font-medium">Confidence</div>
-                  <div className="rounded-lg bg-accent/10 px-3 py-2 text-accent font-medium">Motivation</div>
-                  <div className="rounded-lg bg-accent/10 px-3 py-2 text-accent font-medium">Focus returns</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Phase 4 */}
-          <div className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-8 hover:border-primary/50 transition-all animate-scale-in [animation-delay:300ms]">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 rounded-full bg-primary/20 p-3 text-primary font-bold text-lg w-12 h-12 flex items-center justify-center neon-text-pink">
-                4
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-2 uppercase tracking-wider">Months 3+: Reboot Phase</h3>
-                <p className="text-muted-foreground mb-4">
-                  Full recovery. Brain has healed significantly. You&apos;ve rediscovered yourself. Relationships have rebuilt. Life is better.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Full clarity</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Genuine joy</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Strong urge control</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">New life</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div className="rounded-xl border border-accent/20 bg-background/50 backdrop-blur-sm p-6 hover:border-accent/40 transition-all animate-scale-in [animation-delay:160ms]"><div className="flex items-start gap-5"><div className="flex-shrink-0 w-12 h-12 rounded-full bg-accent/15 flex items-center justify-center font-extrabold text-lg text-accent">3</div><div className="flex-1 min-w-0"><div className="flex items-center gap-3 mb-2"><h3 className="font-bold text-lg uppercase tracking-wider">Months 2–3: Rewiring Phase</h3><span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase font-semibold tracking-wider">Real gains</span></div><p className="text-muted-foreground text-sm leading-relaxed mb-4">Confidence builds. Urges become easier to resist. Life starts to feel genuinely enjoyable again.</p><div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">{'Improved mood,Confidence,Motivation,Focus returns'.split(',').map(s=>(<div key={s} className="rounded-lg bg-accent/8 border border-accent/15 px-3 py-2 text-accent font-medium">{s}</div>))}</div></div></div></div>
+          <div className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-6 hover:border-primary/40 transition-all animate-scale-in [animation-delay:240ms]"><div className="flex items-start gap-5"><div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center font-extrabold text-lg text-primary neon-text-pink">4</div><div className="flex-1 min-w-0"><div className="flex items-center gap-3 mb-2"><h3 className="font-bold text-lg uppercase tracking-wider">Months 3+: Reboot Phase</h3><span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase font-semibold tracking-wider neon-text-pink">Full recovery</span></div><p className="text-muted-foreground text-sm leading-relaxed mb-4">The brain has healed significantly. You&apos;ve rediscovered yourself. Relationships have rebuilt. The person you always wanted to be is now just who you are.</p><div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">{'Full clarity,Genuine joy,Urge control,New identity'.split(',').map(s=>(<div key={s} className="rounded-lg bg-primary/8 border border-primary/15 px-3 py-2 text-primary font-medium">{s}</div>))}</div></div></div></div>
         </div>
-      </div>
-
-      {/* Motivation Section */}
-      <div className="rounded-xl border border-primary/10 bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-sm p-12 text-center space-y-6 animate-scale-in [animation-delay:400ms]">
-        <h2 className="text-2xl font-bold uppercase tracking-wider">
-          <span className="text-primary neon-text-pink">Your journey matters.</span> <br />
-          <span className="text-secondary neon-text-cyan">Every day is a victory.</span>
-        </h2>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          The path to freedom is not easy, but it is absolutely worth it. You have the strength within you. Use SeedGuard to track your progress, celebrate your wins, and learn from your setbacks.
-        </p>
-        <div className="pt-6">
-          <p className="text-sm text-muted-foreground">
-            💪 You are stronger than your urges. 🌱 You deserve better. 🔥 Never give up.
-          </p>
-        </div>
+      </section>
+      <div className="rounded-xl border border-primary/10 bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-sm p-10 text-center space-y-5 animate-scale-in [animation-delay:320ms]">
+        <h2 className="text-2xl font-bold uppercase tracking-wider leading-snug"><span className="text-primary neon-text-pink">Your journey matters.</span><br/><span className="text-secondary neon-text-cyan">Every day is a victory.</span></h2>
+        <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">The path to freedom is not easy, but it is absolutely worth it. You have the strength. Use SeedGuard to track your progress, celebrate your wins, and learn from your setbacks.</p>
+        <p className="text-sm text-muted-foreground pt-2">💪 You are stronger than your urges. &nbsp; 🌱 You deserve better. &nbsp; 🔥 Never give up.</p>
       </div>
     </div>
   );
