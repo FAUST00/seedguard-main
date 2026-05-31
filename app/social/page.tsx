@@ -128,7 +128,7 @@ export default function SocialPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-3xl space-y-8 page-entry">
-      <div>>
+      <div>
         <h1 className="text-4xl font-extrabold tracking-widest uppercase italic neon-text-cyan text-secondary flex items-center gap-3">
           <Users className="w-9 h-9" />
           Social
