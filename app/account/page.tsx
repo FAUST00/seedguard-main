@@ -391,4 +391,10 @@ export default function AccountPage() {
           <LogOut className="w-4 h-4" />
           Delete Account
         </button>
-        <p className="text-xs
+        <p className="text-xs text-muted-foreground">
+          Your streak data (timer, history) is kept. Only your social profile is removed.
+        </p>
+      </div>
+    </div>
+  );
+}
