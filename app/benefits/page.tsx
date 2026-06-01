@@ -132,7 +132,7 @@ export default function Benefits() {
       <section className="mb-14">
         <div className="flex items-center gap-4 mb-6"><h2 className="text-2xl font-bold uppercase tracking-wider text-secondary neon-text-cyan">Month by Month</h2><div className="flex-1 h-px bg-secondary/20"/><span className="text-xs text-muted-foreground uppercase tracking-widest font-medium whitespace-nowrap">Month 1+</span></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">{monthBenefits.map((b,i)=>(<BenefitCard key={b.title} benefit={b} delay={i*60}/>))}</div>
-      </section>��────────── */}
+      </section>”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="mb-14">
         <div className="flex items-center gap-4 mb-8">
           <h2 className="text-2xl font-bold uppercase tracking-wider text-accent">
@@ -149,7 +149,7 @@ export default function Benefits() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2 flex-wrap"><h3 className="font-bold text-lg uppercase tracking-wider">Days 1–7: Detox Phase</h3><span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase font-semibold tracking-wider">Hardest phase</span></div>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">Intense urges and withdrawal-like symptoms are common. Your brain is beginning to heal. White-knuckle through this — it gets significantly easier after day 7.</p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">{'Sleep disruption,Intense urges,Irjitability,Anxiety'.split(',').map(s=>(<div key={s} className="rounded-lg bg-primary/8 border border-primary/15 px-3 py-2 text-primary font-medium">{s}</div>))}</div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">{'Sleep disruption,Intense urges,Irritability,Anxiety'.split(',').map(s=>(<div key={s} className="rounded-lg bg-primary/8 border border-primary/15 px-3 py-2 text-primary font-medium">{s}</div>))}</div>
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function Benefits() {
       <div className="rounded-xl border border-primary/10 bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-sm p-10 text-center space-y-5 animate-scale-in [animation-delay:320ms]">
         <h2 className="text-2xl font-bold uppercase tracking-wider leading-snug"><span className="text-primary neon-text-pink">Your journey matters.</span><br/><span className="text-secondary neon-text-cyan">Every day is a victory.</span></h2>
         <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">The path to freedom is not easy, but it is absolutely worth it. You have the strength. Use SeedGuard to track your progress, celebrate your wins, and learn from your setbacks.</p>
-        <p className="text-sm text-muted-foreground pt-2">💪 You are stronger than your urges. &nbsp; 🌱 You deserve better. &nbsp; 🔥 Never give up.</p>
+        <p className="text-sm text-muted-foreground pt-2">ðŸ’ª You are stronger than your urges. &nbsp; ðŸŒ± You deserve better. &nbsp; ðŸ”¥ Never give up.</p>
       </div>
     </div>
   );
