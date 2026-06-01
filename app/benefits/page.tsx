@@ -132,7 +132,7 @@ export default function Benefits() {
       <section className="mb-14">
         <div className="flex items-center gap-4 mb-6"><h2 className="text-2xl font-bold uppercase tracking-wider text-secondary neon-text-cyan">Month by Month</h2><div className="flex-1 h-px bg-secondary/20"/><span className="text-xs text-muted-foreground uppercase tracking-widest font-medium whitespace-nowrap">Month 1+</span></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">{monthBenefits.map((b,i)=>(<BenefitCard key={b.title} benefit={b} delay={i*60}/>))}</div>
-      </section>”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      </section>─────────── */}
       <section className="mb-14">
         <div className="flex items-center gap-4 mb-8">
           <h2 className="text-2xl font-bold uppercase tracking-wider text-accent">
