@@ -23,6 +23,7 @@ const COLORS = [
 ];
 
 function randomColor() {
+  if (typeof window === 'undefined') return null;
   return COLORS[Math.floor(Math.random() * COLORS.length)];
 }
 
@@ -35,7 +36,7 @@ function generateId(): string {
 
 function getStreakDays(): number {
   try {
-    const start = localStorage.getItem('seedguard_streak_start');
+    const start = (typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_streak_start');
     if (!start) return 0;
     return Math.max(0, Math.floor((Date.now() - new Date(start).getTime()) / 86400000));
   } catch {
@@ -49,7 +50,7 @@ function buildFriendCode(account: Account): string {
     username: account.isAnonymous ? 'Anonymous' : account.username,
     isAnonymous: account.isAnonymous,
     streak: getStreakDays(),
-    streakStart: localStorage.getItem('seedguard_streak_start') || new Date().toISOString(),
+    streakStart: (typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_streak_start') || new Date().toISOString(),
     shared: new Date().toISOString(),
   };
   return btoa(JSON.stringify(payload));
@@ -72,7 +73,7 @@ export default function AccountPage() {
   const [friendsCount, setFriendsCount] = useState(0);
 
   useEffect(() => {
-    const saved = localStorage.getItem('seedguard_account');
+    const saved = (typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_account');
     if (saved) {
       const acc: Account = JSON.parse(saved);
       setAccount(acc);
@@ -82,7 +83,7 @@ export default function AccountPage() {
       setStep('create');
     }
     try {
-      const f = JSON.parse(localStorage.getItem('seedguard_friends') || '[]');
+      const f = JSON.parse((typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_friends') || '[]');
       setFriendsCount(Array.isArray(f) ? f.length : 0);
     } catch {}
   }, []);
@@ -118,7 +119,7 @@ export default function AccountPage() {
 
     localStorage.setItem('seedguard_account', JSON.stringify(newAccount));
     // Ensure streak start is set
-    if (!localStorage.getItem('seedguard_streak_start')) {
+    if (!(typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_streak_start')) {
       localStorage.setItem('seedguard_streak_start', new Date().toISOString());
     }
 
