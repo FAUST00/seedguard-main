@@ -20,7 +20,7 @@ export default function History() {
     // Load history from localStorage
     const loadHistory = () => {
       try {
-        const saved = localStorage.getItem('seedguard_history');
+        const saved = (typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_history');
         if (saved) {
           setEntries(JSON.parse(saved));
         }
@@ -54,7 +54,7 @@ export default function History() {
       const now = new Date().toISOString();
       localStorage.setItem('seedguard_streak_start', now);
       try {
-        const saved = localStorage.getItem('seedguard_stats');
+        const saved = (typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_stats');
         const stats = saved ? JSON.parse(saved) : {};
         const updated = {
           ...stats,
@@ -87,6 +87,7 @@ export default function History() {
   const victories = entries.filter((e) => e.type === 'victory');
   const relapses = entries.filter((e) => e.type === 'relapse');
 
+  if (typeof window === 'undefined') return null;
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-6xl space-y-8 page-entry">
       {/* Header */}
