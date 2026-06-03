@@ -50,7 +50,7 @@ function buildFriendCode(account: Account): string {
     username: account.isAnonymous ? 'Anonymous' : account.username,
     isAnonymous: account.isAnonymous,
     streak: getStreakDays(),
-    streakStart: (typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_streak_start') || new Date().toISOString(),
+    streakStart: (typeof window!=='undefined'?localStorage.getItem('seedguard_streak_start'):null)|| new Date().toISOString(),
     shared: new Date().toISOString(),
   };
   return btoa(JSON.stringify(payload));
@@ -83,7 +83,7 @@ export default function AccountPage() {
       setStep('create');
     }
     try {
-      const f = JSON.parse((typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_friends') || '[]');
+      const f = JSON.parse((typeof window!=='undefined'?localStorage.getItem('seedguard_friends'):null)|| '[]');
       setFriendsCount(Array.isArray(f) ? f.length : 0);
     } catch {}
   }, []);
@@ -114,7 +114,7 @@ export default function AccountPage() {
       username: isAnonymous ? `Anon-${generateId().slice(0, 6).toUpperCase()}` : username.trim(),
       isAnonymous,
       createdAt: new Date().toISOString(),
-      color: randomColor(),
+      color: randomColor() as string,
     };
 
     localStorage.setItem('seedguard_account', JSON.stringify(newAccount));
