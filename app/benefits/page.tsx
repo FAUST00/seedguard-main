@@ -1,214 +1,101 @@
-import { CheckCircle, Heart, Brain, Zap, Eye, Trophy } from 'lucide-react';
+'use client';
 
-interface Benefit {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  timeline: string;
-}
+import { useState } from 'react';
+import { Brain, Heart, Zap, Eye, Trophy, Star, TrendingUp, Shield, CheckCircle } from 'lucide-react';
 
-const benefits: Benefit[] = [
-  {
-    icon: <Brain className="w-8 h-8" />,
-    title: 'Mental Clarity',
-    description: 'Your mind becomes sharper as dopamine receptors reset and normalize.',
-    timeline: '2-4 weeks',
-  },
-  {
-    icon: <Heart className="w-8 h-8" />,
-    title: 'Emotional Stability',
-    description: 'Mood swings decrease and emotional resilience increases.',
-    timeline: '1-3 months',
-  },
-  {
-    icon: <Zap className="w-8 h-8" />,
-    title: 'Increased Energy',
-    description: 'Physical energy and motivation return as your brain chemistry rebalances.',
-    timeline: '3-6 weeks',
-  },
-  {
-    icon: <Eye className="w-8 h-8" />,
-    title: 'Better Focus',
-    description: 'Concentration improves dramatically as your attention span recovers.',
-    timeline: '2-8 weeks',
-  },
-  {
-    icon: <Heart className="w-8 h-8" />,
-    title: 'Relationship Healing',
-    description: 'Trust rebuilds and connections deepen with those close to you.',
-    timeline: '2-6 months',
-  },
-  {
-    icon: <Trophy className="w-8 h-8" />,
-    title: 'Self-Respect',
-    description: 'Genuine confidence returns as you honor your commitments.',
-    timeline: '1-3 months',
-  },
+const weekData = [
+  { week: 1, label: 'WEEK 1', subtitle: 'Days 1–7 · Detox Phase', accent: '#e879f9', border: 'rgba(232,121,249,0.3)', glow: 'rgba(232,121,249,0.08)', number: '01', phase: 'DETOX PHASE',
+    benefits: ['Energy spike around Days 4–7','Increased confidence & assertiveness','Better gym performance','Slight mood elevation','Heightened mental drive'],
+    challenges: ['Intense urges & cravings','Irritability & mood swings','Sleep disruption','Anxiety & restlessness','Possible headaches'] },
+  { week: 2, label: 'WEEK 2', subtitle: 'Days 8–14 · Flatline Begins', accent: '#22d3ee', border: 'rgba(34,211,238,0.3)', glow: 'rgba(34,211,238,0.08)', number: '02', phase: 'FLATLINE',
+    benefits: ['Urge intensity starts decreasing','Internal calm begins building','Brain starts rewiring pathways','Clarity in moments of stillness'],
+    challenges: ['Low energy & motivation','Emotional numbness (flatline)','Brain fog & apathy','Reduced libido — this is normal','Hardest week for most men'] },
+  { week: 3, label: 'WEEK 3', subtitle: 'Days 15–21 · Energy Returns', accent: '#a78bfa', border: 'rgba(167,139,250,0.3)', glow: 'rgba(167,139,250,0.08)', number: '03', phase: 'REAWAKENING',
+    benefits: ['Energy stronger than your baseline','Sharper focus & mental clarity','Improved sleep quality','Increased eye contact & charisma','Motivation resurfaces powerfully','Deeper voice (widely reported)'],
+    challenges: ['Occasional urge spikes','Mood fluctuations','Social rewiring feels uncomfortable'] },
+  { week: 4, label: 'WEEK 4', subtitle: 'Days 22–30 · Clarity Sharpens', accent: '#34d399', border: 'rgba(52,211,153,0.3)', glow: 'rgba(52,211,153,0.08)', number: '04', phase: 'CLARITY',
+    benefits: ['Mental clarity noticeably sharper','Confidence grows daily','Emotional stability improving','Gym performance peak','Skin clearing up','Social presence elevated'],
+    challenges: ['Second flatline possible','Discipline required — no coasting','Urges tied to stress triggers'] },
 ];
 
-export default function Benefits() {
+const monthData = [
+  { period: '~2 Months', title: 'EMOTIONAL STABILITY', icon: Heart, accent: '#e879f9', border: 'rgba(232,121,249,0.25)', bg: 'rgba(232,121,249,0.05)', points: ['Reduced social anxiety','Deeper emotional regulation','Relationship improvements begin','Genuine self-respect & dignity','Consistent, clean daily energy'] },
+  { period: '~3 Months', title: 'DOPAMINE REWIRING', icon: Brain, accent: '#22d3ee', border: 'rgba(34,211,238,0.25)', bg: 'rgba(34,211,238,0.05)', points: ['Life feels naturally enjoyable again','Motivation is now your default state','"Magnetism" & social presence','Better discipline across all areas','Spiritual awareness deepens'] },
+  { period: '4–6 Months', title: 'PEAK PERFORMANCE', icon: Zap, accent: '#a78bfa', border: 'rgba(167,139,250,0.25)', bg: 'rgba(167,139,250,0.05)', points: ['Full mental clarity unlocked','Genuine joy & presence','Strong urge control — automatic','Productivity at an all-time high','Deeper voice & clearer skin','Relationships transform'] },
+  { period: '6+ Months', title: 'LIFE TRANSFORMATION', icon: Trophy, accent: '#fbbf24', border: 'rgba(251,191,36,0.25)', bg: 'rgba(251,191,36,0.05)', points: ['Unbreakable, earned confidence','Intuition & creativity amplified','Sustained mastery — no struggle','Inner peace & clear purpose','Life feels fundamentally different'] },
+  { period: '2–6 Months', title: 'PHYSICAL UPGRADES', icon: TrendingUp, accent: '#34d399', border: 'rgba(52,211,153,0.25)', bg: 'rgba(52,211,153,0.05)', points: ['Testosterone levels optimised','Stronger, faster gym recovery','Better posture & body language','Clearer skin & sharper eyes','More restful, deeper sleep'] },
+  { period: '3–6 Months', title: 'MENTAL CLARITY', icon: Eye, accent: '#fb923c', border: 'rgba(251,146,60,0.25)', bg: 'rgba(251,146,60,0.05)', points: ['Laser focus on demand','Creative breakthroughs','Sharper memory & recall','Better problem-solving instinct','Reduced brain fog permanently'] },
+];
+
+export default function BenefitsPage() {
+  const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
   return (
-    <div className="container mx-auto p-4 md:p-8 max-w-6xl space-y-12 page-entry">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-widest uppercase italic neon-text-cyan text-secondary">
-          The Retention Journey
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Discover the transformative benefits of recovery. Every day matters. Every milestone counts.
-        </p>
+    <div style={{minHeight:'100vh',background:'#080010',color:'#f3e8ff'}}>
+      <div style={{textAlign:'center',padding:'64px 24px 48px',borderBottom:'1px solid rgba(167,139,250,0.15)'}}>
+        <div style={{display:'inline-flex',alignItems:'center',gap:'8px',background:'rgba(232,121,249,0.1)',border:'1px solid rgba(232,121,249,0.3)',borderRadius:'999px',padding:'4px 16px',marginBottom:'20px'}}>
+          <Shield size={14} style={{color:'#e879f9'}} />
+          <span style={{fontSize:'0.75rem',fontWeight:700,letterSpacing:'0.15em',color:'#e879f9'}}>VERIFIED BY COMMUNITY</span>
+        </div>
+        <h1 style={{fontSize:'clamp(2rem,6vw,4rem)',fontWeight:900,fontStyle:'italic',letterSpacing:'-0.02em',margin:'0 0 16px',background:'linear-gradient(135deg,#22d3ee 0%,#a78bfa 50%,#e879f9 100%)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>THE RETENTION JOURNEY</h1>
+        <p style={{fontSize:'1.1rem',color:'rgba(243,232,255,0.65)',maxWidth:'560px',margin:'0 auto',lineHeight:1.6}}>Discover the real, transformative benefits of semen retention. Every day you hold the line, your brain and body are changing.</p>
       </div>
-
-      {/* Timeline Section */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold uppercase tracking-wider text-primary neon-text-pink">
-          Your Path to Freedom
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {benefits.map((benefit, index) => (
-            <div
-              key={index}
-              className="group relative overflow-hidden rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-6 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 animate-scale-in"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
-              <div className="relative">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="rounded-lg bg-primary/10 p-3 text-primary group-hover:scale-110 transition-transform">
-                    {benefit.icon}
+      <div style={{maxWidth:'1100px',margin:'0 auto',padding:'0 20px 80px'}}>
+        <div style={{paddingTop:'56px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'16px',marginBottom:'8px'}}>
+            <div style={{flex:1,height:'1px',background:'linear-gradient(to right,transparent,rgba(232,121,249,0.4))'}} />
+            <h2 style={{fontSize:'0.75rem',fontWeight:700,letterSpacing:'0.2em',color:'#e879f9',whiteSpace:'nowrap'}}>WEEK BY WEEK</h2>
+            <div style={{flex:1,height:'1px',background:'linear-gradient(to left,transparent,rgba(232,121,249,0.4))'}} />
+          </div>
+          <p style={{textAlign:'center',color:'rgba(243,232,255,0.5)',fontSize:'0.9rem',marginBottom:'36px'}}>The first 30 days — what to expect, honestly.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:'20px'}}>
+            {weekData.map((w) => (
+              <div key={w.week} style={{background:w.glow,border:`1px solid ${w.border}`,borderRadius:'16px',padding:'24px',cursor:'pointer',transition:'box-shadow 0.2s',boxShadow:expandedWeek===w.week?`0 0 32px ${w.border}`:'none'}} onClick={()=>setExpandedWeek(expandedWeek===w.week?null:w.week)}>
+                <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:'14px'}}>
+                  <div>
+                    <span style={{fontSize:'0.7rem',fontWeight:700,letterSpacing:'0.15em',color:w.accent}}>{w.label}</span>
+                    <h3 style={{fontSize:'1.15rem',fontWeight:800,color:w.accent,margin:'2px 0 4px'}}>{w.phase}</h3>
+                    <span style={{fontSize:'0.75rem',color:'rgba(243,232,255,0.45)'}}>{w.subtitle}</span>
                   </div>
-                  <span className="text-xs font-semibold text-primary neon-text-pink bg-primary/10 px-3 py-1 rounded-full whitespace-nowrap">
-                    {benefit.timeline}
-                  </span>
+                  <span style={{fontSize:'2.5rem',fontWeight:900,color:w.border,lineHeight:1}}>{w.number}</span>
                 </div>
-
-                <h3 className="font-bold text-lg mb-2 uppercase tracking-wider">
-                  {benefit.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {benefit.description}
-                </p>
-
-                <div className="mt-4 pt-4 border-t border-primary/10">
-                  <div className="flex items-center gap-2 text-sm text-primary font-medium">
-                    <CheckCircle className="w-4 h-4" />
-                    Verified improvement
-                  </div>
+                <div style={{marginBottom:'12px'}}>
+                  <span style={{fontSize:'0.65rem',fontWeight:700,letterSpacing:'0.1em',color:'rgba(52,211,153,0.9)',display:'block',marginBottom:'6px'}}>↑ BENEFITS</span>
+                  <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>{w.benefits.map((b)=>(<span key={b} style={{fontSize:'0.72rem',background:'rgba(52,211,153,0.1)',border:'1px solid rgba(52,211,153,0.25)',borderRadius:'6px',padding:'3px 8px',color:'#6ee7b7'}}>{b}</span>))}</div>
                 </div>
+                {expandedWeek===w.week&&(<div><span style={{fontSize:'0.65rem',fontWeight:700,letterSpacing:'0.1em',color:'rgba(251,146,60,0.9)',display:'block',marginBottom:'6px'}}>⚡ CHALLENGES</span><div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>{w.challenges.map((c)=>(<span key={c} style={{fontSize:'0.72rem',background:'rgba(251,146,60,0.08)',border:'1px solid rgba(251,146,60,0.25)',borderRadius:'6px',padding:'3px 8px',color:'#fdba74'}}>{c}</span>))}</div></div>)}
+                <div style={{marginTop:'14px',fontSize:'0.7rem',color:'rgba(243,232,255,0.35)',textAlign:'right'}}>{expandedWeek===w.week?'Click to collapse ↑':'Tap to see challenges ↓'}</div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Phases Section */}
-      <div className="space-y-8">
-        <h2 className="text-2xl font-bold uppercase tracking-wider text-secondary neon-text-cyan">
-          Recovery Phases
-        </h2>
-
-        <div className="space-y-6">
-          {/* Phase 1 */}
-          <div className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-8 hover:border-primary/50 transition-all animate-scale-in">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 rounded-full bg-primary/20 p-3 text-primary font-bold text-lg w-12 h-12 flex items-center justify-center neon-text-pink">
-                1
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-2 uppercase tracking-wider">Days 1-7: Detox Phase</h3>
-                <p className="text-muted-foreground mb-4">
-                  The hardest part. Intense urges and withdrawal-like symptoms are common. Your brain is starting to heal.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Sleep disruption</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Intense urges</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Irritability</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Anxiety</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Phase 2 */}
-          <div className="rounded-xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-8 hover:border-secondary/50 transition-all animate-scale-in [animation-delay:100ms]">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 rounded-full bg-secondary/20 p-3 text-secondary font-bold text-lg w-12 h-12 flex items-center justify-center neon-text-cyan">
-                2
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-2 uppercase tracking-wider">Weeks 2-4: Adjustment Phase</h3>
-                <p className="text-muted-foreground mb-4">
-                  Urges decrease but flatness/anhedonia may hit. You&apos;re on the right path. Exercise and social connection help enormously.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                  <div className="rounded-lg bg-secondary/10 px-3 py-2 text-secondary font-medium">Lower urges</div>
-                  <div className="rounded-lg bg-secondary/10 px-3 py-2 text-secondary font-medium">Flatness</div>
-                  <div className="rounded-lg bg-secondary/10 px-3 py-2 text-secondary font-medium">Better sleep</div>
-                  <div className="rounded-lg bg-secondary/10 px-3 py-2 text-secondary font-medium">Energy returns</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Phase 3 */}
-          <div className="rounded-xl border border-accent/20 bg-background/50 backdrop-blur-sm p-8 hover:border-accent/50 transition-all animate-scale-in [animation-delay:200ms]">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 rounded-full bg-accent/20 p-3 text-accent font-bold text-lg w-12 h-12 flex items-center justify-center">
-                3
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-2 uppercase tracking-wider">Months 2-3: Rewiring Phase</h3>
-                <p className="text-muted-foreground mb-4">
-                  Confidence builds. Urges become easier to resist. Dopamine reward system begins to normalize. Life feels more enjoyable again.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                  <div className="rounded-lg bg-accent/10 px-3 py-2 text-accent font-medium">Improved mood</div>
-                  <div className="rounded-lg bg-accent/10 px-3 py-2 text-accent font-medium">Confidence</div>
-                  <div className="rounded-lg bg-accent/10 px-3 py-2 text-accent font-medium">Motivation</div>
-                  <div className="rounded-lg bg-accent/10 px-3 py-2 text-accent font-medium">Focus returns</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Phase 4 */}
-          <div className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-8 hover:border-primary/50 transition-all animate-scale-in [animation-delay:300ms]">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 rounded-full bg-primary/20 p-3 text-primary font-bold text-lg w-12 h-12 flex items-center justify-center neon-text-pink">
-                4
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-2 uppercase tracking-wider">Months 3+: Reboot Phase</h3>
-                <p className="text-muted-foreground mb-4">
-                  Full recovery. Brain has healed significantly. You&apos;ve rediscovered yourself. Relationships have rebuilt. Life is better.
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Full clarity</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Genuine joy</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">Strong urge control</div>
-                  <div className="rounded-lg bg-primary/10 px-3 py-2 text-primary font-medium">New life</div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
-
-      {/* Motivation Section */}
-      <div className="rounded-xl border border-primary/10 bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-sm p-12 text-center space-y-6 animate-scale-in [animation-delay:400ms]">
-        <h2 className="text-2xl font-bold uppercase tracking-wider">
-          <span className="text-primary neon-text-pink">Your journey matters.</span> <br />
-          <span className="text-secondary neon-text-cyan">Every day is a victory.</span>
-        </h2>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          The path to freedom is not easy, but it is absolutely worth it. You have the strength within you. Use SeedGuard to track your progress, celebrate your wins, and learn from your setbacks.
-        </p>
-        <div className="pt-6">
-          <p className="text-sm text-muted-foreground">
-            ðª You are stronger than your urges. ð± You deserve better. ð¥ Never give up.
-          </p>
+        <div style={{paddingTop:'72px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'16px',marginBottom:'8px'}}>
+            <div style={{flex:1,height:'1px',background:'linear-gradient(to right,transparent,rgba(34,211,238,0.4))'}} />
+            <h2 style={{fontSize:'0.75rem',fontWeight:700,letterSpacing:'0.2em',color:'#22d3ee',whiteSpace:'nowrap'}}>MONTH BY MONTH</h2>
+            <div style={{flex:1,height:'1px',background:'linear-gradient(to left,transparent,rgba(34,211,238,0.4))'}} />
+          </div>
+          <p style={{textAlign:'center',color:'rgba(243,232,255,0.5)',fontSize:'0.9rem',marginBottom:'36px'}}>Long-term rewards for the men who stay the course.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:'20px'}}>
+            {monthData.map((m)=>{const Icon=m.icon;return(
+              <div key={m.title} style={{background:m.bg,border:`1px solid ${m.border}`,borderRadius:'16px',padding:'28px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px'}}>
+                  <div style={{width:'44px',height:'44px',borderRadius:'12px',background:`${m.accent}18`,border:`1px solid ${m.border}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Icon size={20} style={{color:m.accent}} /></div>
+                  <div><span style={{fontSize:'0.65rem',fontWeight:700,letterSpacing:'0.12em',color:m.accent,display:'block'}}>{m.period}</span><h3 style={{fontSize:'1rem',fontWeight:800,color:'#f3e8ff',margin:0}}>{m.title}</h3></div>
+                </div>
+                <ul style={{margin:0,padding:0,listStyle:'none',display:'flex',flexDirection:'column',gap:'8px'}}>{m.points.map((p)=>(<li key={p} style={{display:'flex',alignItems:'flex-start',gap:'8px',fontSize:'0.85rem',color:'rgba(243,232,255,0.8)',lineHeight:1.4}}><CheckCircle size={14} style={{color:m.accent,flexShrink:0,marginTop:'2px'}} />{p}</li>))}</ul>
+                <div style={{marginTop:'16px',display:'flex',alignItems:'center',gap:'6px'}}><Star size={11} style={{color:m.accent}} /><span style={{fontSize:'0.65rem',color:'rgba(243,232,255,0.35)',fontWeight:600,letterSpacing:'0.08em'}}>VERIFIED BY COMMUNITY</span></div>
+              </div>
+            );})}
+          </div>
         </div>
+        <div style={{marginTop:'72px',background:'linear-gradient(135deg,rgba(232,121,249,0.06),rgba(34,211,238,0.06))',border:'1px solid rgba(167,139,250,0.2)',borderRadius:'20px',padding:'40px',textAlign:'center'}}>
+          <h2 style={{fontSize:'1.5rem',fontWeight:800,letterSpacing:'0.05em',color:'#e879f9',marginBottom:'12px'}}>YOUR PATH TO FREEDOM</h2>
+          <p style={{color:'rgba(243,232,255,0.6)',maxWidth:'480px',margin:'0 auto 28px',lineHeight:1.6,fontSize:'0.95rem'}}>Every man who has made it past 90 days describes a fundamental shift. Will you be one of them?</p>
+          <div style={{display:'flex',justifyContent:'center',flexWrap:'wrap',gap:'12px'}}>
+            {['Day 7 — Feel the shift','Day 14 — Survive flatline','Day 30 — Clarity hits','Day 90 — Rewired','Day 180 — Transformed'].map((m)=>(<div key={m} style={{background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.25)',borderRadius:'999px',padding:'6px 16px',fontSize:'0.8rem',color:'#c4b5fd',fontWeight:600}}>{m}</div>))}
+          </div>
+        </div>
+        <p style={{textAlign:'center',color:'rgba(243,232,255,0.25)',fontSize:'0.75rem',marginTop:'40px',lineHeight:1.6}}>Individual results vary. Benefits are based on community reports and testimonials. Not medical advice.</p>
       </div>
     </div>
   );
