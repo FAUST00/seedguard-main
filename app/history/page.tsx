@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Flame, ShieldCheck, Plus, Trash2 } from 'lucide-react';
+import { syncWithCloud } from '@/lib/sync';
 
 interface HistoryEntry {
   id: string;
@@ -56,22 +57,24 @@ export default function History() {
       try {
         const saved = (typeof window!=='undefined'?localStorage:null)?.getItem('seedguard_stats');
         const stats = saved ? JSON.parse(saved) : {};
-        const updated = {
+        const updatedStats = {
           ...stats,
           currentStreak: 0,
           relapses: (stats.relapses || 0) + 1,
         };
-        localStorage.setItem('seedguard_stats', JSON.stringify(updated));
+        localStorage.setItem('seedguard_stats', JSON.stringify(updatedStats));
       } catch {}
     }
 
     setNewNote('');
+    syncWithCloud();
   };
 
   const deleteEntry = (id: string) => {
     const updated = entries.filter((e) => e.id !== id);
     setEntries(updated);
     localStorage.setItem('seedguard_history', JSON.stringify(updated));
+    syncWithCloud();
   };
 
   if (loading) {

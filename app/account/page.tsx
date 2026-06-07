@@ -27,6 +27,8 @@ export default function AccountPage() {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
+  const [copied, setCopied] = useState(false);
+
   useEffect(() => {
     const saved = localStorage.getItem('seedguard_account');
     if (saved) {
@@ -36,6 +38,14 @@ export default function AccountPage() {
       setStep('create');
     }
   }, []);
+
+  const restoreUserData = (user: any) => {
+    if (user.streakStart) localStorage.setItem('seedguard_streak_start', user.streakStart);
+    if (user.stats) localStorage.setItem('seedguard_stats', JSON.stringify(user.stats));
+    if (user.history) localStorage.setItem('seedguard_history', JSON.stringify(user.history));
+    if (user.settings) localStorage.setItem('seedguard_settings', JSON.stringify(user.settings));
+    if (user.friends) localStorage.setItem('seedguard_friends', JSON.stringify(user.friends));
+  };
 
   const handleCreate = async () => {
     setLoading(true);
@@ -48,7 +58,9 @@ export default function AccountPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed');
+      localStorage.setItem('seedguard_token', data.token);
       localStorage.setItem('seedguard_account', JSON.stringify(data.user));
+      restoreUserData(data.user);
       setAccount(data.user);
       setStep('profile');
     } catch (err: any) {
@@ -69,7 +81,9 @@ export default function AccountPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed');
+      localStorage.setItem('seedguard_token', data.token);
       localStorage.setItem('seedguard_account', JSON.stringify(data.user));
+      restoreUserData(data.user);
       setAccount(data.user);
       setStep('profile');
     } catch (err: any) {
@@ -80,9 +94,36 @@ export default function AccountPage() {
   };
 
   const logout = () => {
+    localStorage.removeItem('seedguard_token');
     localStorage.removeItem('seedguard_account');
+    localStorage.removeItem('seedguard_streak_start');
+    localStorage.removeItem('seedguard_stats');
+    localStorage.removeItem('seedguard_history');
+    localStorage.removeItem('seedguard_settings');
+    localStorage.removeItem('seedguard_friends');
     setAccount(null);
     setStep('create');
+  };
+
+  const getFriendCode = () => {
+    if (!account) return '';
+    const start = localStorage.getItem('seedguard_streak_start');
+    const streak = start ? Math.max(0, Math.floor((Date.now() - new Date(start).getTime()) / 86400000)) : 0;
+    const payload = {
+      id: account.id,
+      username: account.username,
+      isAnonymous: false,
+      streak: streak,
+      streakStart: start || new Date().toISOString(),
+      shared: new Date().toISOString()
+    };
+    return btoa(JSON.stringify(payload));
+  };
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(getFriendCode());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (step === 'loading') return <div className="text-center py-20">Loading...</div>;
@@ -116,9 +157,62 @@ export default function AccountPage() {
         )}
 
         {step === 'profile' && account && (
-          <div className="text-center">
-            <h2>Welcome back, {account.username}</h2>
-            <button onClick={logout} className="mt-8 text-red-500">Logout</button>
+          <div className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-8 space-y-6 text-center animate-scale-in">
+            <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/30 text-primary mb-2">
+              <User className="w-8 h-8" />
+            </div>
+            
+            <div>
+              <h2 className="text-2xl font-bold uppercase tracking-wider text-primary neon-text-pink">
+                Welcome back, {account.username}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Account created on {new Date(account.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+
+            {/* Friend Code Section */}
+            <div className="rounded-lg bg-zinc-950 p-4 border border-zinc-800 text-left space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-secondary neon-text-cyan flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5" />
+                Your Friend Code
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Share this code with friends so they can add you to their leaderboard.
+              </p>
+              <div className="flex gap-2 mt-1">
+                <input
+                  type="text"
+                  readOnly
+                  value={getFriendCode()}
+                  className="flex-1 bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs font-mono select-all focus:outline-none"
+                />
+                <button
+                  onClick={copyCode}
+                  className="px-4 py-2 bg-primary/20 border border-primary/50 text-primary rounded text-xs font-semibold hover:bg-primary/30 transition-all flex items-center gap-1 whitespace-nowrap"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      Copy Code
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={logout}
+              className="w-full py-3 bg-destructive/10 border border-destructive/50 text-destructive rounded-lg hover:bg-destructive/20 transition-all font-semibold uppercase tracking-wider flex items-center justify-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
           </div>
         )}
       </div>

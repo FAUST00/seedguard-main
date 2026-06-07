@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Flame, TrendingUp, Award, Calendar, Shield, Clock, Users } from 'lucide-react';
+import { syncWithCloud } from '@/lib/sync';
 
 interface DashboardStats {
   currentStreak: number;
@@ -124,6 +125,7 @@ export default function Dashboard() {
       localStorage.setItem('seedguard_stats', JSON.stringify(updated));
       return updated;
     });
+    syncWithCloud();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer.days, loading]);
 
@@ -137,11 +139,12 @@ export default function Dashboard() {
     );
   }
 
-  const handleSaveStreak = () => {
+  const handleSaveStreak = async () => {
     if (!editDateInput) return;
     const d = new Date(editDateInput);
     if (isNaN(d.getTime())) return;
     localStorage.setItem('seedguard_streak_start', String(d.getTime()));
+    await syncWithCloud(true);
     setShowStreakEdit(false);
     window.location.reload();
   };

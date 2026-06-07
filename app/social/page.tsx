@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Users, Trophy, Plus, Trash2, Ghost, Crown, Medal, Shield, ClipboardPaste } from 'lucide-react';
+import { syncWithCloud } from '@/lib/sync';
 
 interface Account {
   id: string;
@@ -94,6 +95,7 @@ export default function SocialPage() {
   const saveFriends = (list: Friend[]) => {
     setFriends(list);
     localStorage.setItem('seedguard_friends', JSON.stringify(list));
+    syncWithCloud();
   };
 
   const handleAddFriend = () => {

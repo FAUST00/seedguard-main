@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Moon, Sun, Trash2, Download, Upload } from 'lucide-react';
+import { syncWithCloud } from '@/lib/sync';
 
 export default function Settings() {
   const [isDark, setIsDark] = useState(true);
@@ -23,6 +24,7 @@ export default function Settings() {
     const updated = { ...settings, [key]: value };
     setSettings(updated);
     localStorage.setItem('seedguard_settings', JSON.stringify(updated));
+    syncWithCloud();
   };
 
   const exportData = () => {
