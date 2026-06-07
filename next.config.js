@@ -7,6 +7,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  env: {
+    NEXT_PUBLIC_SEEDGUARD_API_URL: "https://seedguard-api.onrender.com",   // ← CHANGE THIS
+  },
 };
 
 module.exports = nextConfig;
