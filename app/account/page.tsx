@@ -12,7 +12,6 @@ interface Account {
   createdAt: string;
   color?: string;
   streak?: number;
-  // add other fields as needed
 }
 
 export default function AccountPage() {
@@ -39,31 +38,12 @@ export default function AccountPage() {
       setToken(savedToken);
       setAccount(JSON.parse(savedAccount));
       setStep('profile');
-      fetchProfile(savedToken);
     } else {
       setStep('create');
     }
   }, []);
 
-  const fetchProfile = async (authToken: string) => {
-    try {
-      const res = await fetch(`${API_URL}/api/me`, {
-        headers: { Authorization: `Bearer ${authToken}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const profile = data.profile || data.user || data;
-        setAccount(profile);
-        localStorage.setItem('seedguard_account', JSON.stringify(profile));
-      }
-    } catch (e) {
-      console.log('Backend sync failed, using local data');
-    }
-  };
-
   const handleCreate = async () => {
-    // ... (similar to login, using /api/signup)
-    // I'll keep it short for now - use similar pattern as login
     setLoading(true);
     setError('');
     try {
@@ -112,9 +92,6 @@ export default function AccountPage() {
       setAccount(data.user);
       setToken(data.token);
       setStep('profile');
-
-      // Sync full profile
-      await fetchProfile(data.token);
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
@@ -127,7 +104,7 @@ export default function AccountPage() {
     localStorage.removeItem('seedguard_account');
     setAccount(null);
     setToken(null);
-    setStep('login');
+    setStep('create');
   };
 
   return (
@@ -160,7 +137,6 @@ export default function AccountPage() {
         <div className="max-w-md mx-auto text-center">
           <h2>Welcome, {account.username}</h2>
           <button onClick={logout} className="mt-6 text-red-500">Logout</button>
-          {/* Your existing profile cards / streak etc. go here */}
         </div>
       )}
     </div>
