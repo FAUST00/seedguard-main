@@ -33,6 +33,8 @@ export async function signOut() {
   await supabase.auth.signOut();
 }
 
+// ── Streak ────────────────────────────────────────────────────────────
+
 export async function getStreakFromCloud(): Promise<string | null> {
   const user = await getUser();
   if (!user) return null;
@@ -62,6 +64,8 @@ export async function saveStreakToCloud(startDateISO: string) {
   });
 }
 
+// ── Stats ─────────────────────────────────────────────────────────────
+
 export interface StatsPayload {
   currentStreak: number;
   totalDays: number;
@@ -79,6 +83,85 @@ export async function saveStatsToCloud(stats: StatsPayload) {
   });
 }
 
+// ── History / Notes ───────────────────────────────────────────────────
+
+export interface HistoryEntry {
+  id: string;
+  date: string;
+  type: 'victory' | 'relapse';
+  note?: string;
+}
+
+/**
+ * Save a single new entry to Supabase history_logs table.
+ * The entry is ALSO saved to localStorage by the caller — this just mirrors it to the cloud.
+ */
+export async function saveHistoryEntryToCloud(entry: HistoryEntry): Promise<void> {
+  const user = await getUser();
+  if (!user) return;
+  await supabase.from('history_logs').insert({
+    user_id: user.id,
+    started_at: new Date().toISOString(),
+    ended_at: entry.type === 'relapse' ? new Date().toISOString() : null,
+    note: JSON.stringify({ id: entry.id, date: entry.date, type: entry.type, note: entry.note ?? '' }),
+  });
+}
+
+/**
+ * Delete a history entry from Supabase by matching the note JSON id field.
+ */
+export async function deleteHistoryEntryFromCloud(entryId: string): Promise<void> {
+  const user = await getUser();
+  if (!user) return;
+  // Fetch all rows for this user and find the one whose note JSON contains this id
+  const { data } = await supabase
+    .from('history_logs')
+    .select('id, note')
+    .eq('user_id', user.id);
+  if (!data) return;
+  for (const row of data) {
+    try {
+      const parsed = JSON.parse(row.note ?? '{}');
+      if (parsed.id === entryId) {
+        await supabase.from('history_logs').delete().eq('id', row.id);
+        break;
+      }
+    } catch {}
+  }
+}
+
+/**
+ * Load all history entries from Supabase for the logged-in user.
+ * Returns them in the same HistoryEntry format the UI expects.
+ */
+export async function getHistoryFromCloud(): Promise<HistoryEntry[]> {
+  const user = await getUser();
+  if (!user) return [];
+  const { data, error } = await supabase
+    .from('history_logs')
+    .select('id, note, created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+  if (error || !data) return [];
+  const entries: HistoryEntry[] = [];
+  for (const row of data) {
+    try {
+      const parsed = JSON.parse(row.note ?? '{}');
+      if (parsed.id && parsed.type) {
+        entries.push({
+          id: parsed.id,
+          date: parsed.date,
+          type: parsed.type,
+          note: parsed.note,
+        });
+      }
+    } catch {}
+  }
+  return entries;
+}
+
+// ── Profile ───────────────────────────────────────────────────────────
+
 export async function getProfile() {
   const user = await getUser();
   if (!user) return null;
@@ -95,6 +178,8 @@ export async function updateProfile(updates: { username?: string; avatar_url?: s
     updated_at: new Date().toISOString(),
   });
 }
+
+// ── Main syncWithCloud (streak + stats) ───────────────────────────────
 
 export async function syncWithCloud(force = false): Promise<void> {
   try {
@@ -114,6 +199,8 @@ export async function syncWithCloud(force = false): Promise<void> {
   }
 }
 
+// ── Migration ─────────────────────────────────────────────────────────
+
 export async function migrateLocalToCloud(): Promise<string[]> {
   const user = await getUser();
   if (!user) throw new Error('Not logged in');
@@ -128,6 +215,15 @@ export async function migrateLocalToCloud(): Promise<string[]> {
     const stats = JSON.parse(statsRaw);
     await saveStatsToCloud(stats);
     results.push('✅ Stats imported');
+  }
+  // Migrate history entries
+  const historyRaw = localStorage.getItem('seedguard_history');
+  if (historyRaw) {
+    const entries: HistoryEntry[] = JSON.parse(historyRaw);
+    for (const entry of entries) {
+      await saveHistoryEntryToCloud(entry);
+    }
+    results.push(`✅ ${entries.length} history entries imported`);
   }
   const accountRaw = localStorage.getItem('seedguard_account') || localStorage.getItem('seedguard_profile');
   if (accountRaw) {
