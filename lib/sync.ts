@@ -1,12 +1,11 @@
 /**
  * lib/sync.ts
- * Drop-in replacement for the existing syncWithCloud import.
- * Now actually syncs to Supabase instead of being a stub.
+ * All Supabase auth + data sync for SeedGuard.
  */
 
 import { supabase } from './supabase';
 
-// ── Auth helpers ──────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────
 export async function getUser() {
   const { data } = await supabase.auth.getUser();
   return data.user;
@@ -58,14 +57,12 @@ export async function saveStreakToCloud(startDateISO: string) {
   const user = await getUser();
   if (!user) return;
 
-  // Deactivate old streaks
   await supabase
     .from('streaks')
     .update({ active: false, ended_at: new Date().toISOString() })
     .eq('user_id', user.id)
     .eq('active', true);
 
-  // Insert new streak
   await supabase.from('streaks').insert({
     user_id: user.id,
     started_at: startDateISO,
@@ -73,7 +70,7 @@ export async function saveStreakToCloud(startDateISO: string) {
   });
 }
 
-// ── Stats / History ───────────────────────────────────────
+// ── Stats ─────────────────────────────────────────────────
 export interface StatsPayload {
   currentStreak: number;
   totalDays: number;
@@ -84,7 +81,6 @@ export interface StatsPayload {
 export async function saveStatsToCloud(stats: StatsPayload) {
   const user = await getUser();
   if (!user) return;
-
   await supabase.from('profiles').upsert({
     id: user.id,
     stats_json: JSON.stringify(stats),
@@ -92,29 +88,10 @@ export async function saveStatsToCloud(stats: StatsPayload) {
   });
 }
 
-export async function getStatsFromCloud(): Promise<StatsPayload | null> {
-  const user = await getUser();
-  if (!user) return null;
-
-  const { data } = await supabase
-    .from('profiles')
-    .select('stats_json')
-    .eq('id', user.id)
-    .single();
-
-  if (!data?.stats_json) return null;
-  try {
-    return JSON.parse(data.stats_json);
-  } catch {
-    return null;
-  }
-}
-
 export async function logRelapseToCloud(note?: string) {
   const user = await getUser();
   if (!user) return;
 
-  // End active streak and log it
   const { data: streak } = await supabase
     .from('streaks')
     .update({ active: false, ended_at: new Date().toISOString() })
@@ -137,13 +114,11 @@ export async function logRelapseToCloud(note?: string) {
 export async function getHistoryFromCloud() {
   const user = await getUser();
   if (!user) return [];
-
   const { data } = await supabase
     .from('history_logs')
     .select('*')
     .eq('user_id', user.id)
     .order('ended_at', { ascending: false });
-
   return data ?? [];
 }
 
@@ -151,20 +126,13 @@ export async function getHistoryFromCloud() {
 export async function getProfile() {
   const user = await getUser();
   if (!user) return null;
-
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
+  const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
   return data;
 }
 
 export async function updateProfile(updates: { username?: string; avatar_url?: string }) {
   const user = await getUser();
   if (!user) return;
-
   await supabase.from('profiles').upsert({
     id: user.id,
     ...updates,
@@ -173,22 +141,15 @@ export async function updateProfile(updates: { username?: string; avatar_url?: s
 }
 
 // ── Main syncWithCloud (called by dashboard) ──────────────
-/**
- * Called by the dashboard after stats update.
- * Saves streak start + stats to Supabase.
- */
 export async function syncWithCloud(force = false): Promise<void> {
   try {
     const user = await getUser();
-    if (!user) return; // not logged in, skip silently
+    if (!user) return;
 
     const streakStart =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('seedguard_streak_start')
-        : null;
+      typeof window !== 'undefined' ? localStorage.getItem('seedguard_streak_start') : null;
 
     if (streakStart) {
-      // Only push if cloud streak is different or force=true
       const cloudStart = await getStreakFromCloud();
       if (force || cloudStart !== streakStart) {
         await saveStreakToCloud(streakStart);
@@ -196,21 +157,17 @@ export async function syncWithCloud(force = false): Promise<void> {
     }
 
     const statsRaw =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('seedguard_stats')
-        : null;
+      typeof window !== 'undefined' ? localStorage.getItem('seedguard_stats') : null;
 
     if (statsRaw) {
-      const stats = JSON.parse(statsRaw);
-      await saveStatsToCloud(stats);
+      await saveStatsToCloud(JSON.parse(statsRaw));
     }
   } catch (err) {
-    // Never crash the UI over a sync failure
     console.warn('[syncWithCloud] failed silently:', err);
   }
 }
 
-// ── Migration: import localStorage → Supabase ─────────────
+// ── Migration ─────────────────────────────────────────────
 export async function migrateLocalToCloud(): Promise<string[]> {
   const user = await getUser();
   if (!user) throw new Error('Not logged in');
@@ -227,7 +184,6 @@ export async function migrateLocalToCloud(): Promise<string[]> {
   if (statsRaw) {
     const stats = JSON.parse(statsRaw);
     await saveStatsToCloud(stats);
-
     const history = stats.history ?? stats.relapseLog ?? [];
     for (const item of history) {
       await supabase.from('history_logs').insert({
@@ -240,12 +196,14 @@ export async function migrateLocalToCloud(): Promise<string[]> {
     results.push(`✅ ${history.length} history entries imported`);
   }
 
-  const accountRaw = localStorage.getItem('seedguard_account') || localStorage.getItem('seedguard_profile');
+  const accountRaw =
+    localStorage.getItem('seedguard_account') || localStorage.getItem('seedguard_profile');
   if (accountRaw) {
     const account = JSON.parse(accountRaw);
     await updateProfile({ username: account.username ?? account.name });
     results.push('✅ Profile imported');
   }
 
+  if (results.length === 0) results.push('ℹ️ No local data found to import');
   return results;
 }
