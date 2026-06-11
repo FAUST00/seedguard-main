@@ -1,23 +1,41 @@
-name: CI
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NEXT_PUBLIC_SUPABASE_URL: https://earfjshpbwcnpqinrrvl.supabase.co
   NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhcmZqc2hwYndjbnBxaW5ycnZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3OTA1NDEsImV4cCI6MjA5NjM2NjU0MX0.5H38IPnQsbG-DL6qBW8wXhnq0hDTAr2yPH-Shv2xtvg
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-      - run: npm install --legacy-peer-deps --no-audit --no-fund
-      - run: npm run build
+          node-version: 20
+
+      - name: Install
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out/
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
