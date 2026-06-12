@@ -83,81 +83,58 @@ export async function saveStatsToCloud(stats: StatsPayload) {
   });
 }
 
-// ── History / Notes ───────────────────────────────────────────────────
+// ── History Entries ───────────────────────────────────────────────────
+// Uses the 'entries' table: id, user_id, type, note, date, created_at
+// The local entry id is stored in the 'local_id' column so we can
+// efficiently delete by it without scanning all rows.
 
 export interface HistoryEntry {
-  id: string;
-  date: string;
+  id: string;           // local timestamp id
+  date: string;         // display date string
   type: 'victory' | 'relapse';
   note?: string;
 }
 
-/**
- * Save a single new entry to Supabase history_logs table.
- * The entry is ALSO saved to localStorage by the caller — this just mirrors it to the cloud.
- */
 export async function saveHistoryEntryToCloud(entry: HistoryEntry): Promise<void> {
-  const user = await getUser();
+  // Always get a fresh auth check — don't rely on cached user
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
-  await supabase.from('history_logs').insert({
+  const { error } = await supabase.from('entries').insert({
     user_id: user.id,
-    started_at: new Date().toISOString(),
-    ended_at: entry.type === 'relapse' ? new Date().toISOString() : null,
-    note: JSON.stringify({ id: entry.id, date: entry.date, type: entry.type, note: entry.note ?? '' }),
+    local_id: entry.id,
+    type: entry.type,
+    note: entry.note ?? '',
+    date: entry.date,
   });
+  if (error) throw error;
 }
 
-/**
- * Delete a history entry from Supabase by matching the note JSON id field.
- */
-export async function deleteHistoryEntryFromCloud(entryId: string): Promise<void> {
-  const user = await getUser();
+export async function deleteHistoryEntryFromCloud(localId: string): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
-  // Fetch all rows for this user and find the one whose note JSON contains this id
-  const { data } = await supabase
-    .from('history_logs')
-    .select('id, note')
-    .eq('user_id', user.id);
-  if (!data) return;
-  for (const row of data) {
-    try {
-      const parsed = JSON.parse(row.note ?? '{}');
-      if (parsed.id === entryId) {
-        await supabase.from('history_logs').delete().eq('id', row.id);
-        break;
-      }
-    } catch {}
-  }
+  // Efficient: delete directly by local_id + user_id — no full table scan
+  await supabase
+    .from('entries')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('local_id', localId);
 }
 
-/**
- * Load all history entries from Supabase for the logged-in user.
- * Returns them in the same HistoryEntry format the UI expects.
- */
 export async function getHistoryFromCloud(): Promise<HistoryEntry[]> {
-  const user = await getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
   const { data, error } = await supabase
-    .from('history_logs')
-    .select('id, note, created_at')
+    .from('entries')
+    .select('local_id, type, note, date')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
   if (error || !data) return [];
-  const entries: HistoryEntry[] = [];
-  for (const row of data) {
-    try {
-      const parsed = JSON.parse(row.note ?? '{}');
-      if (parsed.id && parsed.type) {
-        entries.push({
-          id: parsed.id,
-          date: parsed.date,
-          type: parsed.type,
-          note: parsed.note,
-        });
-      }
-    } catch {}
-  }
-  return entries;
+  return data.map((row) => ({
+    id: row.local_id,
+    type: row.type as 'victory' | 'relapse',
+    note: row.note,
+    date: row.date,
+  }));
 }
 
 // ── Profile ───────────────────────────────────────────────────────────
@@ -183,54 +160,66 @@ export async function updateProfile(updates: { username?: string; avatar_url?: s
 
 export async function syncWithCloud(force = false): Promise<void> {
   try {
-    const user = await getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const streakStart = typeof window !== 'undefined' ? localStorage.getItem('seedguard_streak_start') : null;
+    const streakStart = typeof window !== 'undefined'
+      ? localStorage.getItem('seedguard_streak_start')
+      : null;
     if (streakStart) {
       const cloudStart = await getStreakFromCloud();
       if (force || cloudStart !== streakStart) {
         await saveStreakToCloud(streakStart);
       }
     }
-    const statsRaw = typeof window !== 'undefined' ? localStorage.getItem('seedguard_stats') : null;
+    const statsRaw = typeof window !== 'undefined'
+      ? localStorage.getItem('seedguard_stats')
+      : null;
     if (statsRaw) await saveStatsToCloud(JSON.parse(statsRaw));
   } catch (err) {
     console.warn('[syncWithCloud] silent fail:', err);
   }
 }
 
-// ── Migration ─────────────────────────────────────────────────────────
+// ── Migration (local → cloud, called once after first login) ──────────
 
 export async function migrateLocalToCloud(): Promise<string[]> {
-  const user = await getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not logged in');
   const results: string[] = [];
+
   const streakStart = localStorage.getItem('seedguard_streak_start');
   if (streakStart) {
     await saveStreakToCloud(streakStart);
     results.push('✅ Streak imported');
   }
+
   const statsRaw = localStorage.getItem('seedguard_stats');
   if (statsRaw) {
-    const stats = JSON.parse(statsRaw);
-    await saveStatsToCloud(stats);
+    await saveStatsToCloud(JSON.parse(statsRaw));
     results.push('✅ Stats imported');
   }
-  // Migrate history entries
+
   const historyRaw = localStorage.getItem('seedguard_history');
   if (historyRaw) {
     const entries: HistoryEntry[] = JSON.parse(historyRaw);
-    for (const entry of entries) {
+    // Only migrate entries that don't already exist in cloud
+    const existing = await getHistoryFromCloud();
+    const existingIds = new Set(existing.map((e) => e.id));
+    const toMigrate = entries.filter((e) => !existingIds.has(e.id));
+    for (const entry of toMigrate) {
       await saveHistoryEntryToCloud(entry);
     }
-    results.push(`✅ ${entries.length} history entries imported`);
+    if (toMigrate.length > 0) results.push(`✅ ${toMigrate.length} history entries imported`);
   }
-  const accountRaw = localStorage.getItem('seedguard_account') || localStorage.getItem('seedguard_profile');
+
+  const accountRaw = localStorage.getItem('seedguard_account')
+    || localStorage.getItem('seedguard_profile');
   if (accountRaw) {
     const account = JSON.parse(accountRaw);
     await updateProfile({ username: account.username ?? account.name });
     results.push('✅ Profile imported');
   }
-  if (results.length === 0) results.push('ℹ️ No local data found');
+
+  if (results.length === 0) results.push('ℹ️ No local data found to import');
   return results;
 }
