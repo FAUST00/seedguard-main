@@ -13,7 +13,7 @@ export default function Home() {
       {/* User-provided hero art — hero-city.jpg */}
       {/* CSS gradient fallback always present; image layered on top */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-65 pointer-events-none"
+        className="absolute inset-0 bg-cover bg-bottom opacity-65 pointer-events-none"
         style={{ backgroundImage: `url(${ART.heroCity})` }}
         aria-hidden
       />
