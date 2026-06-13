@@ -64,6 +64,31 @@ export async function saveStreakToCloud(startDateISO: string) {
   });
 }
 
+/**
+ * Wipe all active streaks for the current user in the cloud
+ * and clear streak fields from their profile row.
+ * Called when the user explicitly resets / clears all data from Settings.
+ */
+export async function resetStreakInCloud(): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  // Mark all active streaks as ended
+  await supabase
+    .from('streaks')
+    .update({ active: false, ended_at: new Date().toISOString() })
+    .eq('user_id', user.id)
+    .eq('active', true);
+  // Clear streak fields on the profile row so the leaderboard resets too
+  await supabase.from('profiles').upsert({
+    id: user.id,
+    current_streak: 0,
+    best_streak: 0,
+    streak_start: null,
+    last_active: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  });
+}
+
 // ── Stats ─────────────────────────────────────────────────────────────
 
 export interface StatsPayload {
@@ -112,7 +137,7 @@ export async function saveHistoryEntryToCloud(entry: HistoryEntry): Promise<void
 export async function deleteHistoryEntryFromCloud(localId: string): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
-  // Efficient: delete directly by local_id + user_id — no full table scan
+  // Efficient: delete directly by local_id + user_id — ino full table scan
   await supabase
     .from('entries')
     .delete()
@@ -156,7 +181,7 @@ export async function updateProfile(updates: { username?: string; avatar_url?: s
   });
 }
 
-// ── Main syncWithCloud (streak + stats) ───────────────────────────────
+// ── Main syncWithCloud (streak + stats) ──────────────────────────────
 
 export async function syncWithCloud(force = false): Promise<void> {
   try {
