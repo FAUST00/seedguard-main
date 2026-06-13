@@ -4,19 +4,22 @@
  * Settings page — appearance (theme), notifications, data management,
  * and the Danger Zone with typed-confirmation account deletion.
  *
- * Header accent: grid-city.jpg placed via ImageBanner.
+ * Fixes applied:
+ *  - Sound toggle plays a test beep when turned ON
+ *  - "Clear All Local Data" also resets cloud streak for logged-in users
  */
 
 import { useState, useEffect } from 'react';
 import {
-  Settings as SettingsIcon, Moon, Sun, Sparkles,
+  Settings as SettingsIcon, Moon, Sparkles,
   Trash2, Download, AlertTriangle, Loader2,
 } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import { useToast } from '@/components/toast';
 import { ImageBanner } from '@/components/synth-background';
 import { ART } from '@/lib/assets';
-import { getUser } from '@/lib/sync';
+import { getUser, resetStreakInCloud } from '@/lib/sync';
+import { playSound } from '@/lib/sound';
 import { supabase } from '@/lib/supabase';
 
 const DELETION_PHRASE = 'delete my account';
@@ -55,6 +58,10 @@ export default function SettingsPage() {
     const updated = { ...settings, [key]: value };
     setSettings(updated);
     try { localStorage.setItem('seedguard_settings', JSON.stringify(updated)); } catch {}
+    // Play a test beep when the user enables sound — immediate proof it works
+    if (key === 'soundEnabled' && value === true) {
+      setTimeout(() => playSound('toggle'), 50);
+    }
     toast('Setting saved', 'success');
   }
 
@@ -72,6 +79,22 @@ export default function SettingsPage() {
     a.click();
     URL.revokeObjectURL(url);
     toast('Backup downloaded.', 'success');
+  }
+
+  async function handleClearLocalData() {
+    const msg = hasAccount
+      ? 'Delete all local data AND reset your cloud streak to zero?\n\nYour streak timer will start fresh when you next log in.'
+      : 'Delete all local data? This cannot be undone.';
+    if (!confirm(msg)) return;
+    if (hasAccount) {
+      try {
+        await resetStreakInCloud();
+      } catch {
+        // Non-fatal — local clear still proceeds
+      }
+    }
+    localStorage.clear();
+    window.location.reload();
   }
 
   async function handleDeleteAccount() {
@@ -127,7 +150,7 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-2xl space-y-8 page-entry">
-      {/* Header banner — grid-city.jpg placed here */}
+      {/* Header banner */}
       <ImageBanner src={ART.gridCity} className="mb-2">
         <div className="p-6 md:p-8">
           <h1 className="text-3xl md:text-4xl font-display font-extrabold tracking-widest uppercase italic neon-text-cyan text-secondary flex items-center gap-3">
@@ -147,7 +170,6 @@ export default function SettingsPage() {
           Appearance
         </h2>
 
-        {/* Theme picker */}
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">Choose your synthwave theme:</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -155,12 +177,8 @@ export default function SettingsPage() {
             <button
               onClick={() => setTheme('dark')}
               aria-pressed={theme === 'dark'}
-              className={`
-                rounded-xl border p-4 text-left transition-all neon-hover
-                ${theme === 'dark'
-                  ? 'border-primary/60 bg-primary/15 neon-box-pink'
-                  : 'border-muted/30 hover:border-muted/60'}
-              `}
+              className={`rounded-xl border p-4 text-left transition-all neon-hover
+                ${theme === 'dark' ? 'border-primary/60 bg-primary/15 neon-box-pink' : 'border-muted/30 hover:border-muted/60'}`}
             >
               <div className="flex items-center gap-2 mb-2">
                 <Moon className="w-5 h-5 text-primary" aria-hidden />
@@ -172,7 +190,6 @@ export default function SettingsPage() {
               <p className="text-xs text-muted-foreground leading-snug">
                 Deep indigo sky, hot magenta + electric cyan. The classic night-city vibe.
               </p>
-              {/* Colour preview dots */}
               <div className="flex gap-1.5 mt-3" aria-hidden>
                 <span className="w-4 h-4 rounded-full bg-[hsl(315,100%,60%)]" />
                 <span className="w-4 h-4 rounded-full bg-[hsl(184,100%,55%)]" />
@@ -184,12 +201,8 @@ export default function SettingsPage() {
             <button
               onClick={() => setTheme('bright')}
               aria-pressed={theme === 'bright'}
-              className={`
-                rounded-xl border p-4 text-left transition-all neon-hover
-                ${theme === 'bright'
-                  ? 'border-secondary/60 bg-secondary/10 neon-box-cyan'
-                  : 'border-muted/30 hover:border-muted/60'}
-              `}
+              className={`rounded-xl border p-4 text-left transition-all neon-hover
+                ${theme === 'bright' ? 'border-secondary/60 bg-secondary/10 neon-box-cyan' : 'border-muted/30 hover:border-muted/60'}`}
             >
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-5 h-5 text-secondary" aria-hidden />
@@ -210,7 +223,6 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Legacy toggle — kept for muscle-memory users */}
         <div className="pt-2 border-t border-muted/20">
           <ToggleSwitch
             id="legacy-dark"
@@ -230,9 +242,24 @@ export default function SettingsPage() {
           Notifications
         </h2>
         <div className="space-y-4">
-          <ToggleSwitch id="push-notifs" label="Push Notifications" checked={settings.notifications} onChange={(v) => updateSettings('notifications', v)} />
-          <ToggleSwitch id="sound-effects" label="Sound Effects" checked={settings.soundEnabled} onChange={(v) => updateSettings('soundEnabled', v)} />
-          <ToggleSwitch id="auto-backup" label="Auto-Backup Data" checked={settings.autoBackup} onChange={(v) => updateSettings('autoBackup', v)} />
+          <ToggleSwitch
+            id="push-notifs"
+            label="Push Notifications"
+            checked={settings.notifications}
+            onChange={(v) => updateSettings('notifications', v)}
+          />
+          <ToggleSwitch
+            id="sound-effects"
+            label="Sound Effects"
+            checked={settings.soundEnabled}
+            onChange={(v) => updateSettings('soundEnabled', v)}
+          />
+          <ToggleSwitch
+            id="auto-backup"
+            label="Auto-Backup Data"
+            checked={settings.autoBackup}
+            onChange={(v) => updateSettings('autoBackup', v)}
+          />
         </div>
       </section>
 
@@ -266,18 +293,19 @@ export default function SettingsPage() {
         </h2>
         <p className="text-sm text-muted-foreground">These actions are permanent. Proceed with extreme caution.</p>
 
-        {/* Clear local data */}
+        {/* Clear local data — also resets cloud streak for logged-in users */}
         <button
-          onClick={() => {
-            if (!confirm('Delete all local data?')) return;
-            localStorage.clear();
-            window.location.reload();
-          }}
+          onClick={handleClearLocalData}
           className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl border border-destructive/50 text-destructive bg-destructive/10 hover:bg-destructive/20 font-bold uppercase tracking-wider neon-hover"
         >
           <Trash2 className="w-5 h-5" aria-hidden />
           Clear All Local Data
         </button>
+        {hasAccount && (
+          <p className="text-xs text-muted-foreground/70 text-center -mt-3">
+            You&apos;re logged in — this will also reset your cloud streak to zero.
+          </p>
+        )}
 
         {/* Permanent account deletion — cloud accounts only */}
         {hasAccount && (
@@ -293,7 +321,6 @@ export default function SettingsPage() {
 
             {showDeletePanel && (
               <div className="rounded-xl border-2 border-destructive/50 bg-destructive/5 p-5 space-y-4 animate-scale-in">
-                {/* Warning list */}
                 <div className="text-sm text-destructive/90 space-y-1">
                   <p className="font-bold">⚠️ This will permanently delete:</p>
                   <ul className="list-disc list-inside space-y-0.5 text-destructive/70 ml-2">
@@ -305,7 +332,6 @@ export default function SettingsPage() {
                   <p className="pt-1 font-bold text-destructive">This action CANNOT be undone.</p>
                 </div>
 
-                {/* Typed confirmation */}
                 <div className="space-y-2">
                   <label htmlFor="delete-confirm" className="block text-sm font-bold text-destructive">
                     Type <span className="font-mono bg-destructive/10 px-1.5 py-0.5 rounded">{DELETION_PHRASE}</span> to confirm:
@@ -339,7 +365,7 @@ export default function SettingsPage() {
       <section className="rounded-2xl border border-primary/10 bg-gradient-to-br from-primary/5 to-secondary/5 p-8 text-center space-y-3 animate-scale-in [animation-delay:400ms]">
         <h3 className="font-bold text-base uppercase tracking-wider">About SeedGuard</h3>
         <div className="space-y-1 text-sm text-muted-foreground">
-          <p><span className="font-semibold text-foreground">Version</span> 3.0.0</p>
+          <p><span className="font-semibold text-foreground">Version</span> 3.1.0</p>
           <p><span className="font-semibold text-foreground">Made for</span> PMO Recovery</p>
           <p className="pt-1">Your local data never leaves your browser. Cloud sync requires an account.</p>
         </div>
