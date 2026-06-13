@@ -19,11 +19,11 @@ export function asset(path: string): string {
  */
 export const ART = {
   /** Pixel-art city + huge sun  → landing page hero background */
-  heroCity: asset('/images/hero-city.jpg'),
+  heroCity: asset('/images/wp4787824-retrowave-night-wallpapers.jpg'),
   /** Pink/blue painted LA skyline → Streaks tab header banner */
-  laSunset: asset('/images/la-sunset.jpg'),
+  laSunset: asset('/images/wp4694442-80s-anime-wallpapers.jpg'),
   /** Wireframe mountains + magenta sun → Social tab header banner */
-  wireframeSun: asset('/images/wireframe-sun.jpg'),
+  wireframeSun: asset('/images/wp4787763-retrowave-space-wallpapers.jpg'),
   /** Purple starry skyline + laser grid → Settings/Account header accent */
-  gridCity: asset('/images/grid-city.jpg'),
+  gridCity: asset('/images/wp4787765-retrowave-space-wallpapers.jpg'),
 } as const;
