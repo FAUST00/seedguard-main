@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Flame, TrendingUp, Award, Calendar, Clock, Users, ChevronRight, Quote } from 'lucide-react';
 import { syncWithCloud, getStreakFromCloud, getUser } from '@/lib/sync';
+import { playSound } from '@/lib/sound';
 
 interface DashboardStats {
   currentStreak: number;
@@ -64,7 +65,7 @@ async function resolveStreakStart(): Promise<Date> {
 
     const relapses = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('seedguard_relapses') || '[]' : '[]');
     if (relapses.length > 0) {
-      const latest = [...relapses].sort((a: any, b: any) =>
+      const latest = [...relapses].sort((a: { relapse_time: string }, b: { relapse_time: string }) =>
         new Date(b.relapse_time).getTime() - new Date(a.relapse_time).getTime()
       )[0];
       const d = new Date(latest.relapse_time);
@@ -94,6 +95,9 @@ function getFirstDay(): Date {
   return new Date(now);
 }
 
+// Days that trigger a milestone fanfare sound
+const MILESTONE_DAYS = new Set([7, 30, 90, 180, 365]);
+
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats>({ currentStreak: 0, totalDays: 0, longestStreak: 0, relapses: 0 });
   const [timer, setTimer] = useState<TimerParts>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -109,11 +113,13 @@ export default function Dashboard() {
   const currentQuoteIdx = (hourlyBase + quoteOffset) % QUOTES.length;
   const currentQuote = QUOTES[currentQuoteIdx];
 
+  // Track previous day count to detect milestone crossings
+  const prevDaysRef = useRef(0);
+
   // Auto-advance quote every hour
   useEffect(() => {
     const id = setInterval(() => {
-      // Force re-render so hourlyBase recomputes; offset stays
-      setQuoteOffset(o => o); // triggers re-render
+      setQuoteOffset(o => o); // triggers re-render so hourlyBase recomputes
     }, 3_600_000);
     return () => clearInterval(id);
   }, []);
@@ -126,7 +132,6 @@ export default function Dashboard() {
       } catch {}
       const user = await getUser();
       setHasAccount(!!(user || (typeof window !== 'undefined' && localStorage.getItem('seedguard_account'))));
-
       const start = await resolveStreakStart();
       setStreakDisplayDate(start.toLocaleDateString());
       setLoading(false);
@@ -166,6 +171,16 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer.days, loading]);
 
+  // Milestone sound — fires once when streak crosses 7 / 30 / 90 / 180 / 365 days
+  useEffect(() => {
+    const prev = prevDaysRef.current;
+    const curr = timer.days;
+    if (curr > prev && MILESTONE_DAYS.has(curr)) {
+      playSound('milestone');
+    }
+    prevDaysRef.current = curr;
+  }, [timer.days]);
+
   const handleSaveStreak = async () => {
     if (!editDateInput) return;
     const d = new Date(editDateInput);
@@ -204,7 +219,11 @@ export default function Dashboard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
           <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#e87f9f' }}>Started: {streakDisplayDate}</span>
           <button
-            onClick={() => { setShowStreakEdit(v => !v); const s = localStorage.getItem('seedguard_streak_start'); setEditDateInput(s ? new Date(s).toISOString().slice(0,10) : ''); }}
+            onClick={() => {
+              setShowStreakEdit(v => !�);
+              const s = localStorage.getItem('seedguard_streak_start');
+              setEditDateInput(s ? new Date(s).toISOString().slice(0, 10) : '');
+            }}
             style={{ background: 'transparent', border: '1px solid #a21caf', borderRadius: '6px', padding: '2px 10px', color: '#e87f9f', cursor: 'pointer', fontSize: '0.8rem' }}
           >✏️ Edit</button>
         </div>
@@ -229,12 +248,12 @@ export default function Dashboard() {
             { value: pad(timer.seconds), label: 'Seconds' },
           ].map(({ value, label }) => (
             <div key={label} className="flex flex-col items-center gap-2">
-              <div className="w-full rounded-xl border border-primary/25 bg-background/80 py-4 px-2 flex items-center justify-center">
+              <div className="w-{ull rounded-xl border border-primary/25 bg-background/80 py-4 px-2 flex items-center justify-center">
                 <span className="text-3xl sm:text-4xl font-extrabold font-mono text-primary neon-text-pink tabular-nums leading-none">{value}</span>
               </div>
               <span className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold">{label}</span>
             </div>
-           ))}
+          ))}
         </div>
       </div>
 
@@ -274,7 +293,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Link href="/history" className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-8 text-center hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 group animate-scale-in [animation-delay:200ms]">
           <div className="inline-flex items-center justify-center w-14 h-14 mb-4 group-hover:scale-110 transition-transform">
-            <Flame className="w-7 h-7 text-primary drop-shadow-[0_0_8px_rgba(255,0,255,0.6)]" />
+            <Flame className="w7 h-7 text-primary drop-shadow-[0_0_8px_rgba(255,0,255,0.6)]" />
           </div>
           <h3 className="font-bold text-lg mb-2 uppercase tracking-wider">Log Entry</h3>
           <p className="text-sm text-muted-foreground">Record a victory or log a relapse to keep your streak accurate.</p>
@@ -288,10 +307,10 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      {/* ** motivational quote **/}
+      {/* ── Motivational Quote ──────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-secondary/30 bg-background/50 backdrop-blur-sm p-6 md:p-8 animate-scale-in [animation-delay:300ms] neon-box-cyan">
         <div className="flex items-center gap-2 mb-4">
-          <Quote className="w-4 h-4 text-secondary/70" aria-hidden />
+          <Quote className="w4 h-4 text-secondary/70" aria-hidden />
           <p className="text-xs text-secondary/70 uppercase tracking-widest font-bold">Daily Wisdom</p>
           <span className="ml-auto text-xs text-muted-foreground/50 tabular-nums">{currentQuoteIdx + 1} / {QUOTES.length}</span>
         </div>
@@ -305,7 +324,7 @@ export default function Dashboard() {
         ) : null}
 
         <button
-          onClick={() => setQuoteOffset(o => (o + 1) % QUOTES.length)}
+          onClick={() => { playSound('click'); setQuoteOffset(o => (o + 1) % QUOTES.length); }}
           className="mt-5 inline-flex items-center gap-1.5 text-xs text-secondary/70 hover:text-secondary font-bold uppercase tracking-wider transition-colors"
           aria-label="Next quote"
         >
