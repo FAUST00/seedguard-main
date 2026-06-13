@@ -1,61 +1,93 @@
 import Link from 'next/link';
-import { Shield, ArrowRight } from 'lucide-react';
+import { Shield, ArrowRight, Trophy, Flame } from 'lucide-react';
+import { ART } from '@/lib/assets';
 
+/**
+ * Landing page.
+ * Hero background: hero-city.jpg (pixel-art city + huge magenta sun).
+ * Placed as the full-page background via ImageBanner-style CSS overlay.
+ */
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 p-4 text-zinc-50 page-entry">
-      <div className="w-full max-w-sm space-y-8 flex flex-col items-center text-center">
-        <div className="rounded-full bg-primary/10 p-5 mb-4 neon-box-pink animate-scale-in">
-          <Shield className="h-12 w-12 text-primary drop-shadow-[0_0_10px_rgba(255,0,255,0.8)]" />
+    <div className="relative flex min-h-screen flex-col items-center justify-center p-4 text-foreground page-entry overflow-hidden">
+      {/* User-provided hero art — hero-city.jpg */}
+      {/* CSS gradient fallback always present; image layered on top */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none"
+        style={{ backgroundImage: `url(${ART.heroCity})` }}
+        aria-hidden
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20 pointer-events-none" aria-hidden />
+
+      {/* Content */}
+      <div className="relative w-full max-w-sm space-y-8 flex flex-col items-center text-center">
+        {/* Shield logo */}
+        <div className="rounded-full bg-primary/10 p-5 neon-box-pink animate-scale-in">
+          <Shield className="h-14 w-14 text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.8)]" aria-hidden />
         </div>
 
-        <h1 className="text-5xl font-extrabold tracking-tight neon-text-cyan text-secondary uppercase italic">
+        <h1 className="text-5xl font-display font-extrabold tracking-tight neon-text-cyan text-secondary uppercase italic">
           SeedGuard
         </h1>
 
-        <p className="text-zinc-400 pb-8 text-lg leading-relaxed">
+        <p className="text-muted-foreground pb-4 text-lg leading-relaxed">
           Your private tracker to reclaim your freedom and build discipline.
-          <span className="block mt-2 text-sm text-cyan-400/70">Sync across all your devices with a free account.</span>
+          <span className="block mt-2 text-sm text-secondary/70">Sync across all your devices with a free account.</span>
         </p>
 
         <Link
           href="/dashboard"
-          className="group inline-flex items-center justify-center gap-2 w-full h-14 px-6 py-2 text-xl font-bold bg-primary text-primary-foreground rounded-lg border border-primary/20 hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-200 neon-box-pink uppercase tracking-widest shadow-lg hover:shadow-primary/20"
+          className="group inline-flex items-center justify-center gap-2 w-full h-14 px-6 text-xl font-extrabold bg-primary/20 text-primary rounded-xl border border-primary/40 hover:bg-primary/30 hover:scale-105 active:scale-95 transition-all neon-box-pink uppercase tracking-widest shadow-lg"
         >
           Start Tracking Now
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden />
         </Link>
 
         <div className="flex gap-4 w-full">
-          <Link href="/account" className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-cyan-500/30 text-cyan-400 text-sm hover:bg-cyan-500/10 transition-all">
+          <Link
+            href="/account"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-secondary/30 text-secondary text-sm font-bold hover:bg-secondary/10 transition-all"
+          >
             Sign In / Sign Up
           </Link>
-          <Link href="/benefits" className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-zinc-700 text-zinc-400 text-sm hover:bg-zinc-800 transition-all">
-            Retention Journey
+          <Link
+            href="/benefits"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-muted/40 text-muted-foreground text-sm hover:bg-muted/20 transition-all"
+          >
+            Journey
           </Link>
         </div>
 
-        <div className="w-full mt-8 pt-8 border-t border-zinc-800">
-          <p className="text-xs text-zinc-500 mb-4">Features</p>
+        {/* Feature grid */}
+        <div className="w-full mt-4 pt-6 border-t border-primary/10 space-y-3">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Features</p>
           <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="rounded-lg bg-zinc-900/50 p-3 border border-zinc-800 hover:border-primary/30 transition-colors">
-              <div className="text-primary font-semibold mb-1">📊 Streak Tracking</div>
-              <div className="text-zinc-400">Build daily momentum</div>
-            </div>
-            <div className="rounded-lg bg-zinc-900/50 p-3 border border-zinc-800 hover:border-secondary/30 transition-colors">
-              <div className="text-secondary font-semibold mb-1">☁️ Cloud Sync</div>
-              <div className="text-zinc-400">Any device, always</div>
-            </div>
-            <div className="rounded-lg bg-zinc-900/50 p-3 border border-zinc-800 hover:border-primary/30 transition-colors">
-              <div className="text-primary font-semibold mb-1">🏆 Leaderboard</div>
-              <div className="text-zinc-400">Compete with friends</div>
-            </div>
-            <div className="rounded-lg bg-zinc-900/50 p-3 border border-zinc-800 hover:border-secondary/30 transition-colors">
-              <div className="text-secondary font-semibold mb-1">🌙 Dark UI</div>
-              <div className="text-zinc-400">Flow state focus</div>
-            </div>
+            {[
+              { icon: '📊', label: 'Streak Tracking', sub: 'Build daily momentum', accent: 'primary' },
+              { icon: '☁️', label: 'Cloud Sync',      sub: 'Any device, always', accent: 'secondary' },
+              { icon: '🏆', label: 'Leaderboards',    sub: 'Friends + Global', accent: 'gold' },
+              { icon: '💬', label: 'Direct Messages', sub: 'Chat with friends', accent: 'accent' },
+            ].map(({ icon, label, sub }) => (
+              <div
+                key={label}
+                className="rounded-xl glass-effect p-3 border border-muted/20 hover:border-primary/30 transition-colors text-left"
+              >
+                <div className="font-bold mb-0.5 text-foreground">{icon} {label}</div>
+                <div className="text-muted-foreground">{sub}</div>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* Leaderboard teaser */}
+        <Link
+          href="/streaks"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gold/30 text-gold bg-gold/5 hover:bg-gold/15 text-sm font-bold transition-all neon-hover"
+        >
+          <Trophy className="w-4 h-4" aria-hidden />
+          View Streak Leaderboard
+          <Flame className="w-4 h-4 flame-glow" aria-hidden />
+        </Link>
       </div>
     </div>
   );
