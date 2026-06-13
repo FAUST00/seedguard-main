@@ -1,21 +1,31 @@
 'use client';
 
+/**
+ * Account page — login/signup form + profile management.
+ * Deletion is handled in Settings → Danger Zone (link provided here too).
+ * Hero art: hero-city.jpg placed in the header banner on the logged-in view.
+ */
+
 import { useState, useEffect } from 'react';
-import { User, LogOut, Copy, Check, Shield } from 'lucide-react';
-import { signIn, signUp, signOut, getUser, getProfile, updateProfile, migrateLocalToCloud } from '@/lib/sync';
+import { User, LogOut, Copy, Check, Shield, ExternalLink } from 'lucide-react';
+import { signIn, signUp, signOut, getUser, getProfile, migrateLocalToCloud } from '@/lib/sync';
+import { syncProfileStreak } from '@/lib/social';
+import { useToast } from '@/components/toast';
+import { ImageBanner } from '@/components/synth-background';
+import { ART } from '@/lib/assets';
 import { useRouter } from 'next/navigation';
 
 export default function AccountPage() {
   const router = useRouter();
+  const { toast } = useToast();
+
   const [step, setStep] = useState<'loading' | 'auth' | 'profile'>('loading');
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [copied, setCopied] = useState(false);
   const [migrating, setMigrating] = useState(false);
   const [migrateResults, setMigrateResults] = useState<string[]>([]);
@@ -25,7 +35,8 @@ export default function AccountPage() {
       const user = await getUser();
       if (user) {
         const p = await getProfile();
-        setProfile(p ?? { username: user.email });
+        setProfile(p ?? { username: user.email, id: user.id });
+        await syncProfileStreak();
         setStep('profile');
       } else {
         setStep('auth');
@@ -37,21 +48,21 @@ export default function AccountPage() {
   async function handleAuth(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setMessage('');
     try {
       if (mode === 'signup') {
         await signUp(email, password, username);
-        setMessage('✅ Account created! Check your email to confirm, then log in.');
+        toast('Account created! Check your email to confirm, then log in.', 'success');
       } else {
         await signIn(email, password);
-        const p = await getProfile();
         const user = await getUser();
-        setProfile(p ?? { username: user?.email });
+        const p = await getProfile();
+        setProfile(p ?? { username: user?.email, id: user?.id });
+        await syncProfileStreak();
         setStep('profile');
+        toast('Logged in successfully.', 'success');
       }
-    } catch (err: any) {
-      setError(err.message ?? 'Something went wrong');
+    } catch (err: unknown) {
+      toast((err as Error).message ?? 'Something went wrong.', 'error');
     } finally {
       setLoading(false);
     }
@@ -62,6 +73,7 @@ export default function AccountPage() {
     setProfile(null);
     setStep('auth');
     router.push('/');
+    toast('Logged out.', 'info');
   }
 
   async function handleMigrate() {
@@ -69,8 +81,10 @@ export default function AccountPage() {
     try {
       const results = await migrateLocalToCloud();
       setMigrateResults(results);
-    } catch (err: any) {
-      setMigrateResults([`❌ ${err.message}`]);
+      toast('Import complete!', 'success');
+    } catch (err: unknown) {
+      setMigrateResults([`Error: ${(err as Error).message}`]);
+      toast('Import failed.', 'error');
     } finally {
       setMigrating(false);
     }
@@ -81,13 +95,12 @@ export default function AccountPage() {
     const streak = (() => {
       try {
         const s = localStorage.getItem('seedguard_streak_start');
-        return s ? Math.max(0, Math.floor((Date.now() - new Date(s).getTime()) / 86400000)) : 0;
+        return s ? Math.max(0, Math.floor((Date.now() - new Date(s).getTime()) / 86_400_000)) : 0;
       } catch { return 0; }
     })();
     const code = btoa(JSON.stringify({
       id: profile.id,
       username: profile.username,
-      isAnonymous: false,
       streak,
       streakStart: localStorage.getItem('seedguard_streak_start') ?? new Date().toISOString(),
       shared: new Date().toISOString(),
@@ -95,108 +108,188 @@ export default function AccountPage() {
     navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    toast('Friend code copied to clipboard!', 'success');
   }
 
+  // ── Loading ────────────────────────────────────────────────────────────────
   if (step === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Shield className="w-8 h-8 text-primary animate-pulse neon-text-pink" />
+        <Shield className="w-8 h-8 text-primary animate-pulse neon-text-pink" aria-label="Loading" />
       </div>
     );
   }
 
+  // ── Profile view ───────────────────────────────────────────────────────────
   if (step === 'profile' && profile) {
+    const displayName = (profile.username as string | null) ?? 'Anonymous';
     return (
       <div className="container mx-auto p-4 md:p-8 max-w-2xl space-y-8 page-entry">
-        <div>
-          <h1 className="text-4xl font-extrabold tracking-widest uppercase italic neon-text-cyan text-secondary">Account</h1>
-          <p className="text-muted-foreground text-lg mt-2">Manage your SeedGuard cloud account.</p>
-        </div>
-
-        {/* Profile Card */}
-        <div className="rounded-xl border border-primary/30 bg-background/60 backdrop-blur-sm p-8 space-y-6 animate-scale-in">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
-              <User className="w-8 h-8 text-primary" />
+        {/* Banner — hero-city.jpg used as the account header */}
+        <ImageBanner src={ART.heroCity}>
+          <div className="p-6 md:p-8 flex items-center gap-5">
+            <div className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/50 flex items-center justify-center flex-shrink-0">
+              <User className="w-8 h-8 text-primary" aria-hidden />
             </div>
             <div>
-              <p className="text-xl font-bold neon-text-pink">{profile.username ?? 'Anonymous'}</p>
-              <p className="text-sm text-muted-foreground">Cloud account active ✅</p>
+              <h1 className="text-2xl md:text-3xl font-display font-extrabold neon-text-pink text-primary uppercase tracking-wider">
+                {displayName}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-0.5">Cloud account active ✅</p>
             </div>
           </div>
+        </ImageBanner>
 
+        {/* Actions */}
+        <div className="rounded-2xl border border-primary/20 glass-effect p-8 space-y-4 animate-scale-in">
           <button
             onClick={copyFriendCode}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-secondary/50 text-secondary bg-secondary/10 hover:bg-secondary/20 transition-all font-medium uppercase tracking-wider"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-secondary/50 text-secondary bg-secondary/10 hover:bg-secondary/20 font-bold uppercase tracking-wider neon-hover"
           >
-            {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+            {copied ? <Check className="w-5 h-5" aria-hidden /> : <Copy className="w-5 h-5" aria-hidden />}
             {copied ? 'Copied!' : 'Copy Friend Code'}
           </button>
 
+          <a
+            href="/streaks"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gold/50 text-gold bg-gold/10 hover:bg-gold/20 font-bold uppercase tracking-wider neon-hover"
+          >
+            <ExternalLink className="w-5 h-5" aria-hidden />
+            View Leaderboard
+          </a>
+
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-destructive/50 text-destructive bg-destructive/10 hover:bg-destructive/20 transition-all font-medium uppercase tracking-wider"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20 font-bold uppercase tracking-wider neon-hover"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-5 h-5" aria-hidden />
             Log Out
           </button>
         </div>
 
         {/* Migrate local data */}
-        <div className="rounded-xl border border-accent/20 bg-background/50 backdrop-blur-sm p-8 space-y-4 animate-scale-in">
-          <h2 className="text-lg font-bold uppercase tracking-wider text-accent">Import Local Data</h2>
-          <p className="text-sm text-muted-foreground">If you used SeedGuard before creating an account, import your existing streaks and history into the cloud.</p>
+        <div className="rounded-2xl border border-accent/20 glass-effect p-8 space-y-4 animate-scale-in">
+          <h2 className="text-base font-bold uppercase tracking-wider text-accent">Import Local Data</h2>
+          <p className="text-sm text-muted-foreground">
+            Had SeedGuard before signing up? Pull your local streaks and history into the cloud.
+          </p>
           {migrateResults.length > 0 ? (
             <div className="space-y-2">
               {migrateResults.map((r, i) => (
-                <div key={i} className="bg-background/80 rounded-lg px-4 py-2 text-sm text-white">{r}</div>
+                <p key={i} className="bg-background/60 rounded-lg px-4 py-2 text-sm">{r}</p>
               ))}
             </div>
           ) : (
             <button
               onClick={handleMigrate}
               disabled={migrating}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-accent/50 text-accent bg-accent/10 hover:bg-accent/20 transition-all font-medium uppercase tracking-wider"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-accent/50 text-accent bg-accent/10 hover:bg-accent/20 font-bold uppercase tracking-wider neon-hover disabled:opacity-50"
             >
-              {migrating ? 'Importing...' : '⬆️ Import My Local Data'}
+              {migrating ? 'Importing…' : '⬆️ Import My Local Data'}
             </button>
           )}
         </div>
+
+        {/* Link to danger zone */}
+        <p className="text-sm text-muted-foreground text-center">
+          To permanently delete your account, go to{' '}
+          <a href="/settings" className="text-destructive hover:underline font-semibold">
+            Settings → Danger Zone
+          </a>.
+        </p>
       </div>
     );
   }
 
+  // ── Auth form ──────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-cyan-400 tracking-widest">SEEDGUARD</h1>
-          <p className="text-gray-500 mt-2 text-sm">Sign in to sync across all your devices.</p>
+      <div className="w-full max-w-md space-y-6 page-entry">
+        {/* Logo */}
+        <div className="text-center space-y-2">
+          <Shield
+            className="w-14 h-14 mx-auto text-primary drop-shadow-[0_0_14px_hsl(var(--primary)/0.8)]"
+            aria-hidden
+          />
+          <h1 className="text-4xl font-display font-extrabold neon-text-pink text-primary tracking-widest uppercase italic">
+            SeedGuard
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Sign in to sync your streak across all devices.
+          </p>
         </div>
-        <div className="bg-gray-900 border border-cyan-900 rounded-2xl p-8 shadow-2xl">
-          <div className="flex mb-6 bg-gray-800 rounded-lg p-1">
-            <button onClick={() => setMode('login')} className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${mode === 'login' ? 'bg-cyan-500 text-black' : 'text-gray-400 hover:text-white'}`}>Log In</button>
-            <button onClick={() => setMode('signup')} className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${mode === 'signup' ? 'bg-cyan-500 text-black' : 'text-gray-400 hover:text-white'}`}>Sign Up</button>
+
+        {/* Card */}
+        <div className="rounded-2xl border border-primary/25 glass-effect p-8 space-y-6 animate-scale-in">
+          {/* Toggle */}
+          <div className="flex gap-1 bg-muted/20 rounded-xl p-1" role="tablist" aria-label="Auth mode">
+            {(['login', 'signup'] as const).map((m) => (
+              <button
+                key={m}
+                role="tab"
+                aria-selected={mode === m}
+                onClick={() => setMode(m)}
+                className={`flex-1 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all
+                  ${mode === m ? 'bg-primary/30 text-primary border border-primary/40 neon-text-pink' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                {m === 'login' ? 'Log In' : 'Sign Up'}
+              </button>
+            ))}
           </div>
-          <form onSubmit={handleAuth} className="space-y-4">
+
+          {/* Form */}
+          <form onSubmit={handleAuth} className="space-y-4" noValidate>
             {mode === 'signup' && (
-              <div>
-                <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Username</label>
-                <input type="text" value={username} onChange={e => setUsername(e.target.value)} required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500" placeholder="YourUsername" />
+              <div className="space-y-1.5">
+                <label htmlFor="username" className="block text-xs text-muted-foreground uppercase tracking-wider">
+                  Username
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  autoComplete="username"
+                  className="w-full bg-background/50 border border-muted/40 rounded-xl px-4 py-3 text-sm placeholder-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30"
+                  placeholder="YourUsername"
+                />
               </div>
             )}
-            <div>
-              <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500" placeholder="you@example.com" />
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="block text-xs text-muted-foreground uppercase tracking-wider">Email</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full bg-background/50 border border-muted/40 rounded-xl px-4 py-3 text-sm placeholder-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30"
+                placeholder="you@example.com"
+              />
             </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Password</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500" placeholder="••••••••" />
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="block text-xs text-muted-foreground uppercase tracking-wider">Password</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                className="w-full bg-background/50 border border-muted/40 rounded-xl px-4 py-3 text-sm placeholder-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30"
+                placeholder="••••••••"
+              />
             </div>
-            {error && <div className="bg-red-950 border border-red-800 rounded-lg px-4 py-3 text-red-400 text-sm">{error}</div>}
-            {message && <div className="bg-green-950 border border-green-800 rounded-lg px-4 py-3 text-green-400 text-sm">{message}</div>}
-            <button type="submit" disabled={loading} className="w-full bg-cyan-500 hover:bg-cyan-400 disabled:bg-gray-700 disabled:text-gray-500 text-black font-bold py-3 rounded-lg transition-all">
-              {loading ? 'Please wait...' : mode === 'login' ? 'Log In' : 'Create Account'}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary/25 hover:bg-primary/35 disabled:opacity-40 border border-primary/50 text-primary font-extrabold py-3.5 rounded-xl uppercase tracking-widest transition-all neon-box-pink"
+            >
+              {loading ? 'Please wait…' : mode === 'login' ? 'Log In' : 'Create Account'}
             </button>
           </form>
         </div>
