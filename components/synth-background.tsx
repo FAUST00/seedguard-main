@@ -16,8 +16,8 @@ export function SynthBackground() {
       {/* Starfield (upper sky) */}
       <div className="synth-stars absolute inset-x-0 top-0 h-1/2" />
 
-      {/* Retro sun sinking behind the horizon */}
-      <div className="synth-sun absolute left-1/2 -translate-x-1/2 bottom-[14%] w-[34rem] h-[34rem] max-w-[80vw] max-h-[80vw] opacity-25" />
+      {/* Retro sun — shifted left to center visually behind the content area */}
+      <div className="synth-sun absolute left-[45%] -translate-x-1/2 bottom-[14%] w-[34rem] h-[34rem] max-w-[80vw] max-h-[80vw] opacity-25" />
 
       {/* Perspective laser grid (lower third) */}
       <div className="synth-grid absolute inset-x-[-20%] bottom-[-6%] h-[42%] opacity-60" />
