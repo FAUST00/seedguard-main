@@ -4,16 +4,16 @@
  * Dedicated Streaks leaderboard tab.
  *
  * Two views (toggled at the top):
- *   "Friends"  — you + accepted friends, sorted by current streak
- *   "Global"   — all 50 top users site-wide
+ *   "Friends"  â you + accepted friends, sorted by current streak
+ *   "Global"   â all 50 top users site-wide
  *
  * Design mirrors the blue/gold reference leaderboard:
- *   • Rank badge (trophy icons for top 3, number for rest)
- *   • Avatar circle with user-colour ring
- *   • Username + tier label
- *   • Current streak (large, neon)
- *   • Best streak + started date in a secondary row
- *   • Flame indicators that glow based on streak tier
+ *   â¢ Rank badge (trophy icons for top 3, number for rest)
+ *   â¢ Avatar circle with user-colour ring
+ *   â¢ Username + tier label
+ *   â¢ Current streak (large, neon)
+ *   â¢ Best streak + started date in a secondary row
+ *   â¢ Flame indicators that glow based on streak tier
  *
  * Background art: la-sunset.jpg in the header banner.
  */
@@ -36,7 +36,7 @@ import { ART } from '@/lib/assets';
 
 type View = 'friends' | 'global';
 
-// ── Rank badge ─────────────────────────────────────────────────────────────────
+// ââ Rank badge âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) return (
     <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gold/20 border-2 border-gold/60 neon-box-gold flex-shrink-0" aria-label="1st place">
@@ -60,7 +60,7 @@ function RankBadge({ rank }: { rank: number }) {
   );
 }
 
-// ── Flame indicator row ─────────────────────────────────────────────────────────
+// ââ Flame indicator row âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function FlameRow({ days }: { days: number }) {
   const { flames, color } = streakTier(days);
   if (flames === 0) return null;
@@ -77,7 +77,7 @@ function FlameRow({ days }: { days: number }) {
   );
 }
 
-// ── Single leaderboard row ──────────────────────────────────────────────────────
+// ââ Single leaderboard row ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
   const tier = streakTier(entry.current_streak);
   const stale = daysSince(entry.last_active ?? null);
@@ -100,7 +100,7 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
     >
       <RankBadge rank={rank} />
 
-      {/* Avatar — click for profile card */}
+      {/* Avatar â click for profile card */}
       <ProfileCard entry={entry}>
         <div
           className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm border-2 flex-shrink-0 ${tier.color}`}
@@ -141,7 +141,7 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
         </div>
       </div>
 
-      {/* Current streak — the headline number */}
+      {/* Current streak â the headline number */}
       <div className="flex-shrink-0 text-right">
         <p className={`text-2xl md:text-3xl font-extrabold tabular-nums leading-none ${tier.color} ${rank <= 3 ? (rank === 1 ? 'neon-text-gold' : 'neon-text-pink') : ''}`}>
           {entry.current_streak}
@@ -152,7 +152,7 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
   );
 }
 
-// ── Page ────────────────────────────────────────────────────────────────────────
+// ââ Page ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 export default function StreaksPage() {
   const { toast } = useToast();
   const [view, setView] = useState<View>('friends');
@@ -161,9 +161,11 @@ export default function StreaksPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const loadData = useCallback(async (showSpinner = false) => {
-    if (showSpinner) setRefreshing(true);
-    else setLoading(true);
+  const loadData = useCallback(async (showSpinner = false, silent = false) => {
+    if (!silent) {
+      if (showSpinner) setRefreshing(true);
+      else setLoading(true);
+    }
     try {
       // Push latest local streak to the DB so our row is current
       await syncProfileStreak();
@@ -172,10 +174,12 @@ export default function StreaksPage() {
         : await getFriendsLeaderboard();
       setEntries(data);
     } catch (err: unknown) {
-      toast((err as Error).message ?? 'Failed to load leaderboard.', 'error');
+      if (!silent) toast((err as Error).message ?? 'Failed to load leaderboard.', 'error');
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (!silent) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, [view, toast]);
 
@@ -187,36 +191,36 @@ export default function StreaksPage() {
     loadData();
   }, [loadData]);
 
-  // ── Live updates: Realtime + 60-second polling fallback ──────────────────────
+  // ââ Live updates: Realtime + 60-second polling fallback ââââââââââââââââââââââ
   const loadDataRef = useRef(loadData);
   useEffect(() => { loadDataRef.current = loadData; }, [loadData]);
 
   useEffect(() => {
-    // Supabase Realtime — fires immediately when any profile's streak changes
+    // Supabase Realtime â fires immediately when any profile's streak changes
     const channel = supabase
       .channel('leaderboard-profiles')
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'profiles' },
-        () => { loadDataRef.current(true); }
+        () => { loadDataRef.current(false, true); }   // silent — no button flicker
       )
       .subscribe();
 
     // 60-second polling fallback (covers browsers that block WebSockets)
-    const interval = setInterval(() => { loadDataRef.current(true); }, 60_000);
+    const interval = setInterval(() => { loadDataRef.current(false, true); }, 60_000); // silent
 
     return () => {
       supabase.removeChannel(channel);
       clearInterval(interval);
     };
   }, []); // runs once on mount, cleaned up on unmount
-  // ─────────────────────────────────────────────────────────────────────────────
+  // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
   const myEntry = entries.find((e) => e.isMe);
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-3xl space-y-6 page-entry">
-      {/* Header banner — la-sunset.jpg placed here */}
+      {/* Header banner â la-sunset.jpg placed here */}
       <ImageBanner src={ART.laSunset} className="mb-2">
         <div className="p-6 md:p-8 flex items-start justify-between flex-wrap gap-4">
           <div>
