@@ -3,12 +3,12 @@
 /**
  * ProfileCard — mini hover card shown on leaderboard / friends rows.
  *
- * Fix applied: replaced bg-background/90 (broken with CSS-var opacity) with
- * an inline style using a hardcoded RGBA value for full opacity control.
+ * Fix v2: fully opaque hex background (#0a0312), removed backdrop-blur,
+ * bolder border + deep shadow so card is always legible over any background.
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { Flame, Trophy, Calendar, Ghost } from 'lucide-react';
+import { Flame, Trophy, Calendar } from 'lucide-react';
 import { streakTier, fmtDate } from '@/lib/streaks';
 import type { StreakEntry } from '@/lib/streaks';
 
@@ -23,14 +23,12 @@ export function ProfileCard({ entry, children }: Props) {
   const triggerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Position card so it doesn't go off-screen
   useEffect(() => {
     if (!open || !triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
     setPos(rect.left > window.innerWidth / 2 ? 'left' : 'right');
   }, [open]);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -69,17 +67,17 @@ export function ProfileCard({ entry, children }: Props) {
           role="dialog"
           aria-label={`${entry.username}'s profile`}
           style={{
-            background: 'rgba(8, 3, 18, 0.96)',
-            border: '1px solid rgba(168, 85, 247, 0.65)',
-            boxShadow: '0 0 24px rgba(168, 85, 247, 0.18)',
+            background: '#0a0312',
+            border: '2px solid rgba(168, 85, 247, 0.85)',
+            boxShadow: '0 8px 40px rgba(0,0,0,0.95), 0 0 16px rgba(168,85,247,0.25)',
           }}
           className={`
-            absolute top-0 z-50 w-60
+            absolute top-0 z-50 w-64
             ${pos === 'right' ? 'left-full ml-3' : 'right-full mr-3'}
-            backdrop-blur-md rounded-2xl p-5 animate-scale-in
+            rounded-2xl p-5 animate-scale-in
           `}
         >
-          {/* Avatar */}
+          {/* Avatar + name */}
           <div className="flex items-center gap-3 mb-4">
             <div
               className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-extrabold border-2 border-primary/50 bg-primary/15 ${tier.color}`}
@@ -96,7 +94,7 @@ export function ProfileCard({ entry, children }: Props) {
               )}
             </div>
             <div className="min-w-0">
-              <p className={`font-bold truncate text-sm ${tier.color || 'text-foreground'} ${entry.isMe ? 'neon-text-pink' : ''}`}>
+              <p className={`font-bold truncate text-sm ${tier.color || 'text-white'} ${entry.isMe ? 'neon-text-pink' : ''}`}>
                 {entry.username}
               </p>
               {entry.isMe && (
@@ -105,7 +103,7 @@ export function ProfileCard({ entry, children }: Props) {
                 </span>
               )}
               {tier.label && (
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{tier.label}</p>
+                <p className="text-[10px] text-purple-300 uppercase tracking-wider font-semibold">{tier.label}</p>
               )}
             </div>
           </div>
@@ -113,27 +111,27 @@ export function ProfileCard({ entry, children }: Props) {
           {/* Stats */}
           <div className="space-y-2.5 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-foreground/75 flex items-center gap-1.5 font-medium">
+              <span className="text-purple-200 flex items-center gap-1.5 font-medium">
                 <Flame className="w-3.5 h-3.5 flame-glow" aria-hidden /> Current
               </span>
-              <span className={`font-bold tabular-nums ${tier.color || 'text-foreground'}`}>
+              <span className={`font-bold tabular-nums ${tier.color || 'text-white'}`}>
                 {entry.current_streak} days
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-foreground/75 flex items-center gap-1.5 font-medium">
+              <span className="text-purple-200 flex items-center gap-1.5 font-medium">
                 <Trophy className="w-3.5 h-3.5" aria-hidden /> Best
               </span>
-              <span className="font-bold tabular-nums text-foreground">
+              <span className="font-bold tabular-nums text-white">
                 {entry.best_streak} days
               </span>
             </div>
             {entry.streak_start && (
               <div className="flex items-center justify-between">
-                <span className="text-foreground/75 flex items-center gap-1.5 font-medium">
+                <span className="text-purple-200 flex items-center gap-1.5 font-medium">
                   <Calendar className="w-3.5 h-3.5" aria-hidden /> Started
                 </span>
-                <span className="text-xs tabular-nums text-foreground/85 font-semibold">
+                <span className="text-xs tabular-nums text-purple-100 font-semibold">
                   {fmtDate(entry.streak_start)}
                 </span>
               </div>
@@ -146,7 +144,7 @@ export function ProfileCard({ entry, children }: Props) {
               {Array.from({ length: 5 }).map((_, i) => (
                 <Flame
                   key={i}
-                  className={`w-4 h-4 transition-opacity ${i < tier.flames ? `${tier.color} flame-glow` : 'text-muted/30'}`}
+                  className={`w-4 h-4 transition-opacity ${i < tier.flames ? `${tier.color} flame-glow` : 'text-purple-900'}`}
                   aria-hidden
                 />
               ))}
