@@ -10,9 +10,10 @@
  *  - Sound effects on login success / error
  */
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { User, LogOut, Copy, Check, Shield, ExternalLink, Mail } from 'lucide-react';
-import { signIn, signUp, signOut, getUser, getProfile, migrateLocalToCloud } from '@/lib/sync';
+import { User, LogOut, Copy, Check, Shield, ExternalLink, Mail, Pencil, X, Loader2 } from 'lucide-react';
+import { signIn, signUp, signOut, getUser, getProfile, migrateLocalToCloud, updateProfile } from '@/lib/sync';
 import { syncProfileStreak } from '@/lib/social';
 import { supabase } from '@/lib/supabase';
 import { playSound, unlockAudio } from '@/lib/sound';
@@ -20,6 +21,22 @@ import { useToast } from '@/components/toast';
 import { ImageBanner } from '@/components/synth-background';
 import { ART } from '@/lib/assets';
 import { useRouter } from 'next/navigation';
+
+const USERNAME_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const USERNAME_LS_KEY = 'seedguard_username_changed_at';
+
+function daysUntilNextChange(lastChanged: string | null): number {
+  if (!lastChanged) return 0;
+  const elapsed = Date.now() - new Date(lastChanged).getTime();
+  return Math.max(0, Math.ceil((USERNAME_COOLDOWN_MS - elapsed) / 86_400_000));
+}
+
+function validateUsername(val: string): string | null {
+  if (val.length < 3) return 'Must be at least 3 characters.';
+  if (val.length > 20) return 'Must be 20 characters or fewer.';
+  if (!/^[a-zA-Z0-9_]+$/.test(val)) return 'Letters, numbers, and underscores only.';
+  return null;
+}
 
 /** User-specific localStorage keys — cleared on logout so the dashboard resets. */
 const USER_LS_KEYS = [
@@ -45,6 +62,12 @@ export default function AccountPage() {
   const [copied, setCopied] = useState(false);
   const [migrating, setMigrating] = useState(false);
   const [migrateResults, setMigrateResults] = useState<string[]>([]);
+
+  // Username editing
+  const [editingUsername, setEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [usernameSaving, setUsernameSaving] = useState(false);
 
   // ── Initial auth check ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -154,6 +177,35 @@ export default function AccountPage() {
     toast('Friend code copied to clipboard!', 'success');
   }
 
+  async function handleSaveUsername() {
+    const trimmed = newUsername.trim();
+    const err = validateUsername(trimmed);
+    if (err) { setUsernameError(err); return; }
+
+    const lastChanged = localStorage.getItem(USERNAME_LS_KEY);
+    const daysLeft = daysUntilNextChange(lastChanged);
+    if (daysLeft > 0) {
+      setUsernameError(`You can change your username again in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.`);
+      return;
+    }
+
+    setUsernameSaving(true);
+    setUsernameError('');
+    try {
+      await updateProfile({ username: trimmed });
+      localStorage.setItem(USERNAME_LS_KEY, new Date().toISOString());
+      setProfile((prev) => prev ? { ...prev, username: trimmed } : prev);
+      setEditingUsername(false);
+      playSound('success');
+      toast('Username updated!', 'success');
+    } catch (err: unknown) {
+      setUsernameError((err as Error).message ?? 'Failed to save username.');
+      playSound('error');
+    } finally {
+      setUsernameSaving(false);
+    }
+  }
+
   // ── Loading ────────────────────────────────────────────────────────────────
   if (step === 'loading') {
     return (
@@ -198,6 +250,10 @@ export default function AccountPage() {
   // ── Profile view ───────────────────────────────────────────────────────────
   if (step === 'profile' && profile) {
     const displayName = (profile.username as string | null) ?? 'Anonymous';
+    const lastChanged = typeof window !== 'undefined' ? localStorage.getItem(USERNAME_LS_KEY) : null;
+    const daysLeft = daysUntilNextChange(lastChanged);
+    const canEdit = daysLeft === 0;
+
     return (
       <div className="container mx-auto p-4 md:p-8 max-w-2xl space-y-8 page-entry">
         {/* Banner */}
@@ -206,11 +262,66 @@ export default function AccountPage() {
             <div className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/50 flex items-center justify-center flex-shrink-0">
               <User className="w-8 h-8 text-primary" aria-hidden />
             </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-display font-extrabold neon-text-pink text-primary uppercase tracking-wider">
-                {displayName}
-              </h1>
+            <div className="flex-1 min-w-0">
+              {editingUsername ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={newUsername}
+                      onChange={(e) => { setNewUsername(e.target.value); setUsernameError(''); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleSaveUsername(); if (e.key === 'Escape') setEditingUsername(false); }}
+                      maxLength={20}
+                      autoFocus
+                      className="flex-1 bg-background/60 border border-primary/50 rounded-lg px-3 py-1.5 text-sm text-primary font-bold focus:outline-none focus:ring-1 focus:ring-primary/60 min-w-0"
+                      placeholder="New username"
+                      aria-label="New username"
+                    />
+                    <button
+                      onClick={handleSaveUsername}
+                      disabled={usernameSaving}
+                      className="px-3 py-1.5 rounded-lg bg-primary/20 border border-primary/50 text-primary text-xs font-bold uppercase tracking-wider hover:bg-primary/30 transition-all disabled:opacity-50 flex items-center gap-1"
+                    >
+                      {usernameSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                      Save
+                    </button>
+                    <button
+                      onClick={() => { setEditingUsername(false); setUsernameError(''); }}
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label="Cancel"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  {usernameError && (
+                    <p className="text-xs text-destructive">{usernameError}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-2xl md:text-3xl font-display font-extrabold neon-text-pink text-primary uppercase tracking-wider truncate">
+                    {displayName}
+                  </h1>
+                  {canEdit ? (
+                    <button
+                      onClick={() => { setNewUsername(displayName === 'Anonymous' ? '' : displayName); setUsernameError(''); setEditingUsername(true); }}
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
+                      aria-label="Edit username"
+                      title="Edit username"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <span className="text-xs text-muted-foreground/60 flex-shrink-0">
+                      (edit in {daysLeft}d)
+                    </span>
+                  )}
+                </div>
+              )}
               <p className="text-sm text-muted-foreground mt-0.5">Cloud account active ✅</p>
+              {!editingUsername && canEdit && (
+                <p className="text-xs text-muted-foreground/50 mt-0.5">Username can be changed once every 7 days</p>
+              )}
             </div>
           </div>
         </ImageBanner>
@@ -225,13 +336,13 @@ export default function AccountPage() {
             {copied ? 'Copied!' : 'Copy Friend Code'}
           </button>
 
-          <a
+          <Link
             href="/streaks"
             className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gold/50 text-gold bg-gold/10 hover:bg-gold/20 font-bold uppercase tracking-wider neon-hover"
           >
             <ExternalLink className="w-5 h-5" aria-hidden />
             View Leaderboard
-          </a>
+          </Link>
 
           <button
             onClick={handleLogout}
@@ -267,9 +378,9 @@ export default function AccountPage() {
 
         <p className="text-sm text-muted-foreground text-center">
           To permanently delete your account, go to{' '}
-          <a href="/settings" className="text-destructive hover:underline font-semibold">
+          <Link href="/settings" className="text-destructive hover:underline font-semibold">
             Settings → Danger Zone
-          </a>.
+          </Link>.
         </p>
       </div>
     );
