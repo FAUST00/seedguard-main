@@ -10,6 +10,7 @@
  * Realtime: friend-request changes + new DMs both trigger live updates.
  */
 
+import Link from 'next/link';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Users, MessageSquare, UserPlus, UserCheck, UserX, Search,
@@ -230,12 +231,12 @@ export default function SocialPage() {
         <p className="text-muted-foreground max-w-sm">
           Create a free account to search for friends, send messages, and join the community.
         </p>
-        <a
+        <Link
           href="/account"
           className="px-6 py-3 rounded-xl border border-primary/50 bg-primary/10 text-primary font-bold uppercase tracking-wider neon-hover"
         >
           Go to Account
-        </a>
+        </Link>
       </div>
     );
   }
