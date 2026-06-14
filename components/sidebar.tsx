@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useState } from 'react';
 import {
-  Shield,
   LayoutDashboard,
   History,
   MapPin,
@@ -15,6 +14,7 @@ import {
   User,
   Flame,
 } from 'lucide-react';
+import { SeedGuardLogo } from '@/components/seedguard-logo';
 
 const navigationItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -44,12 +44,7 @@ export function Sidebar() {
           href="/"
           className="flex items-center gap-3 px-2 hover:opacity-80 transition-opacity"
         >
-          <div className="relative">
-            <Shield className="w-8 h-8 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.8)]" />
-          </div>
-          <span className="font-display font-extrabold text-xl tracking-widest uppercase italic neon-text-pink text-primary">
-            SeedGuard
-          </span>
+          <SeedGuardLogo size="sm" showTagline={false} />
         </Link>
 
         {/* Navigation */}
@@ -87,10 +82,7 @@ export function Sidebar() {
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between h-16 px-4 border-b border-primary/10 glass-effect sticky top-0 z-50">
         <Link href="/" className="flex items-center gap-2">
-          <Shield className="w-6 h-6 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.8)]" />
-          <span className="font-display font-bold text-sm tracking-wider uppercase italic neon-text-pink text-primary">
-            SeedGuard
-          </span>
+          <SeedGuardLogo size="sm" showTagline={false} />
         </Link>
 
         <button
