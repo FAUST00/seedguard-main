@@ -85,25 +85,17 @@ export async function getFriendsLeaderboard(): Promise<StreakEntry[]> {
 /** Format an ISO date string for display. */
 export function fmtDate(iso: string | null): string {
   if (!iso) return '—';
-  try {
-    return new Date(iso).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return '—';
-  }
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 /** Days since an ISO timestamp. */
 export function daysSince(iso: string | null): number {
   if (!iso) return 0;
-  try {
-    return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000));
-  } catch {
-    return 0;
-  }
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return 0;
+  return Math.max(0, Math.floor((Date.now() - d.getTime()) / 86_400_000));
 }
 
 /** Colour class + flame intensity based on streak length. */

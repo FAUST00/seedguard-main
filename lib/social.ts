@@ -187,7 +187,8 @@ export async function getConversation(friendId: string): Promise<DirectMessage[]
   // Mark unread incoming messages as read
   const unread = (data ?? []).filter((m) => !m.read && m.recipient === user.id).map((m) => m.id);
   if (unread.length > 0) {
-    supabase.from('messages').update({ read: true }).in('id', unread).then(() => {});
+    supabase.from('messages').update({ read: true }).in('id', unread)
+      .then(({ error }) => { if (error) console.warn('[markAsRead]', error.message); });
   }
   return (data ?? []) as DirectMessage[];
 }

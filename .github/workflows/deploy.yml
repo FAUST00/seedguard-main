@@ -21,16 +21,20 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm ci --legacy-peer-deps
+
+      - name: Lint
+        run: npm run lint
 
       - name: Build
         run: npm run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: https://earfjshpbwcnpqinrrvl.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhcmZqc2hwYndjbnBxaW5ycnZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3OTA1NDEsImV4cCI6MjA5NjM2NjU0MX0.5H38IPnQsbG-DL6qBW8wXhnq0hDTAr2yPH-Shv2xtvg
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
       - name: Add .nojekyll
         run: touch out/.nojekyll

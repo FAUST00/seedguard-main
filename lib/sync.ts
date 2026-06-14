@@ -201,7 +201,10 @@ export async function syncWithCloud(force = false): Promise<void> {
       : null;
     if (statsRaw) await saveStatsToCloud(JSON.parse(statsRaw));
   } catch (err) {
-    console.warn('[syncWithCloud] silent fail:', err);
+    // Background sync — non-fatal, but log so devtools shows it
+    console.warn('[syncWithCloud]', err);
+    // Re-throw so callers can optionally surface the error to the user
+    throw err;
   }
 }
 

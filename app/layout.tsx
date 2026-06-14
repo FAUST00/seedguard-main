@@ -19,6 +19,24 @@ export const metadata: Metadata = {
     description: 'Build unbreakable streaks. Compete with friends. Reclaim your freedom.',
     type: 'website',
     siteName: 'SeedGuard',
+    images: [
+      {
+        url: '/seedguard-main/images/wp4787824-retrowave-night-wallpapers.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'SeedGuard — PMO Freedom Tracker',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SeedGuard | PMO Freedom Tracker',
+    description: 'Build unbreakable streaks. Compete with friends. Reclaim your freedom.',
+    images: ['/seedguard-main/images/wp4787824-retrowave-night-wallpapers.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
