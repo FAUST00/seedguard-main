@@ -24,8 +24,9 @@ function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
 
-// ── 25 motivational quotes (PMO recovery · Stoic · Discipline) ──────────────
+// ── 100 motivational quotes (PMO recovery · Stoic · Discipline · Philosophy) ─
 const QUOTES = [
+  // Original 25
   { text: 'You have power over your mind, not outside events. Realize this, and you will find strength.', author: 'Marcus Aurelius' },
   { text: 'The first and greatest victory is to conquer yourself.', author: 'Plato' },
   { text: 'Discipline is the bridge between goals and accomplishment.', author: 'Jim Rohn' },
@@ -51,7 +52,91 @@ const QUOTES = [
   { text: 'Strength does not come from physical capacity. It comes from an indomitable will.', author: 'Mahatma Gandhi' },
   { text: 'Make the most of yourself, for that is all there is of you.', author: 'Ralph Waldo Emerson' },
   { text: 'Your future self is watching you right now through your memories. Make him proud.', author: '' },
+  // 75 new quotes
+  { text: 'The happiness of your life depends upon the quality of your thoughts.', author: 'Marcus Aurelius' },
+  { text: 'When you arise in the morning, think of what a precious privilege it is to be alive — to breathe, to think, to enjoy, to love.', author: 'Marcus Aurelius' },
+  { text: 'Think of yourself as dead. You have lived your life. Now take what\'s left and live it properly.', author: 'Marcus Aurelius' },
+  { text: 'Never let the future disturb you. You will meet it, if you have to, with the same weapons of reason which today arm you against the present.', author: 'Marcus Aurelius' },
+  { text: 'The chains of habit are too weak to be felt until they are too strong to be broken.', author: 'Samuel Johnson' },
+  { text: 'Knowing yourself is the beginning of all wisdom.', author: 'Aristotle' },
+  { text: 'He suffers more than necessary who suffers before it is necessary.', author: 'Seneca' },
+  { text: 'Luck is what happens when preparation meets opportunity.', author: 'Seneca' },
+  { text: 'It is not that I am so smart, it is just that I stay with problems longer.', author: 'Albert Einstein' },
+  { text: 'Fall seven times, stand up eight.', author: 'Japanese Proverb' },
+  { text: 'The man who moves a mountain begins by carrying away small stones.', author: 'Confucius' },
+  { text: 'Our greatest glory is not in never falling, but in rising every time we fall.', author: 'Confucius' },
+  { text: 'Either you run the day, or the day runs you.', author: 'Jim Rohn' },
+  { text: 'Success is nothing more than a few simple disciplines practiced every day.', author: 'Jim Rohn' },
+  { text: 'Do not wait; the time will never be just right. Start where you stand.', author: 'Napoleon Hill' },
+  { text: 'The price of anything is the amount of life you exchange for it.', author: 'Henry David Thoreau' },
+  { text: 'Go confidently in the direction of your dreams. Live the life you have imagined.', author: 'Henry David Thoreau' },
+  { text: 'Do what you can, with what you have, where you are.', author: 'Theodore Roosevelt' },
+  { text: 'Speak less than you know. Have more than you show.', author: 'William Shakespeare' },
+  { text: 'To know what you know and what you do not know — that is true knowledge.', author: 'Confucius' },
+  { text: 'First say to yourself what you would be; and then do what you have to do.', author: 'Epictetus' },
+  { text: 'Seek not the good in external things; seek it in yourself.', author: 'Epictetus' },
+  { text: 'Men are disturbed not by the things which happen, but by the opinions about the things.', author: 'Epictetus' },
+  { text: 'Make the best use of what is in your power, and take the rest as it happens.', author: 'Epictetus' },
+  { text: 'He is a wise man who does not grieve for the things which he has not, but rejoices for those which he has.', author: 'Epictetus' },
+  { text: 'No man is free who is not master of himself.', author: 'Epictetus' },
+  { text: 'Wealth consists not in having great possessions, but in having few wants.', author: 'Epictetus' },
+  { text: 'You become what you think about all day long.', author: 'Ralph Waldo Emerson' },
+  { text: 'What lies behind us and what lies before us are tiny matters compared to what lies within us.', author: 'Ralph Waldo Emerson' },
+  { text: 'The only person you are destined to become is the person you decide to be.', author: 'Ralph Waldo Emerson' },
+  { text: 'In the middle of every difficulty lies opportunity.', author: 'Albert Einstein' },
+  { text: 'Life is what happens when you are busy making other plans.', author: 'John Lennon' },
+  { text: 'The secret of getting ahead is getting started.', author: 'Mark Twain' },
+  { text: 'The best time to plant a tree was 20 years ago. The second best time is now.', author: 'Chinese Proverb' },
+  { text: 'Your life does not get better by chance. It gets better by change.', author: 'Jim Rohn' },
+  { text: 'Pain is temporary. Quitting lasts forever.', author: 'Lance Armstrong' },
+  { text: 'It always seems impossible until it is done.', author: 'Nelson Mandela' },
+  { text: 'I am not a product of my circumstances. I am a product of my decisions.', author: 'Stephen Covey' },
+  { text: 'The mind is its own place, and in itself can make a heaven of hell, a hell of heaven.', author: 'John Milton' },
+  { text: 'What you resist, persists. What you accept, you can change.', author: 'Carl Jung' },
+  { text: 'Until you make the unconscious conscious, it will direct your life and you will call it fate.', author: 'Carl Jung' },
+  { text: 'He who has a why to live can bear almost any how.', author: 'Friedrich Nietzsche' },
+  { text: 'Without music, life would be a mistake. Without discipline, music would be noise.', author: 'Friedrich Nietzsche' },
+  { text: 'The secret to change is to focus all of your energy not on fighting the old, but on building the new.', author: 'Socrates' },
+  { text: 'An unexamined life is not worth living.', author: 'Socrates' },
+  { text: 'To move the world, we must first move ourselves.', author: 'Socrates' },
+  { text: 'Courage is knowing what not to fear.', author: 'Plato' },
+  { text: 'Excellence is never an accident. It is always the result of high intention, sincere effort, and intelligent execution.', author: 'Aristotle' },
+  { text: 'The energy you put into controlling yourself is the same energy others waste on excuses.', author: '' },
+  { text: 'Every day is a new opportunity to be better than yesterday.', author: '' },
+  { text: 'The strongest man is not he who overcomes others, but he who overcomes himself.', author: '' },
+  { text: 'A warrior does not give up what he loves. He finds the love in what he does.', author: 'Dan Millman' },
+  { text: 'There is no easy walk to freedom anywhere, and many of us will have to pass through the valley of the shadow of death again and again before we reach the mountaintop.', author: 'Nelson Mandela' },
+  { text: 'Do not pray for an easy life. Pray for the strength to endure a difficult one.', author: 'Bruce Lee' },
+  { text: 'Absorb what is useful, discard what is not, add what is uniquely your own.', author: 'Bruce Lee' },
+  { text: 'If you spend too much time thinking about a thing, you will never get it done.', author: 'Bruce Lee' },
+  { text: 'The successful man will profit from his mistakes and try again in a different way.', author: 'Dale Carnegie' },
+  { text: 'Inaction breeds doubt and fear. Action breeds confidence and courage.', author: 'Dale Carnegie' },
+  { text: 'Most of the important things in the world have been accomplished by people who have kept on trying when there seemed to be no hope at all.', author: 'Dale Carnegie' },
+  { text: 'Yesterday is gone. Tomorrow has not yet come. We have only today. Let us begin.', author: 'Mother Teresa' },
+  { text: 'If you are going through hell, keep going.', author: 'Winston Churchill' },
+  { text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.', author: 'Winston Churchill' },
+  { text: 'Continuous effort — not strength or intelligence — is the key to unlocking our potential.', author: 'Winston Churchill' },
+  { text: 'The will to win, the desire to succeed, the urge to reach your full potential — these are the keys that will unlock the door to personal excellence.', author: 'Confucius' },
+  { text: 'By failing to prepare, you are preparing to fail.', author: 'Benjamin Franklin' },
+  { text: 'An investment in knowledge pays the best interest.', author: 'Benjamin Franklin' },
+  { text: 'Well done is better than well said.', author: 'Benjamin Franklin' },
+  { text: 'Forget past mistakes. Forget failures. Forget everything except what you are going to do now and do it.', author: 'William Durant' },
+  { text: 'The only way to discover the limits of the possible is to go beyond them into the impossible.', author: 'Arthur C. Clarke' },
+  { text: 'Energy and persistence conquer all things.', author: 'Benjamin Franklin' },
+  { text: 'Your greatest asset is your earning ability. Your greatest resource is your time.', author: 'Brian Tracy' },
+  { text: 'Develop the winning edge; small differences in your performance can lead to large differences in your results.', author: 'Brian Tracy' },
+  { text: 'A year from now you may wish you had started today.', author: 'Karen Lamb' },
+  { text: 'The secret of discipline is motivation. When a man is sufficiently motivated, discipline will take care of itself.', author: 'Sir Alexander Paterson' },
+  { text: 'We must all suffer one of two things: the pain of discipline or the pain of regret.', author: 'Jim Rohn' },
 ] as const;
+
+function randomQuoteIndex(exclude: number): number {
+  let next: number;
+  do {
+    next = Math.floor(Math.random() * QUOTES.length);
+  } while (next === exclude && QUOTES.length > 1);
+  return next;
+}
 
 async function resolveStreakStart(): Promise<Date> {
   try {
@@ -95,7 +180,6 @@ function getFirstDay(): Date {
   return new Date(now);
 }
 
-// Days that trigger a milestone fanfare sound
 const MILESTONE_DAYS = new Set([7, 30, 90, 180, 365]);
 
 export default function Dashboard() {
@@ -107,22 +191,21 @@ export default function Dashboard() {
   const [editDateInput, setEditDateInput] = useState('');
   const [streakDisplayDate, setStreakDisplayDate] = useState('');
 
-  // ── Quote state — hourly base + manual offset ──────────────────────────────
-  const [quoteOffset, setQuoteOffset] = useState(0);
-  const hourlyBase = Math.floor(Date.now() / 3_600_000) % QUOTES.length;
-  const currentQuoteIdx = (hourlyBase + quoteOffset) % QUOTES.length;
-  const currentQuote = QUOTES[currentQuoteIdx];
+  // Quote: start at a random index; "Next Quote" picks a different random one
+  const [quoteIndex, setQuoteIndex] = useState(() =>
+    Math.floor(Math.random() * QUOTES.length)
+  );
+  const currentQuote = QUOTES[quoteIndex];
 
-  // Track previous day count to detect milestone crossings
-  const prevDaysRef = useRef(0);
-
-  // Auto-advance quote every hour
+  // Auto-advance to a new random quote every hour
   useEffect(() => {
     const id = setInterval(() => {
-      setQuoteOffset(o => o); // triggers re-render so hourlyBase recomputes
+      setQuoteIndex((prev) => randomQuoteIndex(prev));
     }, 3_600_000);
     return () => clearInterval(id);
   }, []);
+
+  const prevDaysRef = useRef(0);
 
   useEffect(() => {
     async function init() {
@@ -140,7 +223,7 @@ export default function Dashboard() {
     init();
   }, []);
 
-  // Live timer
+  // Live timer — ticks every second
   useEffect(() => {
     const tick = async () => {
       const start = await resolveStreakStart();
@@ -157,7 +240,7 @@ export default function Dashboard() {
     return () => clearInterval(id);
   }, []);
 
-  // Sync stats when day changes
+  // Sync stats when day count changes
   useEffect(() => {
     if (loading) return;
     setStats(prev => {
@@ -168,11 +251,11 @@ export default function Dashboard() {
       if (typeof window !== 'undefined') localStorage.setItem('seedguard_stats', JSON.stringify(updated));
       return updated;
     });
-    syncWithCloud();
+    syncWithCloud().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer.days, loading]);
 
-  // Milestone sound — fires once when streak crosses 7 / 30 / 90 / 180 / 365 days
+  // Milestone sound
   useEffect(() => {
     const prev = prevDaysRef.current;
     const curr = timer.days;
@@ -187,7 +270,7 @@ export default function Dashboard() {
     const d = new Date(editDateInput);
     if (isNaN(d.getTime())) return;
     if (typeof window !== 'undefined') localStorage.setItem('seedguard_streak_start', d.toISOString());
-    await syncWithCloud(true);
+    await syncWithCloud(true).catch(() => {});
     setStreakDisplayDate(d.toLocaleDateString());
     setShowStreakEdit(false);
     window.location.reload();
@@ -308,12 +391,11 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      {/* ── Motivational Quote ──────────────────────────────────────────────────── */}
+      {/* Daily Wisdom */}
       <div className="rounded-xl border border-secondary/30 bg-background/50 backdrop-blur-sm p-6 md:p-8 animate-scale-in [animation-delay:300ms] neon-box-cyan">
         <div className="flex items-center gap-2 mb-4">
           <Quote className="w-4 h-4 text-secondary/70" aria-hidden />
           <p className="text-xs text-secondary/70 uppercase tracking-widest font-bold">Daily Wisdom</p>
-          <span className="ml-auto text-xs text-muted-foreground/50 tabular-nums">{currentQuoteIdx + 1} / {QUOTES.length}</span>
         </div>
 
         <blockquote className="text-base md:text-lg text-foreground leading-relaxed italic mb-3 min-h-[4rem]">
@@ -325,7 +407,10 @@ export default function Dashboard() {
         ) : null}
 
         <button
-          onClick={() => { playSound('click'); setQuoteOffset(o => (o + 1) % QUOTES.length); }}
+          onClick={() => {
+            playSound('click');
+            setQuoteIndex((prev) => randomQuoteIndex(prev));
+          }}
           className="mt-5 inline-flex items-center gap-1.5 text-xs text-secondary/70 hover:text-secondary font-bold uppercase tracking-wider transition-colors"
           aria-label="Next quote"
         >

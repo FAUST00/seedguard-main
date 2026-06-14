@@ -1,23 +1,5 @@
 'use client';
 
-/**
- * Dedicated Streaks leaderboard tab.
- *
- * Two views (toggled at the top):
- *   "Friends"  â you + accepted friends, sorted by current streak
- *   "Global"   â all 50 top users site-wide
- *
- * Design mirrors the blue/gold reference leaderboard:
- *   â¢ Rank badge (trophy icons for top 3, number for rest)
- *   â¢ Avatar circle with user-colour ring
- *   â¢ Username + tier label
- *   â¢ Current streak (large, neon)
- *   â¢ Best streak + started date in a secondary row
- *   â¢ Flame indicators that glow based on streak tier
- *
- * Background art: la-sunset.jpg in the header banner.
- */
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Flame, Trophy, Medal, Crown, RefreshCw, Loader2, Globe, Users } from 'lucide-react';
 import { ImageBanner } from '@/components/synth-background';
@@ -36,7 +18,7 @@ import { ART } from '@/lib/assets';
 
 type View = 'friends' | 'global';
 
-// ââ Rank badge âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Rank badge ────────────────────────────────────────────────────────────────
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) return (
     <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gold/20 border-2 border-gold/60 neon-box-gold flex-shrink-0" aria-label="1st place">
@@ -60,7 +42,7 @@ function RankBadge({ rank }: { rank: number }) {
   );
 }
 
-// ââ Flame indicator row âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Flame indicator row ───────────────────────────────────────────────────────
 function FlameRow({ days }: { days: number }) {
   const { flames, color } = streakTier(days);
   if (flames === 0) return null;
@@ -77,13 +59,12 @@ function FlameRow({ days }: { days: number }) {
   );
 }
 
-// ââ Single leaderboard row ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Single leaderboard row ────────────────────────────────────────────────────
 function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
   const tier = streakTier(entry.current_streak);
   const stale = daysSince(entry.last_active ?? null);
   const initial = (entry.username ?? '?').charAt(0).toUpperCase();
 
-  // Row border colour by rank
   const rankBorder =
     rank === 1 ? 'border-gold/40' :
     rank === 2 ? 'border-zinc-300/30' :
@@ -100,7 +81,6 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
     >
       <RankBadge rank={rank} />
 
-      {/* Avatar â click for profile card */}
       <ProfileCard entry={entry}>
         <div
           className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm border-2 flex-shrink-0 ${tier.color}`}
@@ -112,7 +92,6 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
         </div>
       </ProfileCard>
 
-      {/* Name + meta */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`font-bold text-sm truncate ${entry.isMe ? 'neon-text-pink text-primary' : ''}`}>
@@ -141,7 +120,6 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
         </div>
       </div>
 
-      {/* Current streak â the headline number */}
       <div className="flex-shrink-0 text-right">
         <p className={`text-2xl md:text-3xl font-extrabold tabular-nums leading-none ${tier.color} ${rank <= 3 ? (rank === 1 ? 'neon-text-gold' : 'neon-text-pink') : ''}`}>
           {entry.current_streak}
@@ -152,7 +130,7 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
   );
 }
 
-// ââ Page ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function StreaksPage() {
   const { toast } = useToast();
   const [view, setView] = useState<View>('friends');
@@ -161,25 +139,37 @@ export default function StreaksPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const loadData = useCallback(async (showSpinner = false, silent = false) => {
-    if (!silent) {
-      if (showSpinner) setRefreshing(true);
-      else setLoading(true);
-    }
+  // Read-only fetch — no DB write.
+  // Safe to call from realtime listener and polling without triggering a loop.
+  const fetchEntries = useCallback(async () => {
     try {
-      // Push latest local streak to the DB so our row is current
+      const data = view === 'global'
+        ? await getGlobalLeaderboard()
+        : await getFriendsLeaderboard();
+      setEntries(data);
+    } catch {
+      // Background refresh — suppress toast noise
+    }
+  }, [view]);
+
+  // Full load — syncs your profile to the DB first, then fetches.
+  // Only called on mount, view change, and manual Refresh button.
+  // NOT called from the realtime listener (that would cause an infinite loop:
+  // syncProfileStreak writes to profiles → realtime fires → syncProfileStreak → repeat).
+  const loadData = useCallback(async (showSpinner = false) => {
+    if (showSpinner) setRefreshing(true);
+    else setLoading(true);
+    try {
       await syncProfileStreak();
       const data = view === 'global'
         ? await getGlobalLeaderboard()
         : await getFriendsLeaderboard();
       setEntries(data);
     } catch (err: unknown) {
-      if (!silent) toast((err as Error).message ?? 'Failed to load leaderboard.', 'error');
+      toast((err as Error).message ?? 'Failed to load leaderboard.', 'error');
     } finally {
-      if (!silent) {
-        setLoading(false);
-        setRefreshing(false);
-      }
+      setLoading(false);
+      setRefreshing(false);
     }
   }, [view, toast]);
 
@@ -191,36 +181,34 @@ export default function StreaksPage() {
     loadData();
   }, [loadData]);
 
-  // ââ Live updates: Realtime + 60-second polling fallback ââââââââââââââââââââââ
-  const loadDataRef = useRef(loadData);
-  useEffect(() => { loadDataRef.current = loadData; }, [loadData]);
+  // Keep a stable ref to fetchEntries for use inside the realtime/polling effect
+  const fetchEntriesRef = useRef(fetchEntries);
+  useEffect(() => { fetchEntriesRef.current = fetchEntries; }, [fetchEntries]);
 
+  // Live updates: Realtime + 60-second polling fallback.
+  // Uses fetchEntries (read-only) — never loadData — to avoid the sync loop.
   useEffect(() => {
-    // Supabase Realtime â fires immediately when any profile's streak changes
     const channel = supabase
       .channel('leaderboard-profiles')
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'profiles' },
-        () => { loadDataRef.current(false, true); }   // silent — no button flicker
+        () => { fetchEntriesRef.current(); }
       )
       .subscribe();
 
-    // 60-second polling fallback (covers browsers that block WebSockets)
-    const interval = setInterval(() => { loadDataRef.current(false, true); }, 60_000); // silent
+    const interval = setInterval(() => { fetchEntriesRef.current(); }, 60_000);
 
     return () => {
       supabase.removeChannel(channel);
       clearInterval(interval);
     };
-  }, []); // runs once on mount, cleaned up on unmount
-  // âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+  }, []);
 
   const myEntry = entries.find((e) => e.isMe);
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-3xl space-y-6 page-entry">
-      {/* Header banner â la-sunset.jpg placed here */}
       <ImageBanner src={ART.laSunset} className="mb-2">
         <div className="p-6 md:p-8 flex items-start justify-between flex-wrap gap-4">
           <div>
@@ -233,7 +221,6 @@ export default function StreaksPage() {
             </p>
           </div>
 
-          {/* Refresh */}
           <button
             onClick={() => loadData(true)}
             disabled={refreshing}
@@ -248,7 +235,6 @@ export default function StreaksPage() {
         </div>
       </ImageBanner>
 
-      {/* View toggle */}
       <div
         className="inline-flex rounded-xl border border-muted/30 bg-muted/10 p-1 gap-1 w-full sm:w-auto"
         role="tablist"
@@ -276,7 +262,6 @@ export default function StreaksPage() {
         ))}
       </div>
 
-      {/* My rank card (pinned, only when logged in) */}
       {loggedIn && myEntry && !loading && (
         <div className="rounded-2xl border border-primary/30 glass-effect p-4 flex items-center gap-4 neon-box-pink animate-scale-in">
           <RankBadge rank={myEntry.rank} />
@@ -294,7 +279,6 @@ export default function StreaksPage() {
         </div>
       )}
 
-      {/* Leaderboard list */}
       {loading ? (
         <ul className="space-y-3" aria-label="Loading leaderboard">
           {Array.from({ length: 6 }).map((_, i) => <li key={i}><LeaderboardRowSkeleton /></li>)}
@@ -322,7 +306,6 @@ export default function StreaksPage() {
             ))}
           </ul>
 
-          {/* Summary footer */}
           <div className="rounded-xl border border-muted/15 bg-muted/5 p-4 flex flex-wrap gap-6 justify-center text-sm text-muted-foreground">
             <span>
               <strong className="text-foreground">{entries.length}</strong>{' '}
@@ -344,7 +327,6 @@ export default function StreaksPage() {
         </>
       )}
 
-      {/* How-to note */}
       <div className="rounded-xl border border-muted/15 bg-muted/5 p-5 text-xs text-muted-foreground space-y-1.5">
         <p className="font-bold text-foreground uppercase tracking-wider text-xs">How the leaderboard updates</p>
         <p>Your streak is pushed to the board every time you open this tab or the Dashboard. Friends appear automatically once you&apos;re connected in the Social tab. Global rankings refresh in real-time as users sync.</p>
