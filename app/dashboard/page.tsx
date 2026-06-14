@@ -206,6 +206,8 @@ export default function Dashboard() {
   }, []);
 
   const prevDaysRef = useRef(0);
+  // Cache the resolved streak start so the 1-second timer never hits Supabase
+  const streakStartRef = useRef<Date | null>(null);
 
   useEffect(() => {
     async function init() {
@@ -217,16 +219,18 @@ export default function Dashboard() {
       setHasAccount(!!(user || (typeof window !== 'undefined' && localStorage.getItem('seedguard_account'))));
 
       const start = await resolveStreakStart();
+      streakStartRef.current = start;
       setStreakDisplayDate(start.toLocaleDateString());
       setLoading(false);
     }
     init();
   }, []);
 
-  // Live timer — ticks every second
+  // Live timer — pure math against the cached start date, zero network calls
   useEffect(() => {
-    const tick = async () => {
-      const start = await resolveStreakStart();
+    const tick = () => {
+      const start = streakStartRef.current;
+      if (!start) return;
       const totalSec = Math.max(0, Math.floor((Date.now() - start.getTime()) / 1000));
       setTimer({
         days: Math.floor(totalSec / 86400),
@@ -270,6 +274,7 @@ export default function Dashboard() {
     const d = new Date(editDateInput);
     if (isNaN(d.getTime())) return;
     if (typeof window !== 'undefined') localStorage.setItem('seedguard_streak_start', d.toISOString());
+    streakStartRef.current = d;
     await syncWithCloud(true).catch(() => {});
     setStreakDisplayDate(d.toLocaleDateString());
     setShowStreakEdit(false);

@@ -2,10 +2,24 @@
  * lib/sync.ts - SeedGuard cloud sync via Supabase (client-side only)
  */
 import { supabase } from './supabase';
+import type { User } from '@supabase/supabase-js';
 
-export async function getUser() {
+// Cache the auth user for 30 s to avoid a network round-trip on every call.
+// Invalidated immediately on sign-in / sign-out.
+let _userCache: { user: User | null; ts: number } | null = null;
+const USER_CACHE_TTL = 30_000;
+
+export async function getUser(): Promise<User | null> {
+  if (_userCache && Date.now() - _userCache.ts < USER_CACHE_TTL) {
+    return _userCache.user;
+  }
   const { data } = await supabase.auth.getUser();
+  _userCache = { user: data.user, ts: Date.now() };
   return data.user;
+}
+
+export function invalidateUserCache() {
+  _userCache = null;
 }
 
 export async function getSession() {
@@ -14,12 +28,14 @@ export async function getSession() {
 }
 
 export async function signIn(email: string, password: string) {
+  invalidateUserCache();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
 }
 
 export async function signUp(email: string, password: string, username: string) {
+  invalidateUserCache();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -30,6 +46,7 @@ export async function signUp(email: string, password: string, username: string) 
 }
 
 export async function signOut() {
+  invalidateUserCache();
   await supabase.auth.signOut();
 }
 
@@ -174,11 +191,17 @@ export async function getProfile() {
 export async function updateProfile(updates: { username?: string; avatar_url?: string }) {
   const user = await getUser();
   if (!user) return;
-  await supabase.from('profiles').upsert({
+  const { error } = await supabase.from('profiles').upsert({
     id: user.id,
     ...updates,
     updated_at: new Date().toISOString(),
   });
+  if (error) throw new Error(error.message);
+  // Keep auth metadata in sync so nothing reads the stale signup username
+  if (updates.username) {
+    await supabase.auth.updateUser({ data: { username: updates.username } });
+    invalidateUserCache();
+  }
 }
 
 // ── Main syncWithCloud (streak + stats) ──────────────────────────────

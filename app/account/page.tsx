@@ -194,7 +194,9 @@ export default function AccountPage() {
     try {
       await updateProfile({ username: trimmed });
       localStorage.setItem(USERNAME_LS_KEY, new Date().toISOString());
-      setProfile((prev) => prev ? { ...prev, username: trimmed } : prev);
+      // Re-fetch from DB to confirm the write landed — don't rely on local state patch
+      const refreshed = await getProfile();
+      setProfile(refreshed ?? { ...profile, username: trimmed });
       setEditingUsername(false);
       playSound('success');
       toast('Username updated!', 'success');

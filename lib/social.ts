@@ -51,9 +51,11 @@ export async function syncProfileStreak(): Promise<void> {
     const start = typeof window !== 'undefined'
       ? localStorage.getItem('seedguard_streak_start')
       : null;
+    // NOTE: username is intentionally omitted — it is only written by updateProfile()
+    // in lib/sync.ts. Writing it here would overwrite any username change the user
+    // made, because user_metadata.username is the original signup value and never updated.
     await supabase.from('profiles').upsert({
       id: user.id,
-      username: user.user_metadata?.username ?? user.email ?? 'Anonymous',
       current_streak: stats.currentStreak ?? 0,
       best_streak: stats.longestStreak ?? 0,
       streak_start: start ?? null,
