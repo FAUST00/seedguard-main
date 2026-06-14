@@ -93,9 +93,8 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
   return (
     <li
       className={`
-        relative rounded-2xl border ${rankBorder} glass-effect p-4 flex items-center gap-3
+        rounded-2xl border ${rankBorder} glass-effect p-4 flex items-center gap-3
         neon-hover transition-all duration-200
-        hover:z-10 focus-within:z-10
         ${entry.isMe ? 'ring-1 ring-primary/40' : ''}
       `}
     >
