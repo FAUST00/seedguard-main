@@ -42,9 +42,9 @@ export function Sidebar() {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-3 px-2 hover:opacity-80 transition-opacity"
+          className="flex items-center hover:opacity-80 transition-opacity"
         >
-          <SeedGuardLogo size="sm" showTagline={false} />
+          <SeedGuardLogo size="md" showTagline />
         </Link>
 
         {/* Navigation */}

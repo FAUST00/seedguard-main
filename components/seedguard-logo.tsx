@@ -1,79 +1,90 @@
-import React from 'react';
+'use client';
 
 interface SeedGuardLogoProps {
+  /** sm = 75% scale, md = full (220×68), lg = 130% */
   size?: 'sm' | 'md' | 'lg';
   showTagline?: boolean;
 }
 
 export function SeedGuardLogo({ size = 'md', showTagline = true }: SeedGuardLogoProps) {
-  const scale = size === 'sm' ? 0.6 : size === 'lg' ? 1.4 : 1;
-  const w = Math.round(160 * scale);
-  const h = Math.round((showTagline ? 90 : 68) * scale);
+  const BASE_W = 220;
+  const BASE_H = showTagline ? 68 : 50;
+  const s = size === 'sm' ? 0.75 : size === 'lg' ? 1.3 : 1;
+  const w = Math.round(BASE_W * s);
+  const h = Math.round(BASE_H * s);
 
   return (
     <svg
       width={w}
       height={h}
-      viewBox={`0 0 160 ${showTagline ? 90 : 68}`}
+      viewBox={`0 0 ${BASE_W} ${BASE_H}`}
       role="img"
-      aria-label="SeedGuard logo"
+      aria-label="SeedGuard"
       xmlns="http://www.w3.org/2000/svg"
+      style={{ display: 'block', flexShrink: 0 }}
     >
       <defs>
-        <filter id="sg-glow" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="2.5" result="blur" />
+        {/* Shield / icon glow */}
+        <filter id="sg-glow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="2.8" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <filter id="sg-tglow" x="-10%" y="-40%" width="120%" height="180%">
-          <feGaussianBlur stdDeviation="1.5" result="blur" />
+        {/* Text glow */}
+        <filter id="sg-tglow" x="-15%" y="-50%" width="130%" height="200%">
+          <feGaussianBlur stdDeviation="1.8" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
+        {/* Pink→cyan vertical gradient for shield stroke */}
         <linearGradient id="sg-grad" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#ff2d9b" stopOpacity="0.95" />
           <stop offset="100%" stopColor="#00e5ff" stopOpacity="0.95" />
         </linearGradient>
       </defs>
 
-      {/* Hex shield — centered at x=22, spans x=8..36 */}
+      {/* ── Hex shield ── centered at x=28, y=34 */}
+      {/* shape: pointed top, flat sides, curved bottom point */}
       <path
-        d="M22,4 L36,11 L36,34 C36,46 22,55 22,55 C22,55 8,46 8,34 L8,11 Z"
+        d="M28,5 L44,13 L44,36 C44,50 28,60 28,60 C28,60 12,50 12,36 L12,13 Z"
         fill="none"
         stroke="url(#sg-grad)"
-        strokeWidth="2"
+        strokeWidth="2.2"
         filter="url(#sg-glow)"
       />
-      {/* Left half tint — pink */}
+      {/* Left half pink tint */}
       <path
-        d="M22,4 L8,11 L8,34 C8,46 22,55 22,55 Z"
+        d="M28,5 L12,13 L12,36 C12,50 28,60 28,60 Z"
         fill="#ff2d9b"
-        fillOpacity="0.08"
+        fillOpacity="0.07"
         stroke="none"
       />
 
-      {/* Geometric diamond seed inside shield */}
+      {/* ── Geometric diamond seed inside shield ── */}
       <polygon
-        points="22,15 28,29 22,43 16,29"
+        points="28,16 35,32 28,48 21,32"
         fill="none"
         stroke="#ff2d9b"
-        strokeWidth="1.5"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
         filter="url(#sg-glow)"
       />
-      {/* Center dot — cyan */}
-      <circle cx="22" cy="29" r="3" fill="#00e5ff" filter="url(#sg-glow)" />
+      {/* Cyan center dot */}
+      <circle cx="28" cy="32" r="3.2" fill="#00e5ff" filter="url(#sg-glow)" />
+      {/* Subtle horizontal cross-line */}
+      <line x1="21" y1="32" x2="35" y2="32" stroke="#00e5ff" strokeWidth="0.6" opacity="0.25" />
 
-      {/* SEEDGUARD — centered in full 160px width */}
+      {/* ── SEEDGUARD wordmark ── x=118 = center of right column (58..220) */}
       <text
-        x="80"
-        y="34"
+        x="118"
+        y={showTagline ? '30' : '36'}
         textAnchor="middle"
         fontFamily="'Orbitron', 'Segoe UI', monospace"
-        fontSize="17"
+        fontSize="18"
         fontWeight="700"
         fill="#ff2d9b"
         filter="url(#sg-tglow)"
@@ -82,19 +93,19 @@ export function SeedGuardLogo({ size = 'md', showTagline = true }: SeedGuardLogo
         SEEDGUARD
       </text>
 
-      {/* Tagline — only when showTagline=true */}
+      {/* ── Tagline ── */}
       {showTagline && (
         <text
-          x="80"
-          y="52"
+          x="118"
+          y="50"
           textAnchor="middle"
           fontFamily="'Orbitron', 'Segoe UI', monospace"
-          fontSize="6.5"
+          fontSize="7"
           fontWeight="400"
           fill="#00e5ff"
           filter="url(#sg-tglow)"
-          letterSpacing="5"
-          opacity="0.7"
+          letterSpacing="5.5"
+          opacity="0.72"
         >
           PMO RECOVERY TRACKER
         </text>
