@@ -43,7 +43,7 @@ export default function MigratePage() {
             <button onClick={() => router.push('/dashboard')} className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 rounded-lg">Go to Dashboard →</button>
           </>
         )}
-        <button onClick={() => router.push('/dashboard')} className="w-full mt-3 text-gray-600 hover:text-gray-400 text-sm py-2">Skip — I don't have existing data</button>
+        <button onClick={() => router.push('/dashboard')} className="w-full mt-3 text-gray-600 hover:text-gray-400 text-sm py-2">Skip — I don&apos;t have existing data</button>
       </div>
     </div>
   );
