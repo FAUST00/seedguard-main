@@ -73,33 +73,33 @@ export function SeedGuardLogo({ size = 'md', showTagline = true }: SeedGuardLogo
       <circle cx="24" cy="33" r="3" fill="#00e5ff" filter="url(#sg-glow)" />
       <line x1="17" y1="33" x2="31" y2="33" stroke="#00e5ff" strokeWidth="0.5" opacity="0.2" />
 
-      {/* ── SEEDGUARD — baseline at y=37, center of right column x=50..200 → x=125 ── */}
+      {/* ── SEEDGUARD — right column center x=124, shield ends ~x=42 ── */}
       <text
-        x="125"
-        y="37"
+        x="124"
+        y={showTagline ? '34' : '36'}
         textAnchor="middle"
         fontFamily="'Orbitron','Segoe UI',monospace"
-        fontSize="17"
+        fontSize="16"
         fontWeight="700"
         fill="#ff2d9b"
         filter="url(#sg-tglow)"
-        letterSpacing="4"
+        letterSpacing="3.5"
       >
         SEEDGUARD
       </text>
 
-      {/* ── Tagline ── */}
+      {/* ── Tagline — letter-spacing kept small so text stays inside x=44..196 ── */}
       {showTagline && (
         <text
-          x="125"
-          y="54"
+          x="124"
+          y="52"
           textAnchor="middle"
           fontFamily="'Orbitron','Segoe UI',monospace"
-          fontSize="6.5"
+          fontSize="6"
           fontWeight="400"
           fill="#00e5ff"
           filter="url(#sg-tglow)"
-          letterSpacing="5"
+          letterSpacing="2.5"
           opacity="0.72"
         >
           PMO RECOVERY TRACKER
