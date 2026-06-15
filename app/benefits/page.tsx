@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Brain, Heart, Zap, Eye, Trophy, Star, TrendingUp, Shield, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+import { Brain, Heart, Zap, Eye, Trophy, Star, TrendingUp, Shield, CheckCircle, BookOpen } from 'lucide-react';
 
 // Per-card accent colors are data-driven and intentionally kept as style values
 // so each card can carry its own unique color without generating unused Tailwind classes.
@@ -54,7 +55,16 @@ export default function BenefitsPage() {
     <div className="min-h-screen bg-background text-foreground">
 
       {/* Hero */}
-      <div className="text-center py-16 px-6 pb-12 border-b border-primary/10">
+      <div className="relative text-center py-16 px-6 pb-12 border-b border-primary/10">
+        {/* More Info button — top right */}
+        <Link
+          href="/esoteric"
+          className="absolute top-6 right-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-secondary/40 bg-secondary/10 text-secondary hover:bg-secondary/20 font-bold uppercase tracking-wider text-xs transition-all neon-hover"
+        >
+          <BookOpen className="w-3.5 h-3.5" aria-hidden />
+          More Info
+        </Link>
+
         <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-full px-4 py-1 mb-5">
           <Shield className="w-3.5 h-3.5 text-primary" aria-hidden />
           <span className="text-xs font-bold tracking-widest text-primary uppercase">Verified by community</span>
