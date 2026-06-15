@@ -124,6 +124,36 @@ function StatCard({ value, label, accent }: { value: string; label: string; acce
   );
 }
 
+// ── Practitioner card ────────────────────────────────────────────────────────
+function PractitionerCard({ name, years, accent, quote, body, img, imgAlt, imgCaption }: {
+  name: string; years: string; accent: string; quote: string; body: string;
+  img: string; imgAlt: string; imgCaption: string;
+}) {
+  return (
+    <div className="rounded-2xl border glass-effect p-5" style={{ borderColor: accent + '33' }}>
+      <div className="mb-3">
+        <h3 className="font-bold text-base uppercase tracking-wider" style={{ color: accent }}>{name}</h3>
+        <p className="text-xs text-muted-foreground">{years}</p>
+      </div>
+      <div style={{ overflow: 'hidden' }}>
+        <WikiImage
+          src={img}
+          alt={imgAlt}
+          caption={imgCaption}
+          floatRight
+          defaultWidth={82}
+          expandedWidth={196}
+          maxImgHeight={108}
+        />
+        <p className="italic text-sm text-foreground/80 leading-relaxed border-l-2 pl-3 mb-3" style={{ borderColor: accent }}>
+          &ldquo;{quote}&rdquo;
+        </p>
+        <p className="text-xs text-foreground/70 leading-relaxed">{body}</p>
+      </div>
+    </div>
+  );
+}
+
 // ── Practitioner data ─────────────────────────────────────────────────────────
 const PRACTITIONERS = [
   {
@@ -265,15 +295,18 @@ export default function EsotericPage() {
             </div>
 
             <div className="space-y-3 text-sm text-foreground/80 leading-relaxed">
-              <div className="flex gap-4 items-start">
-                <p className="flex-1">
-                  <strong className="text-secondary">Inside the seminiferous tubules</strong> (the tiny sperm-producing coils packed inside the testes), the body manufactures roughly 1,500 sperm cells every single second. The testicles are running a non-stop industrial production line from puberty until death.
-                </p>
+              {/* Float testis schematic right — paragraph wraps around it naturally */}
+              <div style={{ overflow: 'hidden' }}>
                 <WikiImage
                   src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Illu_testis_schematic.jpg"
                   alt="Medical schematic anatomy diagram of the testis"
                   caption="Schematic anatomy of the testis. Public domain, via Wikimedia Commons."
+                  floatRight
+                  maxImgHeight={140}
                 />
+                <p>
+                  <strong className="text-secondary">Inside the seminiferous tubules</strong> (the tiny sperm-producing coils packed inside the testes), the body manufactures roughly 1,500 sperm cells every single second. The testicles are running a non-stop industrial production line from puberty until death.
+                </p>
               </div>
               <p>
                 Western medicine&apos;s position is straightforward: semen is a <em>renewable</em> bodily fluid. If you don&apos;t ejaculate, your body doesn&apos;t &ldquo;fill up&rdquo; indefinitely. Instead, older sperm cells simply break down inside the epididymis (the storage tube behind the testes) and their raw nutrients (proteins, zinc, magnesium, fructose) are reabsorbed directly back into the bloodstream.
@@ -319,12 +352,11 @@ export default function EsotericPage() {
 
             <Accordion title="Taoism: The Three Treasures & Jing" accent="#ff2d9b" icon={Flame}>
               <div className="pt-4 space-y-4">
-                {/* Float image right — text wraps naturally around it */}
                 <div style={{ overflow: 'hidden' }}>
                   <WikiImage
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/%E6%AD%A6%E5%BD%93%E5%B1%B1%E7%B4%AB%E9%9C%84%E5%AE%AB_%2814739990839%29.jpg/330px-%E6%AD%A6%E5%BD%93%E5%B1%B1%E7%B4%AB%E9%9C%84%E5%AE%AB_%2814739990839%29.jpg"
                     alt="Purple Cloud Temple at Wudang Mountains, China"
-                    caption="Purple Cloud Temple, Wudang Mountains. A sacred center of Taoist practice for over 1,000 years. CC BY 2.0."
+                    caption="Purple Cloud Temple, Wudang Mountains. Sacred center of Taoist practice for over 1,000 years. CC BY 2.0."
                     floatRight
                   />
                   <p>
@@ -353,34 +385,34 @@ export default function EsotericPage() {
 
             <Accordion title="Ayurveda: Ojas and the 7 Dhatus" accent="#00e5ff" icon={Star}>
               <div className="pt-4 space-y-4">
-                <div className="flex gap-4 items-start">
-                  <div className="flex-1 space-y-3">
-                    <p>
-                      Ancient Indian medicine describes the body as processing food through <strong className="text-foreground">seven successive layers of tissue</strong> called Dhatus. Each layer refines the one before it, like a distillery producing increasingly pure essences:
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {[
-                        { n: '1. Rasa', d: 'Plasma / lymph' },
-                        { n: '2. Rakta', d: 'Blood' },
-                        { n: '3. Mamsa', d: 'Muscle tissue' },
-                        { n: '4. Meda', d: 'Fat / adipose' },
-                        { n: '5. Asthi', d: 'Bone' },
-                        { n: '6. Majja', d: 'Bone marrow / nerves' },
-                        { n: '7. Shukra', d: 'Reproductive tissue: the final distillation' },
-                      ].map((d) => (
-                        <div key={d.n} className="flex items-start gap-2 text-xs">
-                          <span className="text-secondary font-bold flex-shrink-0">{d.n}</span>
-                          <span className="text-foreground/70">{d.d}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                {/* Chakra diagram floats right beside the intro text + dhatu grid */}
+                <div style={{ overflow: 'hidden' }}>
                   <WikiImage
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/DiagrammaChakraKundalini.jpg/250px-DiagrammaChakraKundalini.jpg"
                     alt="Kundalini energy diagram showing chakras and serpent energy"
                     caption="Kundalini chakra diagram showing the seven energy centers. Public domain."
-                    maxImgHeight={220}
+                    floatRight
+                    maxImgHeight={240}
                   />
+                  <p>
+                    Ancient Indian medicine describes the body as processing food through <strong className="text-foreground">seven successive layers of tissue</strong> called Dhatus. Each layer refines the one before it, like a distillery producing increasingly pure essences:
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+                    {[
+                      { n: '1. Rasa', d: 'Plasma / lymph' },
+                      { n: '2. Rakta', d: 'Blood' },
+                      { n: '3. Mamsa', d: 'Muscle tissue' },
+                      { n: '4. Meda', d: 'Fat / adipose' },
+                      { n: '5. Asthi', d: 'Bone' },
+                      { n: '6. Majja', d: 'Bone marrow / nerves' },
+                      { n: '7. Shukra', d: 'Reproductive tissue: the final distillation' },
+                    ].map((d) => (
+                      <div key={d.n} className="flex items-start gap-2 text-xs">
+                        <span className="text-secondary font-bold flex-shrink-0">{d.n}</span>
+                        <span className="text-foreground/70">{d.d}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <p>
                   It takes <strong className="text-foreground">approximately 40 days</strong> of metabolic energy and perfect digestion to produce a single drop of <em>Shukra</em>. It is the body&apos;s most refined, concentrated product. If Shukra is preserved rather than spent, Ayurveda teaches it undergoes a final sublimation and transforms into <strong className="text-secondary">Ojas</strong>.
@@ -428,9 +460,19 @@ export default function EsotericPage() {
 
             <Accordion title="Kundalini Yoga: The Serpent Fire & The Caduceus" accent="#34d399" icon={Zap}>
               <div className="pt-4 space-y-4">
-                <p>
-                  Kundalini is described in Hindu and Tantric traditions as a dormant serpentine energy coiled at the base of the spine, in the <em>Muladhara</em> (root chakra), the same energetic center associated with the reproductive organs. Through retention, meditation, and specific breathwork (<em>pranayama</em>), this energy is said to rise through the seven chakras along the <em>Sushumna</em> (central channel) until it reaches the crown, producing states of <strong className="text-foreground">samadhi</strong>, described as the union of individual consciousness with universal consciousness.
-                </p>
+                <div style={{ overflow: 'hidden' }}>
+                  <WikiImage
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Late_Kundalini_Model_of_Hatha_Yoga.svg/250px-Late_Kundalini_Model_of_Hatha_Yoga.svg.png"
+                    alt="Diagram of the late Kundalini model in Hatha Yoga showing chakras and energy channels"
+                    caption="Kundalini model in Hatha Yoga: chakras, Sushumna, and Kundalini rising. CC BY-SA 4.0."
+                    floatRight
+                    defaultWidth={118}
+                    expandedWidth={220}
+                  />
+                  <p>
+                    Kundalini is described in Hindu and Tantric traditions as a dormant serpentine energy coiled at the base of the spine, in the <em>Muladhara</em> (root chakra), the same energetic center associated with the reproductive organs. Through retention, meditation, and specific breathwork (<em>pranayama</em>), this energy is said to rise through the seven chakras along the <em>Sushumna</em> (central channel) until it reaches the crown, producing states of <strong className="text-foreground">samadhi</strong>, described as the union of individual consciousness with universal consciousness.
+                  </p>
+                </div>
                 <p>
                   <strong className="text-green-400">The Caduceus, the medical symbol used worldwide today,</strong> is two serpents coiling up a central staff topped by wings. This is a direct encoding of Kundalini knowledge: the two serpents are the <em>Ida</em> (lunar/feminine) and <em>Pingala</em> (solar/masculine) energy channels wrapping around the spine. The wings at the top represent the liberation of consciousness when the energy reaches the crown.
                 </p>
@@ -505,6 +547,30 @@ export default function EsotericPage() {
                   author="The Kybalion — Three Initiates (Hermetic Philosophy)"
                   accent="#fbbf24"
                 />
+                {/* Three Rosicrucian/Hermetic images as a centered gallery */}
+                <div className="flex gap-3 justify-center pt-1">
+                  <WikiImage
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Rose_Cross_Lamen.svg/250px-Rose_Cross_Lamen.svg.png"
+                    alt="The Rose Cross Lamen, worn by Adepts of the Golden Dawn inner order"
+                    caption="Rose Cross Lamen, Golden Dawn inner order. Public domain."
+                    defaultWidth={96}
+                    expandedWidth={200}
+                  />
+                  <WikiImage
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Robert_Fludd%2C_Integra_naturae_speculum_artisque_imago.jpg/250px-Robert_Fludd%2C_Integra_naturae_speculum_artisque_imago.jpg"
+                    alt="Robert Fludd Great Chain of Being cosmological diagram, 1617"
+                    caption="Fludd's Great Chain of Being, Utriusque Cosmi, 1617. CC BY 4.0."
+                    defaultWidth={96}
+                    expandedWidth={200}
+                  />
+                  <WikiImage
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Frontpage_-_Robert_Fludd_-_Utriusque_cosmi_Historia_-_1617-19.png/250px-Frontpage_-_Robert_Fludd_-_Utriusque_cosmi_Historia_-_1617-19.png"
+                    alt="Frontispiece of Robert Fludd's Utriusque Cosmi Historia, 1617"
+                    caption="Frontispiece, Utriusque Cosmi Historia, Fludd, 1617. Public domain."
+                    defaultWidth={96}
+                    expandedWidth={200}
+                  />
+                </div>
               </div>
             </Accordion>
 
@@ -542,38 +608,19 @@ export default function EsotericPage() {
             <div className="flex-1 h-px bg-gradient-to-l from-transparent to-primary/40" />
           </div>
 
-          {/* align-items: start prevents grid from stretching shorter cards to match taller neighbors */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ alignItems: 'start' }}>
-            {PRACTITIONERS.map(({ name, years, accent, quote, body, img, imgAlt, imgCaption }) => (
-              <div
-                key={name}
-                className="rounded-2xl border glass-effect p-5"
-                style={{ borderColor: accent + '33' }}
-              >
-                {/* Name + years header — sits above the text/image block */}
-                <div className="mb-3">
-                  <h3 className="font-bold text-base uppercase tracking-wider" style={{ color: accent }}>{name}</h3>
-                  <p className="text-xs text-muted-foreground">{years}</p>
-                </div>
+          {/* Mobile: single ordered column */}
+          <div className="flex flex-col gap-4 md:hidden">
+            {PRACTITIONERS.map((p) => <PractitionerCard key={p.name} {...p} />)}
+          </div>
 
-                {/* Portrait floats right inside the text block — quote and body wrap around it */}
-                <div style={{ overflow: 'hidden' }}>
-                  <WikiImage
-                    src={img}
-                    alt={imgAlt}
-                    caption={imgCaption}
-                    floatRight
-                    defaultWidth={82}
-                    expandedWidth={196}
-                    maxImgHeight={108}
-                  />
-                  <p className="italic text-sm text-foreground/80 leading-relaxed border-l-2 pl-3 mb-3" style={{ borderColor: accent }}>
-                    &ldquo;{quote}&rdquo;
-                  </p>
-                  <p className="text-xs text-foreground/70 leading-relaxed">{body}</p>
-                </div>
-              </div>
-            ))}
+          {/* Desktop: two independent flex columns (true masonry — no cross-column height matching) */}
+          <div className="hidden md:flex gap-4 items-start">
+            <div className="flex-1 flex flex-col gap-4">
+              {PRACTITIONERS.filter((_, i) => i % 2 === 0).map((p) => <PractitionerCard key={p.name} {...p} />)}
+            </div>
+            <div className="flex-1 flex flex-col gap-4">
+              {PRACTITIONERS.filter((_, i) => i % 2 === 1).map((p) => <PractitionerCard key={p.name} {...p} />)}
+            </div>
           </div>
         </section>
 
@@ -607,11 +654,11 @@ export default function EsotericPage() {
                       ))}
                     </div>
                   </div>
+                  {/* No maxImgHeight — the full SVG must be visible */}
                   <WikiImage
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Caduceus.svg/250px-Caduceus.svg.png"
                     alt="The Caduceus symbol: two serpents entwined around a winged staff"
                     caption="The Caduceus. Used globally as a medical symbol. Public domain."
-                    maxImgHeight={240}
                   />
                 </div>
                 <p>The people who placed this symbol on medical institutions understood exactly what it meant. The question is whether the knowledge it encodes was lost, or deliberately separated from its original context.</p>
@@ -620,17 +667,18 @@ export default function EsotericPage() {
 
             <Accordion title="The Obelisk: Monuments to Reproductive Energy" accent="#a78bfa" icon={Infinity}>
               <div className="pt-4 space-y-4">
+                {/* Image floats right beside the first paragraph only */}
                 <div style={{ overflow: 'hidden' }}>
                   <WikiImage
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Obelisco_del_Laterano_ROMA_04_06_2019.jpg/250px-Obelisco_del_Laterano_ROMA_04_06_2019.jpg"
                     alt="The Lateran Obelisk in Rome, the tallest surviving ancient obelisk"
-                    caption="The Lateran Obelisk, Rome. The tallest surviving ancient obelisk at 45.7 m. Originally from Karnak, Egypt, c. 1400 BC. CC BY-SA 4.0."
+                    caption="The Lateran Obelisk, Rome. Tallest surviving ancient obelisk at 45.7 m. Originally from Karnak, Egypt, c. 1400 BC. CC BY-SA 4.0."
                     floatRight
-                    maxImgHeight={180}
+                    maxImgHeight={120}
                   />
                   <p>Obelisks, Egyptian stone pillars now placed at the center of Washington D.C., the Vatican, London&apos;s Cleopatra&apos;s Needle, and Paris, were understood by Egyptian mystery schools as monuments to the generative life-force of the god Osiris. The shape is explicit. Their placement at the centers of the world&apos;s most powerful institutions is not coincidental; it is an esoteric declaration of what truly governs the world.</p>
-                  <p className="mt-3">The <strong className="text-purple-400">Washington Monument</strong> (555 feet tall, the largest obelisk on Earth) stands at the center of the United States capital. The <strong className="text-purple-400">Vatican Obelisk</strong> stands in the center of St. Peter&apos;s Square, a Catholic institution that officially condemns the very knowledge the obelisk encodes. Both institutions are, esoterically, monuments to the power of directed sexual energy, placed by those who understood it, in full view of those who do not.</p>
                 </div>
+                <p>The <strong className="text-purple-400">Washington Monument</strong> (555 feet tall, the largest obelisk on Earth) stands at the center of the United States capital. The <strong className="text-purple-400">Vatican Obelisk</strong> stands in the center of St. Peter&apos;s Square, a Catholic institution that officially condemns the very knowledge the obelisk encodes. Both institutions are, esoterically, monuments to the power of directed sexual energy, placed by those who understood it, in full view of those who do not.</p>
               </div>
             </Accordion>
           </div>
@@ -698,9 +746,20 @@ export default function EsotericPage() {
           <div className="rounded-2xl border border-yellow-500/20 glass-effect p-6 md:p-8 space-y-5">
             <Accordion title="The Economics of a Dopamine-Addicted Population" accent="#fbbf24" icon={BookOpen}>
               <div className="pt-4 space-y-4">
-                <p>
-                  A man who controls his sexual energy is harder to manipulate. He doesn&apos;t need constant external stimulation. He is less impulsive, less susceptible to advertising, less likely to make fear-based decisions. He has a stable inner life that doesn&apos;t depend on constant consumption.
-                </p>
+                <div style={{ overflow: 'hidden' }}>
+                  <WikiImage
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Edward_Bernays_cropped.png/250px-Edward_Bernays_cropped.png"
+                    alt="Edward Bernays, father of propaganda, 1917"
+                    caption="Edward Bernays, 1917. Inventor of modern propaganda. Public domain."
+                    floatRight
+                    defaultWidth={88}
+                    expandedWidth={180}
+                    maxImgHeight={110}
+                  />
+                  <p>
+                    A man who controls his sexual energy is harder to manipulate. He doesn&apos;t need constant external stimulation. He is less impulsive, less susceptible to advertising, less likely to make fear-based decisions. He has a stable inner life that doesn&apos;t depend on constant consumption.
+                  </p>
+                </div>
                 <p>
                   The pornography industry generates over <strong className="text-yellow-400">$97 billion annually</strong> worldwide. The pharmaceutical industry generates billions more treating the anxiety, depression, and low testosterone that result from compulsive sexual behavior. The entertainment industry is built on the commodification of sexuality as a permanent attention hook.
                 </p>
