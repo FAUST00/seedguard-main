@@ -10,17 +10,30 @@ import {
 // ── Wikipedia-style expandable thumbnail ─────────────────────────────────────
 function WikiImage({
   src, alt, caption, className,
+  maxImgHeight, defaultWidth = 112, expandedWidth = 220, floatRight = false,
 }: {
   src: string;
   alt: string;
   caption: string;
   className?: string;
+  maxImgHeight?: number;
+  defaultWidth?: number;
+  expandedWidth?: number;
+  floatRight?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const w = expanded ? expandedWidth : defaultWidth;
   return (
     <figure
       className={className}
-      style={{ width: expanded ? 220 : 112, flexShrink: 0, transition: 'width 0.22s ease' }}
+      style={{
+        width: w,
+        flexShrink: 0,
+        transition: 'width 0.22s ease',
+        ...(floatRight
+          ? { float: 'right' as const, marginLeft: '0.875rem', marginBottom: '0.625rem' }
+          : {}),
+      }}
     >
       <button
         onClick={() => setExpanded((v) => !v)}
@@ -28,7 +41,17 @@ function WikiImage({
         aria-label={expanded ? 'Shrink image' : 'Expand image'}
         aria-expanded={expanded}
       >
-        <img src={src} alt={alt} className="w-full h-auto block" loading="lazy" />
+        {maxImgHeight && !expanded ? (
+          <img
+            src={src}
+            alt={alt}
+            loading="lazy"
+            className="w-full block"
+            style={{ height: maxImgHeight, objectFit: 'cover', objectPosition: 'top center' }}
+          />
+        ) : (
+          <img src={src} alt={alt} className="w-full h-auto block" loading="lazy" />
+        )}
       </button>
       <figcaption className="mt-1.5 text-[10px] text-muted-foreground/60 leading-snug text-center px-0.5">
         {caption}&nbsp;
@@ -161,7 +184,7 @@ const PRACTITIONERS = [
     body: 'Leonardo was celibate throughout his life. He was simultaneously the greatest painter, sculptor, architect, musician, mathematician, engineer, anatomist, geologist, botanist, and writer of his era. He filled thousands of notebook pages with inventions that were not built until centuries later, including helicopters, tanks, solar power, and robotics. Historians call him a genius. Esoteric scholars would call him a man who had learned to feed every faculty of his being from the same inexhaustible inner source.',
     img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Francesco_Melzi_-_Portrait_of_Leonardo.png/250px-Francesco_Melzi_-_Portrait_of_Leonardo.png',
     imgAlt: 'Portrait of Leonardo da Vinci by Francesco Melzi, c. 1515',
-    imgCaption: 'Portrait by Francesco Melzi, c. 1515. The only confirmed contemporary likeness. Public domain.',
+    imgCaption: 'Portrait by Francesco Melzi, c. 1515. Only confirmed contemporary likeness. Public domain.',
   },
   {
     name: 'Pythagoras',
@@ -296,22 +319,24 @@ export default function EsotericPage() {
 
             <Accordion title="Taoism: The Three Treasures & Jing" accent="#ff2d9b" icon={Flame}>
               <div className="pt-4 space-y-4">
-                <div className="flex gap-4 items-start">
-                  <p className="flex-1">
+                {/* Float image right — text wraps naturally around it */}
+                <div style={{ overflow: 'hidden' }}>
+                  <WikiImage
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/%E6%AD%A6%E5%BD%93%E5%B1%B1%E7%B4%AB%E9%9C%84%E5%AE%AB_%2814739990839%29.jpg/330px-%E6%AD%A6%E5%BD%93%E5%B1%B1%E7%B4%AB%E9%9C%84%E5%AE%AB_%2814739990839%29.jpg"
+                    alt="Purple Cloud Temple at Wudang Mountains, China"
+                    caption="Purple Cloud Temple, Wudang Mountains. A sacred center of Taoist practice for over 1,000 years. CC BY 2.0."
+                    floatRight
+                  />
+                  <p>
                     In Taoist philosophy, the health and lifespan of a man is governed by three treasures:
                     <strong className="text-foreground"> Jing</strong> (essence),
                     <strong className="text-foreground"> Qi</strong> (energy), and
                     <strong className="text-foreground"> Shen</strong> (spirit).
                   </p>
-                  <WikiImage
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/%E6%AD%A6%E5%BD%93%E5%B1%B1%E7%B4%AB%E9%9C%84%E5%AE%AB_%2814739990839%29.jpg/330px-%E6%AD%A6%E5%BD%93%E5%B1%B1%E7%B4%AB%E9%9C%84%E5%AE%AB_%2814739990839%29.jpg"
-                    alt="Purple Cloud Temple at Wudang Mountains, China"
-                    caption="Purple Cloud Temple, Wudang Mountains. A sacred center of Taoist practice for over 1,000 years. CC BY 2.0."
-                  />
+                  <p className="mt-3">
+                    <strong className="text-pink-400">Jing</strong> is your foundational life-force battery. You are born with a fixed reservoir of it, inherited from your parents at conception, and when it is depleted, your body ages rapidly and dies. Semen is understood as the <em>physical manifestation</em> of a man&apos;s Jing. Every unnecessary ejaculation is a direct withdrawal from this account.
+                  </p>
                 </div>
-                <p>
-                  <strong className="text-pink-400">Jing</strong> is your foundational life-force battery. You are born with a fixed reservoir of it, inherited from your parents at conception, and when it is depleted, your body ages rapidly and dies. Semen is understood as the <em>physical manifestation</em> of a man&apos;s Jing. Every unnecessary ejaculation is a direct withdrawal from this account.
-                </p>
                 <p>
                   Taoist masters developed practices known as <strong className="text-foreground">Coitus Reservatus</strong> and <strong className="text-foreground">injaculation</strong> (non-ejaculatory orgasm), techniques that allow a man to experience the peak of pleasure without releasing Jing. The conserved energy was said to travel backward up the <em>Du Mai</em> (Governing Vessel, along the spine) to nourish the brain, the organs, and the immune system.
                 </p>
@@ -354,6 +379,7 @@ export default function EsotericPage() {
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/DiagrammaChakraKundalini.jpg/250px-DiagrammaChakraKundalini.jpg"
                     alt="Kundalini energy diagram showing chakras and serpent energy"
                     caption="Kundalini chakra diagram showing the seven energy centers. Public domain."
+                    maxImgHeight={220}
                   />
                 </div>
                 <p>
@@ -375,19 +401,20 @@ export default function EsotericPage() {
 
             <Accordion title="Ancient Egypt: Eye of Horus & Pineal Activation" accent="#a78bfa" icon={Eye}>
               <div className="pt-4 space-y-4">
-                <div className="flex gap-4 items-start">
-                  <p className="flex-1">
-                    Egyptian mystery schools, the most sophisticated esoteric tradition in recorded history, held sexual energy as the cornerstone of spiritual initiation. The priests of the highest orders practiced <strong className="text-foreground">strict sexual continence</strong> as a prerequisite for advanced teachings.
-                  </p>
+                <div style={{ overflow: 'hidden' }}>
                   <WikiImage
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Tutankhamun_pendant_with_Wadjet.jpg/250px-Tutankhamun_pendant_with_Wadjet.jpg"
                     alt="Tutankhamun pendant with Wadjet Eye of Horus, 18th dynasty"
                     caption="Tutankhamun pendant with the Wadjet (Eye of Horus), 18th dynasty, c. 1323 BC. Public domain."
+                    floatRight
                   />
+                  <p>
+                    Egyptian mystery schools, the most sophisticated esoteric tradition in recorded history, held sexual energy as the cornerstone of spiritual initiation. The priests of the highest orders practiced <strong className="text-foreground">strict sexual continence</strong> as a prerequisite for advanced teachings.
+                  </p>
+                  <p className="mt-3">
+                    The <strong className="text-purple-400">Eye of Horus</strong> (Wadjet) is widely interpreted in esoteric traditions as an anatomical cross-section of the human brain, specifically mapping the <em>thalamus, hypothalamus, corpus callosum,</em> and <strong className="text-foreground">pineal gland</strong>. The ancient Egyptians believed that retained sexual energy, when circulated upward through the spine, would &ldquo;open&rdquo; the pineal gland, producing states of heightened perception and spiritual vision that they depicted as the &ldquo;all-seeing eye.&rdquo;
+                  </p>
                 </div>
-                <p>
-                  The <strong className="text-purple-400">Eye of Horus</strong> (Wadjet) is widely interpreted in esoteric traditions as an anatomical cross-section of the human brain, specifically mapping the <em>thalamus, hypothalamus, corpus callosum,</em> and <strong className="text-foreground">pineal gland</strong>. The ancient Egyptians believed that retained sexual energy, when circulated upward through the spine, would &ldquo;open&rdquo; the pineal gland, producing states of heightened perception and spiritual vision that they depicted as the &ldquo;all-seeing eye.&rdquo;
-                </p>
                 <p>
                   The pineal gland produces <strong className="text-foreground">DMT (dimethyltryptamine)</strong>, one of the most potent psychoactive compounds known, and is the only part of the brain that is not duplicated bilaterally. René Descartes called it &ldquo;the seat of the soul.&rdquo; Ancient Egyptians called it the Eye of Ra. Both pointed at the same organ 2,500 years apart.
                 </p>
@@ -433,19 +460,21 @@ export default function EsotericPage() {
 
             <Accordion title="Freemasonry: Sex Transmutation at the 33rd Degree" accent="#fbbf24" icon={Shield}>
               <div className="pt-4 space-y-4">
-                <div className="flex gap-4 items-start">
-                  <p className="flex-1">
-                    Freemasonry&apos;s public face is charitable fraternity. Its inner degrees, however, preserve a sophisticated system of esoteric knowledge that mainstream historians rarely discuss. The Scottish Rite culminates at the <strong className="text-yellow-400">33rd Degree</strong>, a level that initiates are explicitly told encodes the deepest secrets of human nature and the cosmos.
-                  </p>
+                <div style={{ overflow: 'hidden' }}>
                   <WikiImage
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Emblematic_Structure_of_Freemasonry.gif/250px-Emblematic_Structure_of_Freemasonry.gif"
                     alt="Emblematic Structure of Freemasonry historical diagram"
                     caption="Emblematic Structure of Freemasonry, historical diagram. Public domain."
+                    floatRight
+                    maxImgHeight={200}
                   />
+                  <p>
+                    Freemasonry&apos;s public face is charitable fraternity. Its inner degrees, however, preserve a sophisticated system of esoteric knowledge that mainstream historians rarely discuss. The Scottish Rite culminates at the <strong className="text-yellow-400">33rd Degree</strong>, a level that initiates are explicitly told encodes the deepest secrets of human nature and the cosmos.
+                  </p>
+                  <p className="mt-3">
+                    Albert Pike, the 33rd-degree Sovereign Grand Commander who wrote <em>Morals and Dogma</em> (1871), the most authoritative text of Masonic philosophy ever published, was explicit: the true &ldquo;Great Work&rdquo; of Freemasonry is the <strong className="text-foreground">transmutation of base energies into higher spiritual attainment</strong>. This is the same alchemical language used in Taoist and Ayurvedic traditions.
+                  </p>
                 </div>
-                <p>
-                  Albert Pike, the 33rd-degree Sovereign Grand Commander who wrote <em>Morals and Dogma</em> (1871), the most authoritative text of Masonic philosophy ever published, was explicit: the true &ldquo;Great Work&rdquo; of Freemasonry is the <strong className="text-foreground">transmutation of base energies into higher spiritual attainment</strong>. This is the same alchemical language used in Taoist and Ayurvedic traditions.
-                </p>
                 <PullQuote
                   text="The great secret of Masonry is the control and use of the creative force in man. To waste it is to die. To master it is to become a god."
                   author="Albert Pike, Morals and Dogma (paraphrased from Chapter on Hermetic Philosophy)"
@@ -481,22 +510,24 @@ export default function EsotericPage() {
 
             <Accordion title="Kabbalah: Yesod and the Foundation of the Tree of Life" accent="#fbbf24" icon={Star}>
               <div className="pt-4 space-y-4">
-                <div className="flex gap-4 items-start">
-                  <p className="flex-1">
-                    In the Jewish mystical tradition of Kabbalah, the <strong className="text-yellow-400">Tree of Life</strong> maps ten divine emanations (Sefirot) through which God&apos;s creative energy flows into the world. The ninth Sefirah, <strong className="text-foreground">Yesod</strong>, is explicitly associated with the reproductive organs and the sexual life-force.
-                  </p>
+                <div style={{ overflow: 'hidden' }}>
                   <WikiImage
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Kabbalah_Tree_of_Life.png/250px-Kabbalah_Tree_of_Life.png"
                     alt="Coloured Kabbalah Tree of Life diagram showing the 10 Sephirot"
                     caption="Kabbalah Tree of Life: the ten Sephirot. Public domain."
+                    floatRight
+                    maxImgHeight={220}
                   />
+                  <p>
+                    In the Jewish mystical tradition of Kabbalah, the <strong className="text-yellow-400">Tree of Life</strong> maps ten divine emanations (Sefirot) through which God&apos;s creative energy flows into the world. The ninth Sefirah, <strong className="text-foreground">Yesod</strong>, is explicitly associated with the reproductive organs and the sexual life-force.
+                  </p>
+                  <p className="mt-3">
+                    Yesod means <em>&ldquo;Foundation.&rdquo;</em> It is the channel through which all the higher emanations flow into physical manifestation. Kabbalistic masters taught that a man who could master Yesod, channeling rather than wasting this foundational energy, would unlock access to all the higher Sefirot above it: beauty, wisdom, understanding, and ultimately, union with the divine (Keter, the crown).
+                  </p>
+                  <p className="mt-3">
+                    The story of <strong className="text-foreground">Samson and Delilah</strong> in the Old Testament is read by Kabbalistic scholars as an allegory: Samson&apos;s &ldquo;hair&rdquo; represents his accumulated Yesodic energy. When Delilah (symbolic of sexual temptation) cuts it and he spills his vital force, he loses his supernatural strength and becomes a prisoner. The exoteric reading is a love story. The esoteric reading is a warning about the misuse of sexual energy.
+                  </p>
                 </div>
-                <p>
-                  Yesod means <em>&ldquo;Foundation.&rdquo;</em> It is the channel through which all the higher emanations flow into physical manifestation. Kabbalistic masters taught that a man who could master Yesod, channeling rather than wasting this foundational energy, would unlock access to all the higher Sefirot above it: beauty, wisdom, understanding, and ultimately, union with the divine (Keter, the crown).
-                </p>
-                <p>
-                  The story of <strong className="text-foreground">Samson and Delilah</strong> in the Old Testament is read by Kabbalistic scholars as an allegory: Samson&apos;s &ldquo;hair&rdquo; represents his accumulated Yesodic energy. When Delilah (symbolic of sexual temptation) cuts it and he spills his vital force, he loses his supernatural strength and becomes a prisoner. The exoteric reading is a love story. The esoteric reading is a warning about the misuse of sexual energy.
-                </p>
               </div>
             </Accordion>
 
@@ -511,29 +542,36 @@ export default function EsotericPage() {
             <div className="flex-1 h-px bg-gradient-to-l from-transparent to-primary/40" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* align-items: start prevents grid from stretching shorter cards to match taller neighbors */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ alignItems: 'start' }}>
             {PRACTITIONERS.map(({ name, years, accent, quote, body, img, imgAlt, imgCaption }) => (
               <div
                 key={name}
-                className="rounded-2xl border glass-effect p-5 space-y-3"
+                className="rounded-2xl border glass-effect p-5"
                 style={{ borderColor: accent + '33' }}
               >
-                <div className="flex items-start gap-3">
+                {/* Name + years header — sits above the text/image block */}
+                <div className="mb-3">
+                  <h3 className="font-bold text-base uppercase tracking-wider" style={{ color: accent }}>{name}</h3>
+                  <p className="text-xs text-muted-foreground">{years}</p>
+                </div>
+
+                {/* Portrait floats right inside the text block — quote and body wrap around it */}
+                <div style={{ overflow: 'hidden' }}>
                   <WikiImage
                     src={img}
                     alt={imgAlt}
                     caption={imgCaption}
-                    className="mt-0.5"
+                    floatRight
+                    defaultWidth={82}
+                    expandedWidth={196}
+                    maxImgHeight={108}
                   />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-base uppercase tracking-wider" style={{ color: accent }}>{name}</h3>
-                    <p className="text-xs text-muted-foreground">{years}</p>
-                  </div>
+                  <p className="italic text-sm text-foreground/80 leading-relaxed border-l-2 pl-3 mb-3" style={{ borderColor: accent }}>
+                    &ldquo;{quote}&rdquo;
+                  </p>
+                  <p className="text-xs text-foreground/70 leading-relaxed">{body}</p>
                 </div>
-                <p className="italic text-sm text-foreground/80 leading-relaxed border-l-2 pl-3" style={{ borderColor: accent }}>
-                  &ldquo;{quote}&rdquo;
-                </p>
-                <p className="text-xs text-foreground/70 leading-relaxed">{body}</p>
               </div>
             ))}
           </div>
@@ -552,9 +590,9 @@ export default function EsotericPage() {
               <div className="pt-4 space-y-4">
                 <div className="flex gap-4 items-start">
                   <div className="flex-1">
-                    <p>The Caduceus, two serpents entwined around a winged staff, appears on ambulances, hospitals, medical schools, and pharmacies worldwide. Its true origin is not Greek mythology. It is a direct encoding of the Kundalini energy system:
+                    <p className="mb-3">The Caduceus, two serpents entwined around a winged staff, appears on ambulances, hospitals, medical schools, and pharmacies worldwide. Its true origin is not Greek mythology. It is a direct encoding of the Kundalini energy system:
                     </p>
-                    <div className="space-y-2 text-sm mt-3">
+                    <div className="space-y-2 text-sm">
                       {[
                         { symbol: 'The central staff', meaning: 'The human spine: the Sushumna channel through which life-force travels' },
                         { symbol: 'Left serpent (Ida)', meaning: 'Lunar / feminine energy channel, cool, receptive, right-brain' },
@@ -573,6 +611,7 @@ export default function EsotericPage() {
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Caduceus.svg/250px-Caduceus.svg.png"
                     alt="The Caduceus symbol: two serpents entwined around a winged staff"
                     caption="The Caduceus. Used globally as a medical symbol. Public domain."
+                    maxImgHeight={240}
                   />
                 </div>
                 <p>The people who placed this symbol on medical institutions understood exactly what it meant. The question is whether the knowledge it encodes was lost, or deliberately separated from its original context.</p>
@@ -580,16 +619,18 @@ export default function EsotericPage() {
             </Accordion>
 
             <Accordion title="The Obelisk: Monuments to Reproductive Energy" accent="#a78bfa" icon={Infinity}>
-              <div className="pt-4 space-y-3">
-                <div className="flex gap-4 items-start">
-                  <p className="flex-1">Obelisks, Egyptian stone pillars now placed at the center of Washington D.C., the Vatican, London&apos;s Cleopatra&apos;s Needle, and Paris, were understood by Egyptian mystery schools as monuments to the generative life-force of the god Osiris. The shape is explicit. Their placement at the centers of the world&apos;s most powerful institutions is not coincidental; it is an esoteric declaration of what truly governs the world.</p>
+              <div className="pt-4 space-y-4">
+                <div style={{ overflow: 'hidden' }}>
                   <WikiImage
                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Obelisco_del_Laterano_ROMA_04_06_2019.jpg/250px-Obelisco_del_Laterano_ROMA_04_06_2019.jpg"
                     alt="The Lateran Obelisk in Rome, the tallest surviving ancient obelisk"
                     caption="The Lateran Obelisk, Rome. The tallest surviving ancient obelisk at 45.7 m. Originally from Karnak, Egypt, c. 1400 BC. CC BY-SA 4.0."
+                    floatRight
+                    maxImgHeight={180}
                   />
+                  <p>Obelisks, Egyptian stone pillars now placed at the center of Washington D.C., the Vatican, London&apos;s Cleopatra&apos;s Needle, and Paris, were understood by Egyptian mystery schools as monuments to the generative life-force of the god Osiris. The shape is explicit. Their placement at the centers of the world&apos;s most powerful institutions is not coincidental; it is an esoteric declaration of what truly governs the world.</p>
+                  <p className="mt-3">The <strong className="text-purple-400">Washington Monument</strong> (555 feet tall, the largest obelisk on Earth) stands at the center of the United States capital. The <strong className="text-purple-400">Vatican Obelisk</strong> stands in the center of St. Peter&apos;s Square, a Catholic institution that officially condemns the very knowledge the obelisk encodes. Both institutions are, esoterically, monuments to the power of directed sexual energy, placed by those who understood it, in full view of those who do not.</p>
                 </div>
-                <p>The <strong className="text-purple-400">Washington Monument</strong> (555 feet tall, the largest obelisk on Earth) stands at the center of the United States capital. The <strong className="text-purple-400">Vatican Obelisk</strong> stands in the center of St. Peter&apos;s Square, a Catholic institution that officially condemns the very knowledge the obelisk encodes. Both institutions are, esoterically, monuments to the power of directed sexual energy, placed by those who understood it, in full view of those who do not.</p>
               </div>
             </Accordion>
           </div>
