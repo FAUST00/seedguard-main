@@ -295,7 +295,7 @@ export default function EsotericPage() {
             </div>
 
             <div className="space-y-3 text-sm text-foreground/80 leading-relaxed">
-              {/* Float testis schematic right — paragraph wraps around it naturally */}
+              {/* All three paragraphs inside wrapper so total text height exceeds image height */}
               <div style={{ overflow: 'hidden' }}>
                 <WikiImage
                   src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Illu_testis_schematic.jpg"
@@ -307,13 +307,13 @@ export default function EsotericPage() {
                 <p>
                   <strong className="text-secondary">Inside the seminiferous tubules</strong> (the tiny sperm-producing coils packed inside the testes), the body manufactures roughly 1,500 sperm cells every single second. The testicles are running a non-stop industrial production line from puberty until death.
                 </p>
+                <p className="mt-3">
+                  Western medicine&apos;s position is straightforward: semen is a <em>renewable</em> bodily fluid. If you don&apos;t ejaculate, your body doesn&apos;t &ldquo;fill up&rdquo; indefinitely. Instead, older sperm cells simply break down inside the epididymis (the storage tube behind the testes) and their raw nutrients (proteins, zinc, magnesium, fructose) are reabsorbed directly back into the bloodstream.
+                </p>
+                <p className="mt-3">
+                  <strong className="text-foreground">What Western science misses:</strong> the fact that reabsorption happens at all, that the body actively recycles semen back into itself, is actually the biological confirmation of what ancient traditions taught for millennia: these nutrients never leave. Retention is nature&apos;s own recycling program.
+                </p>
               </div>
-              <p>
-                Western medicine&apos;s position is straightforward: semen is a <em>renewable</em> bodily fluid. If you don&apos;t ejaculate, your body doesn&apos;t &ldquo;fill up&rdquo; indefinitely. Instead, older sperm cells simply break down inside the epididymis (the storage tube behind the testes) and their raw nutrients (proteins, zinc, magnesium, fructose) are reabsorbed directly back into the bloodstream.
-              </p>
-              <p>
-                <strong className="text-foreground">What Western science misses:</strong> the fact that reabsorption happens at all, that the body actively recycles semen back into itself, is actually the biological confirmation of what ancient traditions taught for millennia: these nutrients never leave. Retention is nature&apos;s own recycling program.
-              </p>
             </div>
 
             <div className="rounded-xl border border-secondary/20 p-4 bg-secondary/5">
@@ -392,7 +392,7 @@ export default function EsotericPage() {
                     alt="Kundalini energy diagram showing chakras and serpent energy"
                     caption="Kundalini chakra diagram showing the seven energy centers. Public domain."
                     floatRight
-                    maxImgHeight={240}
+                    maxImgHeight={175}
                   />
                   <p>
                     Ancient Indian medicine describes the body as processing food through <strong className="text-foreground">seven successive layers of tissue</strong> called Dhatus. Each layer refines the one before it, like a distillery producing increasingly pure essences:
@@ -413,10 +413,10 @@ export default function EsotericPage() {
                       </div>
                     ))}
                   </div>
+                  <p className="mt-3">
+                    It takes <strong className="text-foreground">approximately 40 days</strong> of metabolic energy and perfect digestion to produce a single drop of <em>Shukra</em>. It is the body&apos;s most refined, concentrated product. If Shukra is preserved rather than spent, Ayurveda teaches it undergoes a final sublimation and transforms into <strong className="text-secondary">Ojas</strong>.
+                  </p>
                 </div>
-                <p>
-                  It takes <strong className="text-foreground">approximately 40 days</strong> of metabolic energy and perfect digestion to produce a single drop of <em>Shukra</em>. It is the body&apos;s most refined, concentrated product. If Shukra is preserved rather than spent, Ayurveda teaches it undergoes a final sublimation and transforms into <strong className="text-secondary">Ojas</strong>.
-                </p>
                 <p>
                   Ojas is described as a golden luminous fluid, the subtle essence responsible for
                   radiant skin and bright eyes, steel immune function, effortless mental clarity,
@@ -472,10 +472,10 @@ export default function EsotericPage() {
                   <p>
                     Kundalini is described in Hindu and Tantric traditions as a dormant serpentine energy coiled at the base of the spine, in the <em>Muladhara</em> (root chakra), the same energetic center associated with the reproductive organs. Through retention, meditation, and specific breathwork (<em>pranayama</em>), this energy is said to rise through the seven chakras along the <em>Sushumna</em> (central channel) until it reaches the crown, producing states of <strong className="text-foreground">samadhi</strong>, described as the union of individual consciousness with universal consciousness.
                   </p>
+                  <p className="mt-3">
+                    <strong className="text-green-400">The Caduceus, the medical symbol used worldwide today,</strong> is two serpents coiling up a central staff topped by wings. This is a direct encoding of Kundalini knowledge: the two serpents are the <em>Ida</em> (lunar/feminine) and <em>Pingala</em> (solar/masculine) energy channels wrapping around the spine. The wings at the top represent the liberation of consciousness when the energy reaches the crown.
+                  </p>
                 </div>
-                <p>
-                  <strong className="text-green-400">The Caduceus, the medical symbol used worldwide today,</strong> is two serpents coiling up a central staff topped by wings. This is a direct encoding of Kundalini knowledge: the two serpents are the <em>Ida</em> (lunar/feminine) and <em>Pingala</em> (solar/masculine) energy channels wrapping around the spine. The wings at the top represent the liberation of consciousness when the energy reaches the crown.
-                </p>
                 <p>
                   Modern medicine adopted this symbol without acknowledging, or perhaps deliberately obscuring, its original meaning. The ancient physicians who used this symbol were communicating that the mastery of sexual energy is the foundation of all healing.
                 </p>
@@ -508,7 +508,7 @@ export default function EsotericPage() {
                     alt="Emblematic Structure of Freemasonry historical diagram"
                     caption="Emblematic Structure of Freemasonry, historical diagram. Public domain."
                     floatRight
-                    maxImgHeight={200}
+                    maxImgHeight={145}
                   />
                   <p>
                     Freemasonry&apos;s public face is charitable fraternity. Its inner degrees, however, preserve a sophisticated system of esoteric knowledge that mainstream historians rarely discuss. The Scottish Rite culminates at the <strong className="text-yellow-400">33rd Degree</strong>, a level that initiates are explicitly told encodes the deepest secrets of human nature and the cosmos.
@@ -677,8 +677,8 @@ export default function EsotericPage() {
                     maxImgHeight={120}
                   />
                   <p>Obelisks, Egyptian stone pillars now placed at the center of Washington D.C., the Vatican, London&apos;s Cleopatra&apos;s Needle, and Paris, were understood by Egyptian mystery schools as monuments to the generative life-force of the god Osiris. The shape is explicit. Their placement at the centers of the world&apos;s most powerful institutions is not coincidental; it is an esoteric declaration of what truly governs the world.</p>
+                  <p className="mt-3">The <strong className="text-purple-400">Washington Monument</strong> (555 feet tall, the largest obelisk on Earth) stands at the center of the United States capital. The <strong className="text-purple-400">Vatican Obelisk</strong> stands in the center of St. Peter&apos;s Square, a Catholic institution that officially condemns the very knowledge the obelisk encodes. Both institutions are, esoterically, monuments to the power of directed sexual energy, placed by those who understood it, in full view of those who do not.</p>
                 </div>
-                <p>The <strong className="text-purple-400">Washington Monument</strong> (555 feet tall, the largest obelisk on Earth) stands at the center of the United States capital. The <strong className="text-purple-400">Vatican Obelisk</strong> stands in the center of St. Peter&apos;s Square, a Catholic institution that officially condemns the very knowledge the obelisk encodes. Both institutions are, esoterically, monuments to the power of directed sexual energy, placed by those who understood it, in full view of those who do not.</p>
               </div>
             </Accordion>
           </div>
@@ -754,15 +754,15 @@ export default function EsotericPage() {
                     floatRight
                     defaultWidth={88}
                     expandedWidth={180}
-                    maxImgHeight={110}
+                    maxImgHeight={90}
                   />
                   <p>
                     A man who controls his sexual energy is harder to manipulate. He doesn&apos;t need constant external stimulation. He is less impulsive, less susceptible to advertising, less likely to make fear-based decisions. He has a stable inner life that doesn&apos;t depend on constant consumption.
                   </p>
+                  <p className="mt-3">
+                    The pornography industry generates over <strong className="text-yellow-400">$97 billion annually</strong> worldwide. The pharmaceutical industry generates billions more treating the anxiety, depression, and low testosterone that result from compulsive sexual behavior. The entertainment industry is built on the commodification of sexuality as a permanent attention hook.
+                  </p>
                 </div>
-                <p>
-                  The pornography industry generates over <strong className="text-yellow-400">$97 billion annually</strong> worldwide. The pharmaceutical industry generates billions more treating the anxiety, depression, and low testosterone that result from compulsive sexual behavior. The entertainment industry is built on the commodification of sexuality as a permanent attention hook.
-                </p>
                 <p>
                   A population that has learned to master its own sexual energy is a population that is substantially more sovereign, more disciplined, and less dependent on external systems for its sense of satisfaction. This is not conspiracy theory; it is straightforward economics and behavioral psychology.
                 </p>
