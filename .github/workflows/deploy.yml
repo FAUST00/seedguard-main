@@ -35,6 +35,8 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Web Push VAPID public key — safe to expose; clients subscribe with it.
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: BDVc4k_hUGIuFZXs0fqgDaY0XE0FzIa_WYKsJ5eCVwh-YJX2KCyTGFb5SFMkfFsXiU_gyKm-iuyqj2guomzd8mM
 
       - name: Add .nojekyll
         run: touch out/.nojekyll
