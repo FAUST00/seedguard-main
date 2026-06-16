@@ -63,6 +63,23 @@ export function checkInToday(): boolean {
   return true;
 }
 
+/** Consecutive-day check-in streak from an explicit check-in list (pure). */
+export function checkinStreakFrom(checkins: string[]): number {
+  const set = new Set(checkins);
+  if (set.size === 0) return 0;
+  let streak = 0;
+  const cursor = new Date();
+  if (!set.has(cursor.toISOString().slice(0, 10))) {
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+    if (!set.has(cursor.toISOString().slice(0, 10))) return 0;
+  }
+  while (set.has(cursor.toISOString().slice(0, 10))) {
+    streak++;
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+  }
+  return streak;
+}
+
 /** Consecutive-day check-in streak ending today or yesterday. */
 export function checkinStreak(): number {
   const set = new Set(getCheckins());
