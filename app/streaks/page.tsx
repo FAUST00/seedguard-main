@@ -16,6 +16,7 @@ import { syncProfileStreak } from '@/lib/social';
 import { getUser } from '@/lib/sync';
 import { supabase } from '@/lib/supabase';
 import { ART } from '@/lib/assets';
+import { EmptyState } from '@/components/ui';
 
 type View = 'friends' | 'global' | 'weekly' | 'monthly';
 
@@ -267,18 +268,21 @@ export default function StreaksPage() {
           {Array.from({ length: 6 }).map((_, i) => <li key={i}><LeaderboardRowSkeleton /></li>)}
         </ul>
       ) : entries.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-muted/30 p-12 text-center text-muted-foreground">
-          <Flame className="w-10 h-10 mx-auto mb-3 opacity-30 flame-glow" aria-hidden />
+        <div className="rounded-2xl border border-dashed border-muted/30">
           {view === 'friends' ? (
-            <>
-              <p className="font-semibold">No friends yet.</p>
-              <p className="text-sm mt-1">Add friends in the Social tab to see their streaks here.</p>
-            </>
+            <EmptyState
+              Icon={Users}
+              accent="gold"
+              title="No friends yet"
+              description="Add friends in the Social tab to see their streaks ranked here."
+            />
           ) : (
-            <>
-              <p className="font-semibold">No data yet.</p>
-              <p className="text-sm mt-1">Be the first! Create an account and start your streak.</p>
-            </>
+            <EmptyState
+              Icon={Flame}
+              accent="gold"
+              title="No data yet"
+              description="Be the first — create an account and start your streak to claim the top spot."
+            />
           )}
         </div>
       ) : (

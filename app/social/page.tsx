@@ -30,6 +30,7 @@ import {
   type FriendRequest, type DirectMessage, type PublicProfile,
 } from '@/lib/social';
 import { ART } from '@/lib/assets';
+import { EmptyState } from '@/components/ui';
 
 type Tab = 'friends' | 'requests' | 'messages';
 
@@ -352,9 +353,13 @@ export default function SocialPage() {
               <UserCheck className="w-4 h-4" aria-hidden /> Your Friends ({friends.length})
             </h2>
             {friends.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-muted/30 p-10 text-center text-muted-foreground">
-                <Ghost className="w-10 h-10 mx-auto mb-3 opacity-30" aria-hidden />
-                <p className="text-sm">No friends yet. Search above to get started.</p>
+              <div className="rounded-2xl border border-dashed border-muted/30">
+                <EmptyState
+                  Icon={Ghost}
+                  accent="primary"
+                  title="No friends yet"
+                  description="Search for warriors above and send a request to build your accountability circle."
+                />
               </div>
             ) : (
               <ul className="space-y-3" aria-label="Friends list">

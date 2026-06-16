@@ -13,6 +13,7 @@ import {
   deleteHistoryEntryFromCloud,
   type HistoryEntry,
 } from '@/lib/sync';
+import { PageHeader, EmptyState } from '@/components/ui';
 
 // ── Calendar Heatmap ─────────────────────────────────────────────────────────
 function toYMD(d: Date): string {
@@ -391,14 +392,10 @@ export default function History() {
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-6xl space-y-8 page-entry">
-      <div>
-        <h1 className="text-4xl font-extrabold tracking-widest uppercase italic neon-text-cyan text-secondary">
-          History
-        </h1>
-        <p className="text-muted-foreground text-lg mt-2">
-          Track every victory and setback — the whole picture builds discipline.
-        </p>
-      </div>
+      <PageHeader
+        title="History"
+        subtitle="Track every victory and setback — the whole picture builds discipline."
+      />
 
       {/* Calendar Heatmap */}
       <CalendarHeatmap entries={entries} />
@@ -527,9 +524,18 @@ export default function History() {
           >
             <div className="space-y-2 pt-1">
               {victories.length === 0 ? (
-                <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
-                  {entries.length === 0 ? 'No wins logged yet. Start your journey today!' : 'No victories match this filter.'}
-                </div>
+                entries.length === 0 ? (
+                  <EmptyState
+                    emoji="🛡️"
+                    accent="secondary"
+                    title="No wins logged yet"
+                    description="Every entry sharpens your discipline. Log your first victory above and start the record."
+                  />
+                ) : (
+                  <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
+                    No victories match this filter.
+                  </div>
+                )
               ) : victories.map((entry) => (
                 <LogEntry
                   key={entry.id}
@@ -568,9 +574,18 @@ export default function History() {
           >
             <div className="space-y-2 pt-1">
               {relapses.length === 0 ? (
-                <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
-                  {entries.length === 0 ? 'No relapses logged yet. Keep it up!' : 'No relapses match this filter.'}
-                </div>
+                entries.length === 0 ? (
+                  <EmptyState
+                    emoji="✨"
+                    accent="secondary"
+                    title="Clean slate"
+                    description="No relapses logged. Keep holding the line — every clean day compounds."
+                  />
+                ) : (
+                  <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
+                    No relapses match this filter.
+                  </div>
+                )
               ) : relapses.map((entry) => (
                 <LogEntry
                   key={entry.id}
