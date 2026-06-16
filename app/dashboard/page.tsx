@@ -28,6 +28,7 @@ import { QuickLogSheet } from '@/components/quick-log-sheet';
 import { WeeklyChallenge } from '@/components/weekly-challenge';
 import { AccountabilityPartner } from '@/components/accountability-partner';
 import { pullGamification, pushGamification } from '@/lib/gamification-sync';
+import { detectNewAchievements, type Achievement } from '@/lib/achievements';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -42,6 +43,16 @@ interface TimerParts {
 }
 
 function pad(n: number): string { return String(n).padStart(2, '0'); }
+
+/** Count distinct days a mood was logged (for achievement progress). */
+function countMoodCheckins(): number {
+  if (typeof window === 'undefined') return 0;
+  let n = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    if (localStorage.key(i)?.startsWith('seedguard_mood_')) n++;
+  }
+  return n;
+}
 
 
 // ── Streak start resolver ──────────────────────────────────────────────────
@@ -122,6 +133,7 @@ export default function Dashboard() {
   // Celebration modal
   const [celebration, setCelebration] = useState<{ day: number } | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [achUnlocked, setAchUnlocked] = useState<Achievement | null>(null);
 
   // Urge surfing modal
   const [showUrge, setShowUrge] = useState(false);
@@ -243,7 +255,25 @@ export default function Dashboard() {
       badgeCount: badgeIds.length,
       questXp: getQuestXp(),
     });
-    setLevelInfo(levelFromXp(xp));
+    const level = levelFromXp(xp);
+    setLevelInfo(level);
+
+    // Celebrate any newly-unlocked achievements
+    const fresh = detectNewAchievements({
+      currentStreak: curr,
+      longestStreak: updated.longestStreak,
+      totalDays: updated.totalDays,
+      relapses: updated.relapses,
+      entryCount,
+      moodCheckins: countMoodCheckins(),
+      level: level.level,
+    });
+    if (fresh.length > 0) {
+      playSound('milestone');
+      setAchUnlocked(fresh[0]);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 4000);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer.days, loading, questBump]);
 
@@ -352,6 +382,28 @@ export default function Dashboard() {
 
       {/* Confetti overlay */}
       {showConfetti && <Confetti />}
+
+      {/* ── Achievement Unlocked toast ────────────────────────────────── */}
+      {achUnlocked && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setAchUnlocked(null)}>
+          <div
+            className="relative w-full max-w-xs rounded-2xl border border-gold/40 bg-background/95 p-7 text-center space-y-3 neon-box-gold animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold/80">Achievement Unlocked</p>
+            <div className="text-5xl">{achUnlocked.emoji}</div>
+            <h2 className="text-xl font-extrabold text-gold neon-text-gold uppercase tracking-wider">{achUnlocked.name}</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">{achUnlocked.description}</p>
+            <Link
+              href="/achievements"
+              onClick={() => setAchUnlocked(null)}
+              className="inline-flex items-center justify-center gap-1 w-full py-2.5 rounded-xl bg-gold/20 border border-gold/50 text-gold font-bold uppercase tracking-wider text-sm hover:bg-gold/30 transition-all"
+            >
+              View All <ChevronRight className="w-4 h-4" aria-hidden />
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* ── Milestone Celebration Modal ───────────────────────────────── */}
       {celebration && (

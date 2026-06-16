@@ -85,6 +85,33 @@ export function earnedCount(s: AchievementStats): number {
   return ACHIEVEMENTS.filter((a) => isEarned(a, s)).length;
 }
 
+const SEEN_KEY = 'seedguard_ach_seen';
+
+/**
+ * Return achievements earned since the last time we checked, and update the
+ * "seen" set. On the very first run it seeds the set silently (returns []),
+ * so existing users don't get a confetti storm for past unlocks.
+ */
+export function detectNewAchievements(s: AchievementStats): Achievement[] {
+  if (typeof window === 'undefined') return [];
+  const earnedIds = ACHIEVEMENTS.filter((a) => isEarned(a, s)).map((a) => a.id);
+  let seenRaw: string | null = null;
+  try { seenRaw = localStorage.getItem(SEEN_KEY); } catch {}
+
+  if (seenRaw === null) {
+    try { localStorage.setItem(SEEN_KEY, JSON.stringify(earnedIds)); } catch {}
+    return [];
+  }
+
+  let seen: Set<string>;
+  try { seen = new Set(JSON.parse(seenRaw) as string[]); } catch { seen = new Set(); }
+  const fresh = earnedIds.filter((id) => !seen.has(id));
+  if (fresh.length > 0) {
+    try { localStorage.setItem(SEEN_KEY, JSON.stringify(earnedIds)); } catch {}
+  }
+  return ACHIEVEMENTS.filter((a) => fresh.includes(a.id));
+}
+
 /** Build achievement stats from localStorage (client only). */
 export function loadAchievementStats(): AchievementStats {
   const empty: AchievementStats = {
