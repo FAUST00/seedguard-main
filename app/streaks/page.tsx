@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Flame, Trophy, Medal, Crown, RefreshCw, Loader2, Globe, Users, Calendar, Clock } from 'lucide-react';
+import { Flame, Trophy, Medal, Crown, RefreshCw, Loader2, Globe, Users, Calendar, Clock, Star } from 'lucide-react';
 import { ImageBanner } from '@/components/synth-background';
 import { LeaderboardRowSkeleton } from '@/components/skeleton';
 import { ProfileCard } from '@/components/profile-card';
 import { useToast } from '@/components/toast';
 import {
   getGlobalLeaderboard, getFriendsLeaderboard,
-  getWeeklyLeaderboard, getMonthlyLeaderboard,
+  getWeeklyLeaderboard, getMonthlyLeaderboard, getLevelLeaderboard,
   fmtDate, daysSince, streakTier,
   type StreakEntry,
 } from '@/lib/streaks';
@@ -18,7 +18,7 @@ import { supabase } from '@/lib/supabase';
 import { ART } from '@/lib/assets';
 import { EmptyState } from '@/components/ui';
 
-type View = 'friends' | 'global' | 'weekly' | 'monthly';
+type View = 'friends' | 'global' | 'weekly' | 'monthly' | 'levels';
 
 // ── Rank badge ────────────────────────────────────────────────────────────────
 function RankBadge({ rank }: { rank: number }) {
@@ -58,10 +58,11 @@ function FlameRow({ days }: { days: number }) {
 }
 
 // ── Leaderboard row ──────────────────────────────────────────────────────────
-function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
+function LeaderboardRow({ entry, rank, metric = 'streak' }: { entry: StreakEntry; rank: number; metric?: 'streak' | 'level' }) {
   const tier = streakTier(entry.current_streak);
   const stale = daysSince(entry.last_active ?? null);
   const initial = (entry.username ?? '?').charAt(0).toUpperCase();
+  const isLevel = metric === 'level';
 
   const rankBorder =
     rank === 1 ? 'border-gold/40' :
@@ -95,10 +96,19 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
           )}
         </div>
         <div className="flex items-center gap-3 mt-1 flex-wrap">
-          <FlameRow days={entry.current_streak} />
-          <span className="text-xs text-muted-foreground tabular-nums">Best: {entry.best_streak}d</span>
-          {entry.streak_start && (
-            <span className="text-xs text-muted-foreground">Since {fmtDate(entry.streak_start)}</span>
+          {isLevel ? (
+            <>
+              <span className="text-xs text-secondary font-bold tabular-nums">{(entry.xp ?? 0).toLocaleString()} XP</span>
+              <span className="text-xs text-muted-foreground tabular-nums">Streak: {entry.current_streak}d</span>
+            </>
+          ) : (
+            <>
+              <FlameRow days={entry.current_streak} />
+              <span className="text-xs text-muted-foreground tabular-nums">Best: {entry.best_streak}d</span>
+              {entry.streak_start && (
+                <span className="text-xs text-muted-foreground">Since {fmtDate(entry.streak_start)}</span>
+              )}
+            </>
           )}
           {stale >= 3 && !entry.isMe && (
             <span className="text-[10px] text-muted-foreground/60">Updated {stale}d ago</span>
@@ -107,10 +117,10 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
       </div>
 
       <div className="flex-shrink-0 text-right">
-        <p className={`text-2xl md:text-3xl font-extrabold tabular-nums leading-none ${tier.color} ${rank <= 3 ? (rank === 1 ? 'neon-text-gold' : 'neon-text-pink') : ''}`}>
-          {entry.current_streak}
+        <p className={`text-2xl md:text-3xl font-extrabold tabular-nums leading-none ${isLevel ? 'text-secondary' : tier.color} ${rank <= 3 ? (rank === 1 ? 'neon-text-gold' : 'neon-text-pink') : ''}`}>
+          {isLevel ? (entry.level ?? 1) : entry.current_streak}
         </p>
-        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">days</p>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">{isLevel ? 'level' : 'days'}</p>
       </div>
     </li>
   );
@@ -122,6 +132,7 @@ const TABS: { id: View; label: string; icon: typeof Globe; desc: string }[] = [
   { id: 'weekly',  label: 'This Week', icon: Clock,  desc: 'Warriors active in the last 7 days.' },
   { id: 'monthly', label: 'Monthly',  icon: Calendar, desc: 'Warriors active in the last 30 days.' },
   { id: 'global',  label: 'All Time', icon: Globe,   desc: 'Top 50 warriors site-wide, all time.' },
+  { id: 'levels',  label: 'Levels',   icon: Star,    desc: 'Top 50 warriors ranked by XP and level.' },
 ];
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -139,6 +150,7 @@ export default function StreaksPage() {
       if (view === 'global')        data = await getGlobalLeaderboard();
       else if (view === 'weekly')   data = await getWeeklyLeaderboard();
       else if (view === 'monthly')  data = await getMonthlyLeaderboard();
+      else if (view === 'levels')   data = await getLevelLeaderboard();
       else                          data = await getFriendsLeaderboard();
       setEntries(data);
     } catch {}
@@ -153,6 +165,7 @@ export default function StreaksPage() {
       if (view === 'global')        data = await getGlobalLeaderboard();
       else if (view === 'weekly')   data = await getWeeklyLeaderboard();
       else if (view === 'monthly')  data = await getMonthlyLeaderboard();
+      else if (view === 'levels')   data = await getLevelLeaderboard();
       else                          data = await getFriendsLeaderboard();
       setEntries(data);
     } catch (err: unknown) {
@@ -289,14 +302,23 @@ export default function StreaksPage() {
         <>
           <ul className="space-y-3" role="list" aria-label={`${activeTab.label} leaderboard`}>
             {entries.map((entry) => (
-              <LeaderboardRow key={entry.id} entry={entry} rank={entry.rank} />
+              <LeaderboardRow key={entry.id} entry={entry} rank={entry.rank} metric={view === 'levels' ? 'level' : 'streak'} />
             ))}
           </ul>
 
           <div className="rounded-xl border border-muted/15 bg-muted/5 p-4 flex flex-wrap gap-6 justify-center text-sm text-muted-foreground">
             <span><strong className="text-foreground">{entries.length}</strong> {view === 'global' ? 'users ranked' : view === 'friends' ? 'friends tracked' : 'warriors'}</span>
-            <span>Top streak: <strong className={streakTier(entries[0]?.current_streak ?? 0).color}>{entries[0]?.current_streak ?? 0} days</strong></span>
-            <span>Avg: <strong className="text-foreground">{Math.round(entries.reduce((s, e) => s + e.current_streak, 0) / (entries.length || 1))} days</strong></span>
+            {view === 'levels' ? (
+              <>
+                <span>Top level: <strong className="text-secondary">{entries[0]?.level ?? 1}</strong></span>
+                <span>Top XP: <strong className="text-foreground">{(entries[0]?.xp ?? 0).toLocaleString()}</strong></span>
+              </>
+            ) : (
+              <>
+                <span>Top streak: <strong className={streakTier(entries[0]?.current_streak ?? 0).color}>{entries[0]?.current_streak ?? 0} days</strong></span>
+                <span>Avg: <strong className="text-foreground">{Math.round(entries.reduce((s, e) => s + e.current_streak, 0) / (entries.length || 1))} days</strong></span>
+              </>
+            )}
           </div>
         </>
       )}

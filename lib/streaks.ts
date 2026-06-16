@@ -4,6 +4,7 @@
 
 import { supabase } from './supabase';
 import { getUser } from './sync';
+import { levelFromXp } from './xp';
 import type { PublicProfile } from './social';
 
 export interface StreakEntry {
@@ -16,6 +17,47 @@ export interface StreakEntry {
   streak_start: string | null;
   last_active: string | null;
   isMe: boolean;
+  xp?: number;
+  level?: number;
+}
+
+/** Persist the current user's total XP so it can be ranked server-side. */
+export async function saveXpToCloud(totalXp: number): Promise<void> {
+  try {
+    const user = await getUser();
+    if (!user) return;
+    await supabase.from('profiles').upsert({
+      id: user.id,
+      xp: Math.max(0, Math.round(totalXp)),
+      updated_at: new Date().toISOString(),
+    });
+  } catch {
+    // xp column may not exist yet — no-op until the migration runs.
+  }
+}
+
+/** Levels leaderboard — top 50 users by total XP. */
+export async function getLevelLeaderboard(): Promise<StreakEntry[]> {
+  const user = await getUser();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, avatar_url, current_streak, best_streak, streak_start, last_active, xp')
+    .order('xp', { ascending: false })
+    .limit(50);
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((row, i) => ({
+    rank: i + 1,
+    id: row.id,
+    username: row.username ?? 'Anonymous',
+    avatar_url: row.avatar_url ?? null,
+    current_streak: row.current_streak ?? 0,
+    best_streak: row.best_streak ?? 0,
+    streak_start: row.streak_start ?? null,
+    last_active: row.last_active ?? null,
+    isMe: user?.id === row.id,
+    xp: row.xp ?? 0,
+    level: levelFromXp(row.xp ?? 0).level,
+  }));
 }
 
 /** Global leaderboard — top 50 users by current streak. */

@@ -29,6 +29,7 @@ import { WeeklyChallenge } from '@/components/weekly-challenge';
 import { AccountabilityPartner } from '@/components/accountability-partner';
 import { pullGamification, pushGamification } from '@/lib/gamification-sync';
 import { detectNewAchievements, type Achievement } from '@/lib/achievements';
+import { saveXpToCloud } from '@/lib/streaks';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -257,6 +258,7 @@ export default function Dashboard() {
     });
     const level = levelFromXp(xp);
     setLevelInfo(level);
+    if (hasAccount) saveXpToCloud(xp).catch(() => {}); // feed the levels leaderboard
 
     // Celebrate any newly-unlocked achievements
     const fresh = detectNewAchievements({
@@ -275,7 +277,7 @@ export default function Dashboard() {
       setTimeout(() => setShowConfetti(false), 4000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timer.days, loading, questBump]);
+  }, [timer.days, loading, questBump, hasAccount]);
 
   // Just showing up and holding the streak completes the daily "hold" quest;
   // any quest completion bumps a counter so XP recomputes with fresh stats.
