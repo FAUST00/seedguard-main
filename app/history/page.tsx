@@ -228,9 +228,13 @@ export default function History() {
   const [entryType, setEntryType] = useState<'victory' | 'relapse'>('victory');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Accordion
+  // Individual entry accordion
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [allExpanded, setAllExpanded] = useState(false);
+
+  // Section-level accordion (open by default)
+  const [victoriesOpen, setVictoriesOpen] = useState(true);
+  const [relapsesOpen, setRelapsesOpen] = useState(true);
 
   // Search + filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -341,26 +345,6 @@ export default function History() {
       setExpandedIds(new Set(entries.map(e => e.id)));
     }
     setAllExpanded(!allExpanded);
-  };
-
-  // Section-level expand/collapse helpers
-  const toggleSection = (type: 'victory' | 'relapse') => {
-    const sectionIds = filteredEntries.filter(e => e.type === type).map(e => e.id);
-    const allSectionExpanded = sectionIds.every(id => expandedIds.has(id));
-    setExpandedIds(prev => {
-      const next = new Set(prev);
-      if (allSectionExpanded) {
-        sectionIds.forEach(id => next.delete(id));
-      } else {
-        sectionIds.forEach(id => next.add(id));
-      }
-      return next;
-    });
-  };
-
-  const isSectionExpanded = (type: 'victory' | 'relapse') => {
-    const sectionIds = filteredEntries.filter(e => e.type === type).map(e => e.id);
-    return sectionIds.length > 0 && sectionIds.every(id => expandedIds.has(id));
   };
 
   // Filtered + searched entries
@@ -518,30 +502,35 @@ export default function History() {
 
       {/* History Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-4 animate-scale-in">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-xl font-bold uppercase tracking-widest flex items-center gap-2 text-secondary neon-text-cyan">
-              <ShieldCheck className="w-6 h-6" />
+        {/* ── Victories section ── */}
+        <div className="space-y-3 animate-scale-in">
+          <button
+            onClick={() => setVictoriesOpen(v => !v)}
+            aria-expanded={victoriesOpen}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-secondary/25 bg-secondary/5 hover:bg-secondary/10 hover:border-secondary/40 transition-all text-left group"
+          >
+            <ShieldCheck className="w-5 h-5 text-secondary flex-shrink-0" aria-hidden />
+            <span className="flex-1 text-base font-bold uppercase tracking-widest text-secondary neon-text-cyan">
               Victories &amp; Notes
-              <span className="text-sm font-semibold text-secondary/60 normal-case tracking-normal">({victories.length})</span>
-            </h2>
-            {victories.length > 0 && (
-              <button
-                onClick={() => toggleSection('victory')}
-                className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-secondary/60 hover:text-secondary border border-secondary/25 hover:border-secondary/50 px-3 py-1.5 rounded-lg transition-all flex-shrink-0"
-              >
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isSectionExpanded('victory') ? 'rotate-180' : ''}`} />
-                {isSectionExpanded('victory') ? 'Collapse All' : 'Expand All'}
-              </button>
-            )}
-          </div>
-          {victories.length === 0 ? (
-            <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
-              {entries.length === 0 ? 'No wins logged yet. Start your journey today!' : 'No victories match this filter.'}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {victories.map((entry) => (
+            </span>
+            <span className="text-xs font-semibold text-secondary/50 normal-case tracking-normal mr-2">
+              {victories.length} {victories.length === 1 ? 'entry' : 'entries'}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 text-secondary/50 transition-transform duration-300 ${victoriesOpen ? 'rotate-180' : ''}`}
+              aria-hidden
+            />
+          </button>
+          <div
+            className="overflow-hidden transition-all duration-400 ease-in-out"
+            style={{ maxHeight: victoriesOpen ? '99999px' : '0px' }}
+          >
+            <div className="space-y-2 pt-1">
+              {victories.length === 0 ? (
+                <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
+                  {entries.length === 0 ? 'No wins logged yet. Start your journey today!' : 'No victories match this filter.'}
+                </div>
+              ) : victories.map((entry) => (
                 <LogEntry
                   key={entry.id}
                   entry={entry}
@@ -551,33 +540,38 @@ export default function History() {
                 />
               ))}
             </div>
-          )}
+          </div>
         </div>
 
-        <div className="space-y-4 animate-scale-in [animation-delay:100ms]">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-xl font-bold uppercase tracking-widest flex items-center gap-2 text-destructive">
-              <Flame className="w-6 h-6" />
+        {/* ── Relapses section ── */}
+        <div className="space-y-3 animate-scale-in [animation-delay:100ms]">
+          <button
+            onClick={() => setRelapsesOpen(v => !v)}
+            aria-expanded={relapsesOpen}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-destructive/25 bg-destructive/5 hover:bg-destructive/10 hover:border-destructive/40 transition-all text-left group"
+          >
+            <Flame className="w-5 h-5 text-destructive flex-shrink-0" aria-hidden />
+            <span className="flex-1 text-base font-bold uppercase tracking-widest text-destructive">
               Relapse Log
-              <span className="text-sm font-semibold text-destructive/60 normal-case tracking-normal">({relapses.length})</span>
-            </h2>
-            {relapses.length > 0 && (
-              <button
-                onClick={() => toggleSection('relapse')}
-                className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-destructive/60 hover:text-destructive border border-destructive/25 hover:border-destructive/50 px-3 py-1.5 rounded-lg transition-all flex-shrink-0"
-              >
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isSectionExpanded('relapse') ? 'rotate-180' : ''}`} />
-                {isSectionExpanded('relapse') ? 'Collapse All' : 'Expand All'}
-              </button>
-            )}
-          </div>
-          {relapses.length === 0 ? (
-            <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
-              {entries.length === 0 ? 'No relapses logged yet. Keep it up!' : 'No relapses match this filter.'}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {relapses.map((entry) => (
+            </span>
+            <span className="text-xs font-semibold text-destructive/50 normal-case tracking-normal mr-2">
+              {relapses.length} {relapses.length === 1 ? 'entry' : 'entries'}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 text-destructive/50 transition-transform duration-300 ${relapsesOpen ? 'rotate-180' : ''}`}
+              aria-hidden
+            />
+          </button>
+          <div
+            className="overflow-hidden transition-all duration-400 ease-in-out"
+            style={{ maxHeight: relapsesOpen ? '99999px' : '0px' }}
+          >
+            <div className="space-y-2 pt-1">
+              {relapses.length === 0 ? (
+                <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
+                  {entries.length === 0 ? 'No relapses logged yet. Keep it up!' : 'No relapses match this filter.'}
+                </div>
+              ) : relapses.map((entry) => (
                 <LogEntry
                   key={entry.id}
                   entry={entry}
@@ -587,7 +581,7 @@ export default function History() {
                 />
               ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
 
