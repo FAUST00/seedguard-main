@@ -18,12 +18,18 @@ const QUEST_XP_KEY = 'seedguard_quest_xp';
 const PARTNER_KEY = 'seedguard_partner';
 const CHECKIN_KEY = 'seedguard_partner_checkins';
 const CHALLENGE_PREFIX = 'seedguard_challenge_';
+const QUESTS_PREFIX = 'seedguard_quests_';
+
+function todayStamp(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 
 interface GamificationBlob {
   questXp: number;
   partner: Partner | null;
   partnerCheckins: string[];
   challengeClaims: string[]; // claimed week keys
+  questsToday: { date: string; ids: string[] }; // today's completed quest ids
   updatedAt: string;
 }
 
@@ -31,6 +37,7 @@ function getLocalBlob(): GamificationBlob {
   const challengeClaims: string[] = [];
   let partner: Partner | null = null;
   let partnerCheckins: string[] = [];
+  let questsToday: string[] = [];
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
@@ -40,23 +47,33 @@ function getLocalBlob(): GamificationBlob {
     }
     partner = JSON.parse(localStorage.getItem(PARTNER_KEY) || 'null');
     partnerCheckins = JSON.parse(localStorage.getItem(CHECKIN_KEY) || '[]');
+    questsToday = JSON.parse(localStorage.getItem(`${QUESTS_PREFIX}${todayStamp()}`) || '[]');
   } catch {}
   return {
     questXp: Number(localStorage.getItem(QUEST_XP_KEY) || '0') || 0,
     partner,
     partnerCheckins: Array.isArray(partnerCheckins) ? partnerCheckins : [],
     challengeClaims,
+    questsToday: { date: todayStamp(), ids: Array.isArray(questsToday) ? questsToday : [] },
     updatedAt: new Date().toISOString(),
   };
 }
 
 /** Merge remote into local (non-destructive) and persist the result locally. */
 function applyMerged(local: GamificationBlob, remote: Partial<GamificationBlob>): GamificationBlob {
+  // Today's quest checkmarks — union only when the remote blob is from today,
+  // so yesterday's completions never bleed into a fresh day.
+  const today = todayStamp();
+  const localToday = local.questsToday.ids;
+  const remoteToday = remote.questsToday?.date === today ? (remote.questsToday.ids ?? []) : [];
+  const questsTodayIds = Array.from(new Set([...localToday, ...remoteToday]));
+
   const merged: GamificationBlob = {
     questXp: Math.max(local.questXp, Number(remote.questXp) || 0),
     partner: local.partner ?? remote.partner ?? null,
     partnerCheckins: Array.from(new Set([...local.partnerCheckins, ...(remote.partnerCheckins ?? [])])).sort(),
     challengeClaims: Array.from(new Set([...local.challengeClaims, ...(remote.challengeClaims ?? [])])),
+    questsToday: { date: today, ids: questsTodayIds },
     updatedAt: new Date().toISOString(),
   };
   try {
@@ -64,6 +81,7 @@ function applyMerged(local: GamificationBlob, remote: Partial<GamificationBlob>)
     if (merged.partner) localStorage.setItem(PARTNER_KEY, JSON.stringify(merged.partner));
     localStorage.setItem(CHECKIN_KEY, JSON.stringify(merged.partnerCheckins));
     for (const wk of merged.challengeClaims) localStorage.setItem(`${CHALLENGE_PREFIX}${wk}`, '1');
+    localStorage.setItem(`${QUESTS_PREFIX}${today}`, JSON.stringify(questsTodayIds));
   } catch {}
   return merged;
 }
