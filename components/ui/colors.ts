@@ -16,6 +16,7 @@ export interface AccentTokens {
   bgHover: string;
   text: string;
   gradientFrom: string;
+  barFill: string;  // strong solid fill for progress bars
   neonText: string; // '' when no neon utility exists for this accent
   neonBox: string;  // '' when no neon utility exists for this accent
 }
@@ -28,6 +29,7 @@ export const ACCENT: Record<Accent, AccentTokens> = {
     bgHover: 'hover:bg-primary/20',
     text: 'text-primary',
     gradientFrom: 'from-primary/5',
+    barFill: 'bg-primary/70',
     neonText: 'neon-text-pink',
     neonBox: 'neon-box-pink',
   },
@@ -38,6 +40,7 @@ export const ACCENT: Record<Accent, AccentTokens> = {
     bgHover: 'hover:bg-secondary/20',
     text: 'text-secondary',
     gradientFrom: 'from-secondary/5',
+    barFill: 'bg-secondary/70',
     neonText: 'neon-text-cyan',
     neonBox: 'neon-box-cyan',
   },
@@ -48,6 +51,7 @@ export const ACCENT: Record<Accent, AccentTokens> = {
     bgHover: 'hover:bg-accent/20',
     text: 'text-accent',
     gradientFrom: 'from-accent/5',
+    barFill: 'bg-accent/70',
     neonText: '',
     neonBox: '',
   },
@@ -58,6 +62,7 @@ export const ACCENT: Record<Accent, AccentTokens> = {
     bgHover: 'hover:bg-destructive/20',
     text: 'text-destructive',
     gradientFrom: 'from-destructive/5',
+    barFill: 'bg-destructive/70',
     neonText: '',
     neonBox: '',
   },
@@ -68,6 +73,7 @@ export const ACCENT: Record<Accent, AccentTokens> = {
     bgHover: 'hover:bg-gold/20',
     text: 'text-gold',
     gradientFrom: 'from-gold/5',
+    barFill: 'bg-gold/70',
     neonText: 'neon-text-gold',
     neonBox: 'neon-box-gold',
   },

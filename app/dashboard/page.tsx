@@ -829,9 +829,14 @@ export default function Dashboard() {
       {/* ── Badges ────────────────────────────────────────────────────── */}
       {earnedBadges.length > 0 && (
         <div className="rounded-xl border border-gold/20 bg-background/50 backdrop-blur-sm p-6 animate-scale-in">
-          <h3 className="font-bold text-sm uppercase tracking-wider text-gold neon-text-gold mb-4">
-            🏅 Earned Badges
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-sm uppercase tracking-wider text-gold neon-text-gold">
+              🏅 Earned Badges
+            </h3>
+            <Link href="/achievements" className="flex items-center gap-1 text-xs font-bold text-gold/70 hover:text-gold uppercase tracking-wider transition-colors">
+              All Achievements <ChevronRight className="w-3.5 h-3.5" aria-hidden />
+            </Link>
+          </div>
           <div className="flex flex-wrap gap-3">
             {earnedBadges.map((badge) => (
               <div
