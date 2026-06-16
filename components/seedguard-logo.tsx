@@ -6,7 +6,7 @@ const ICON_SRC = asset('/images/logo-icon.svg'); // shield only  — collapsed s
 const LOGO_SRC = asset('/images/logo.svg');       // shield + SEEDGUARD text — expanded sidebar + hero
 
 interface SeedGuardLogoProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'hero';
   showTagline?: boolean;
   collapsed?: boolean;
 }
@@ -34,13 +34,24 @@ export function SeedGuardLogo({ size = 'md', collapsed = false }: SeedGuardLogoP
     );
   }
 
+  if (size === 'hero') {
+    // Landing page hero — shield icon only, title/tagline rendered as HTML below
+    return (
+      <img
+        src={ICON_SRC}
+        alt="SeedGuard shield"
+        style={{ height: 200, width: 'auto', display: 'block', flexShrink: 0, maxWidth: '90vw' }}
+      />
+    );
+  }
+
   if (size === 'lg') {
-    // Landing page hero
+    // Expanded sidebar large variant
     return (
       <img
         src={LOGO_SRC}
         alt="SeedGuard"
-        style={{ width: 380, height: 'auto', display: 'block', flexShrink: 0, maxWidth: '90vw' }}
+        style={{ width: 220, height: 'auto', display: 'block', flexShrink: 0, maxWidth: '90vw' }}
       />
     );
   }

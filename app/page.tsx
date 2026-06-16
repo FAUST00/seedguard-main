@@ -34,15 +34,23 @@ export default function Home() {
 
         {/* ── Left column — brand + CTA ─────────────────────────────────── */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-6 flex-1">
-          {/* Hero card — logo, title, description */}
-          <div className="animate-scale-in w-full rounded-2xl bg-black/45 backdrop-blur-md border border-primary/20 shadow-2xl shadow-primary/10 p-6 md:p-8 flex flex-col items-center md:items-start space-y-4">
-            <SeedGuardLogo size="lg" />
+          {/* Hero card */}
+          <div className="animate-scale-in w-full rounded-2xl bg-black/45 backdrop-blur-md border border-primary/20 shadow-2xl shadow-primary/10 p-6 md:p-10 flex flex-col items-center text-center space-y-5">
+            {/* Shield icon — large, no embedded text */}
+            <SeedGuardLogo size="hero" />
 
-            <h1 className="text-4xl md:text-5xl font-black uppercase tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-[#00e5ff] to-[#ff2d9b] drop-shadow-[0_0_18px_rgba(0,229,255,0.55)] leading-none">
+            {/* Main title */}
+            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-[0.25em] leading-none text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-[#00e5ff] to-[#ff2d9b] drop-shadow-[0_0_20px_rgba(0,229,255,0.6)]">
               SEEDGUARD
             </h1>
 
-            <p className="text-foreground/90 text-base md:text-lg leading-relaxed font-medium max-w-sm">
+            {/* Tagline — always visible, readable, not glitchy */}
+            <p className="text-sm md:text-base font-black uppercase tracking-[0.3em] text-[#c084fc] drop-shadow-[0_0_10px_rgba(192,132,252,0.6)]">
+              NOFAP &amp; PMO FREEDOM TRACKER
+            </p>
+
+            {/* Description */}
+            <p className="text-foreground/85 text-base md:text-lg leading-relaxed font-medium max-w-sm">
               Your private tracker to reclaim your freedom and build unbreakable discipline.
             </p>
 
