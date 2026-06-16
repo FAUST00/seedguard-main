@@ -16,7 +16,7 @@ security definer
 as $$
 begin
   perform net.http_post(
-    url     := 'https://earfjshpbwcnpqinrrvl.functions.supabase.co/send-push',
+    url     := 'https://earfjshpbwcnpqinrrvl.supabase.co/functions/v1/send-push',
     headers := jsonb_build_object('Content-Type', 'application/json'),
     body    := jsonb_build_object('record', row_to_json(new))
   );
