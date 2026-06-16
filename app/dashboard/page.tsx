@@ -10,6 +10,7 @@ import {
 import { syncWithCloud, getStreakFromCloud, getUser } from '@/lib/sync';
 import { playSound } from '@/lib/sound';
 import { ALL_BADGES, computeEarnedBadgeIds, type BadgeStats } from '@/lib/badges';
+import { StatCard, PageHeader, SectionHeading } from '@/components/ui';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -650,43 +651,38 @@ export default function Dashboard() {
       )}
 
       {/* ── Page Header ───────────────────────────────────────────────── */}
-      <div className="flex items-start justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-4xl font-extrabold tracking-widest uppercase italic neon-text-cyan text-secondary">Dashboard</h1>
-          <p className="text-muted-foreground text-base mt-1">
-            {timer.days === 0
-              ? 'Every journey starts with a single day. Today is that day.'
-              : `Day ${timer.days} — every second you hold is a victory.`}
-          </p>
-        </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          {todayMood && (
-            <span className="text-lg" title={`Today's mood: ${MOODS.find((m) => m.value === todayMood)?.label}`}>
-              {MOODS.find((m) => m.value === todayMood)?.emoji}
-            </span>
-          )}
-          <button
-            onClick={() => setShowUrge(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-destructive/50 bg-destructive/10 text-destructive hover:bg-destructive/20 font-bold uppercase tracking-wider text-xs transition-all"
-          >
-            <AlertTriangle className="w-4 h-4" aria-hidden />
-            I&apos;m Struggling
-          </button>
-          {!hasAccount && (
-            <Link href="/login" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/40 bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-all neon-text-pink">
-              <Users className="w-4 h-4" />
-              Sign In
-            </Link>
-          )}
-        </div>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        subtitle={timer.days === 0
+          ? 'Every journey starts with a single day. Today is that day.'
+          : `Day ${timer.days} — every second you hold is a victory.`}
+        actions={
+          <>
+            {todayMood && (
+              <span className="text-lg" title={`Today's mood: ${MOODS.find((m) => m.value === todayMood)?.label}`}>
+                {MOODS.find((m) => m.value === todayMood)?.emoji}
+              </span>
+            )}
+            <button
+              onClick={() => setShowUrge(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-destructive/50 bg-destructive/10 text-destructive hover:bg-destructive/20 font-bold uppercase tracking-wider text-xs transition-all"
+            >
+              <AlertTriangle className="w-4 h-4" aria-hidden />
+              I&apos;m Struggling
+            </button>
+            {!hasAccount && (
+              <Link href="/login" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/40 bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-all neon-text-pink">
+                <Users className="w-4 h-4" />
+                Sign In
+              </Link>
+            )}
+          </>
+        }
+      />
 
       {/* ── SVG Progress Ring + Live Timer ────────────────────────────── */}
       <div className="rounded-xl border border-primary/30 bg-background/60 backdrop-blur-sm p-6 md:p-8 neon-box-pink animate-scale-in">
-        <div className="flex items-center gap-3 mb-6">
-          <Clock className="w-5 h-5 text-primary" aria-hidden />
-          <h2 className="text-lg font-bold uppercase tracking-widest text-primary neon-text-pink">Live Streak Timer</h2>
-        </div>
+        <SectionHeading accent="primary" Icon={Clock} className="mb-6">Live Streak Timer</SectionHeading>
 
         <div className="flex flex-col md:flex-row items-center gap-8 mb-6">
           {/* SVG Ring */}
@@ -768,29 +764,13 @@ export default function Dashboard() {
 
       {/* ── Stats Grid ────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: 'Current Streak', value: timer.days,           sub: 'days clean',     color: 'primary',     Icon: Flame },
-          { label: 'Total Days',     value: stats.totalDays,      sub: 'tracked',        color: 'secondary',   Icon: Calendar },
-          { label: 'Longest Streak', value: stats.longestStreak,  sub: 'personal best',  color: 'accent',      Icon: TrendingUp },
-          { label: 'Relapses',       value: stats.relapses,       sub: 'logged',         color: 'destructive', Icon: Award },
-        ].map(({ label, value, sub, color, Icon }, i) => (
-          <div
-            key={label}
-            className={`group relative overflow-hidden rounded-xl border border-${color}/20 bg-background/50 backdrop-blur-sm p-5 hover:border-${color}/50 transition-all duration-300 animate-scale-in`}
-            style={{ animationDelay: `${i * 50}ms` }}
-          >
-            <div className={`absolute inset-0 bg-gradient-to-br from-${color}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-            <div className="relative flex items-start justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">{label}</p>
-                <p className={`text-3xl font-bold text-${color}${color === 'primary' ? ' neon-text-pink' : color === 'secondary' ? ' neon-text-cyan' : ''}`}>{value}</p>
-                <p className="text-xs text-muted-foreground mt-1">{sub}</p>
-              </div>
-              <div className={`rounded-full bg-${color}/10 p-2`}>
-                <Icon className={`w-5 h-5 text-${color}`} aria-hidden />
-              </div>
-            </div>
-          </div>
+        {([
+          { label: 'Current Streak', value: timer.days,          sub: 'days clean',    accent: 'primary',     Icon: Flame },
+          { label: 'Total Days',     value: stats.totalDays,     sub: 'tracked',       accent: 'secondary',   Icon: Calendar },
+          { label: 'Longest Streak', value: stats.longestStreak, sub: 'personal best', accent: 'accent',      Icon: TrendingUp },
+          { label: 'Relapses',       value: stats.relapses,      sub: 'logged',        accent: 'destructive', Icon: Award },
+        ] as const).map((s, i) => (
+          <StatCard key={s.label} {...s} index={i} />
         ))}
       </div>
 
