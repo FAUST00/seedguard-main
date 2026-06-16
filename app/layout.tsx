@@ -7,6 +7,9 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { SynthBackground } from '@/components/synth-background';
 
 export const metadata: Metadata = {
+  // Origin for resolving OG/Twitter image URLs. The image paths already carry
+  // the /seedguard-main basePath, so this is the bare GitHub Pages origin.
+  metadataBase: new URL('https://faust00.github.io'),
   title: {
     default: 'SeedGuard | NoFap & PMO Freedom Tracker',
     template: '%s | SeedGuard',

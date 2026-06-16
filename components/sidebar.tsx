@@ -233,7 +233,7 @@ export function Sidebar() {
 
       {/* ── Mobile Bottom Tab Bar ─────────────────────────────────────── */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-primary/15 flex"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-primary/15 flex pb-[env(safe-area-inset-bottom)]"
         aria-label="Primary navigation"
       >
         {bottomTabs.map((tab) => {
@@ -244,8 +244,10 @@ export function Sidebar() {
               key={tab.href}
               href={tab.href}
               aria-current={active ? 'page' : undefined}
+              aria-label={tab.label}
               className={`
-                flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-all
+                flex-1 flex flex-col items-center justify-center gap-1 min-h-[56px] py-2 transition-all
+                active:scale-95 active:bg-muted/30
                 ${active ? 'text-primary neon-text-pink' : 'text-muted-foreground'}
               `}
             >

@@ -153,12 +153,11 @@ function getFirstDay(): Date {
 }
 
 // ── Progress ring ─────────────────────────────────────────────────────────
-const MILESTONE_LIST = [7, 14, 30, 60, 90, 100, 180, 365];
 const CIRC = 2 * Math.PI * 88; // r=88
 
 function getRingProgress(days: number): { prev: number; next: number; pct: number } {
-  const next = MILESTONE_LIST.find((m) => m > days) ?? MILESTONE_LIST[MILESTONE_LIST.length - 1];
-  const prev = [...MILESTONE_LIST].reverse().find((m) => m <= days) ?? 0;
+  const next = MILESTONE_DAYS.find((m) => m > days) ?? MILESTONE_DAYS[MILESTONE_DAYS.length - 1];
+  const prev = [...MILESTONE_DAYS].reverse().find((m) => m <= days) ?? 0;
   const pct = next === prev ? 1 : (days - prev) / (next - prev);
   return { prev, next, pct: Math.min(1, Math.max(0, pct)) };
 }
