@@ -1,96 +1,107 @@
 import Link from 'next/link';
-import { Shield, ArrowRight, Trophy, Flame } from 'lucide-react';
+import { ArrowRight, Trophy, Flame } from 'lucide-react';
 import { ART } from '@/lib/assets';
+import { SeedGuardLogo } from '@/components/seedguard-logo';
 
-/**
- * Landing page.
- * Hero background: hero-city.jpg (pixel-art city + huge magenta sun).
- * Placed as the full-page background via ImageBanner-style CSS overlay.
- */
 export default function Home() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center p-4 text-foreground page-entry overflow-hidden">
-      {/* Solid blocker — hides the global SynthBackground (CSS sun/grid/stars) on this page only */}
+      {/* Solid blocker — hides the global SynthBackground on landing page */}
       <div className="absolute inset-0 bg-background pointer-events-none" aria-hidden />
-      {/* Hero city wallpaper — fills the screen, covers the blocker */}
+      {/* Hero city wallpaper */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-80 pointer-events-none"
         style={{ backgroundImage: `url(${ART.heroCity})` }}
         aria-hidden
       />
-      {/* Bottom-fade: keeps content readable */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent pointer-events-none" aria-hidden />
+      {/* Bottom-fade + left-fade for readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/50 to-transparent pointer-events-none" aria-hidden />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent pointer-events-none" aria-hidden />
+      {/* Neon bottom edge glow */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60 pointer-events-none" aria-hidden />
 
-      {/* Content — glass card gives contrast against the city image */}
-      <div className="relative w-full max-w-sm space-y-6 flex flex-col items-center text-center bg-background/55 backdrop-blur-md rounded-2xl border border-primary/20 p-8 shadow-2xl">
-        {/* Shield logo */}
-        <div className="rounded-full bg-primary/20 p-5 neon-box-pink animate-scale-in">
-          <Shield className="h-14 w-14 text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.8)]" aria-hidden />
-        </div>
+      {/* ── Layout: single column mobile, two-column md+ ───────────────── */}
+      <div className="relative w-full max-w-5xl flex flex-col md:flex-row items-center gap-10 md:gap-16">
 
-        <h1 className="text-5xl font-display font-extrabold tracking-tight neon-text-cyan text-secondary uppercase italic">
-          SeedGuard
-        </h1>
+        {/* ── Left column — brand + CTA ─────────────────────────────────── */}
+        <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-6 flex-1">
 
-        <p className="text-foreground/90 pb-2 text-lg leading-relaxed font-medium">
-          Your private tracker to reclaim your freedom and build discipline.
-          <span className="block mt-2 text-sm text-secondary/80">Sync across all your devices with a free account.</span>
-        </p>
+          {/* Hero card — logo, title, description */}
+          <div className="animate-scale-in w-full rounded-2xl bg-black/45 backdrop-blur-md border border-primary/20 shadow-2xl shadow-primary/10 p-6 md:p-8 flex flex-col items-center md:items-start space-y-4">
+            <SeedGuardLogo size="lg" />
 
-        {/* Primary CTA — bold and unmissable */}
-        <Link
-          href="/dashboard"
-          className="group inline-flex items-center justify-center gap-2 w-full h-14 px-6 text-xl font-extrabold bg-primary/55 text-white rounded-xl border-2 border-primary/85 hover:bg-primary/70 hover:scale-105 active:scale-95 transition-all neon-box-pink uppercase tracking-widest shadow-xl shadow-primary/30"
-        >
-          Start Tracking Now
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden />
-        </Link>
+            {/* Large SEEDGUARD heading — visual impact + accessibility */}
+            <h1 className="text-4xl md:text-5xl font-black uppercase tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-[#00e5ff] to-[#ff2d9b] drop-shadow-[0_0_18px_rgba(0,229,255,0.55)] leading-none">
+              SEEDGUARD
+            </h1>
 
-        <div className="flex gap-4 w-full">
+            <p className="text-foreground/90 text-base md:text-lg leading-relaxed font-medium max-w-sm">
+              Your private tracker to reclaim your freedom and build unbreakable discipline.
+              <span className="block mt-1 text-sm text-secondary/80">Sync across all your devices with a free account.</span>
+            </p>
+          </div>
+
+          {/* Primary CTA */}
           <Link
-            href="/account"
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-secondary/65 bg-secondary/25 text-secondary text-sm font-bold hover:bg-secondary/40 transition-all"
+            href="/dashboard"
+            className="group inline-flex items-center justify-center gap-2 w-full md:w-auto h-14 px-8 text-xl font-extrabold bg-primary/55 text-white rounded-xl border-2 border-primary/85 hover:bg-primary/70 hover:scale-105 active:scale-95 transition-all neon-box-pink uppercase tracking-widest shadow-xl shadow-primary/30 animate-[pulse_3s_ease-in-out_infinite] [animation-property:box-shadow]"
           >
-            Sign In / Sign Up
+            Start Tracking Now
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden />
           </Link>
-          <Link
-            href="/benefits"
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-white/35 bg-white/15 text-white text-sm font-semibold hover:bg-white/25 transition-all"
-          >
-            Journey
-          </Link>
-        </div>
 
-        {/* Feature grid */}
-        <div className="w-full pt-4 border-t border-primary/20 space-y-3">
-          <p className="text-xs text-secondary/80 uppercase tracking-wider font-bold">Features</p>
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            {[
-              { icon: '📊', label: 'Streak Tracking', sub: 'Build daily momentum' },
-              { icon: '☁️', label: 'Cloud Sync',      sub: 'Any device, always' },
-              { icon: '🏆', label: 'Leaderboards',    sub: 'Friends + Global' },
-              { icon: '💬', label: 'Direct Messages', sub: 'Chat with friends' },
-            ].map(({ icon, label, sub }) => (
-              <div
-                key={label}
-                className="rounded-xl bg-background/60 p-3 border border-primary/25 hover:border-primary/50 transition-colors text-left"
-              >
-                <div className="font-bold mb-0.5 text-white">{icon} {label}</div>
-                <div className="text-foreground/70">{sub}</div>
-              </div>
-            ))}
+          {/* Secondary CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <Link
+              href="/account"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-secondary/65 bg-secondary/25 text-secondary text-sm font-bold hover:bg-secondary/40 transition-all"
+            >
+              Sign In / Sign Up
+            </Link>
+            <Link
+              href="/benefits"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-white/35 bg-white/15 text-white text-sm font-semibold hover:bg-white/25 transition-all"
+            >
+              The Journey
+            </Link>
           </div>
         </div>
 
-        {/* Leaderboard teaser */}
-        <Link
-          href="/streaks"
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-gold/65 text-gold bg-gold/20 hover:bg-gold/35 text-sm font-bold transition-all shadow-lg shadow-gold/20"
-        >
-          <Trophy className="w-4 h-4" aria-hidden />
-          View Streak Leaderboard
-          <Flame className="w-4 h-4 flame-glow" aria-hidden />
-        </Link>
+        {/* ── Right column — feature grid + leaderboard ─────────────────── */}
+        <div className="flex flex-col items-center space-y-5 w-full md:w-auto md:max-w-xs">
+          {/* Feature grid */}
+          <div className="w-full rounded-2xl bg-background/55 backdrop-blur-md border border-primary/20 p-6 shadow-2xl space-y-4">
+            <p className="text-xs text-secondary/80 uppercase tracking-wider font-bold text-center">What you get — free</p>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              {[
+                { icon: '📊', label: 'Streak Tracking',  sub: 'Live second-by-second' },
+                { icon: '☁️', label: 'Cloud Sync',       sub: 'Any device, always' },
+                { icon: '🏆', label: 'Leaderboards',     sub: 'Friends + Global + Weekly' },
+                { icon: '🔥', label: 'Badges & Rewards', sub: 'Milestones celebrated' },
+                { icon: '💬', label: 'Direct Messages',  sub: 'Chat with friends' },
+                { icon: '🆘', label: 'Urge Support',     sub: 'Emergency breathing tool' },
+              ].map(({ icon, label, sub }) => (
+                <div
+                  key={label}
+                  className="rounded-xl bg-background/60 p-3 border border-primary/25 hover:border-primary/50 transition-colors text-left"
+                >
+                  <div className="font-bold mb-0.5 text-white">{icon} {label}</div>
+                  <div className="text-foreground/60">{sub}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Leaderboard CTA */}
+          <Link
+            href="/streaks"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-gold/65 text-gold bg-gold/20 hover:bg-gold/35 text-sm font-bold transition-all shadow-lg shadow-gold/20"
+          >
+            <Trophy className="w-4 h-4" aria-hidden />
+            View Streak Leaderboard
+            <Flame className="w-4 h-4 flame-glow" aria-hidden />
+          </Link>
+        </div>
       </div>
     </div>
   );

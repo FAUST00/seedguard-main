@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useState } from 'react';
 import {
-  Shield,
   LayoutDashboard,
   History,
   MapPin,
@@ -15,6 +14,7 @@ import {
   User,
   Flame,
 } from 'lucide-react';
+import { SeedGuardLogo } from '@/components/seedguard-logo';
 
 const navigationItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -40,16 +40,8 @@ export function Sidebar() {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 border-r border-primary/10 glass-effect p-6 flex-col gap-8 md:min-h-screen shrink-0 sticky top-0">
         {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-2 hover:opacity-80 transition-opacity"
-        >
-          <div className="relative">
-            <Shield className="w-8 h-8 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.8)]" />
-          </div>
-          <span className="font-display font-extrabold text-xl tracking-widest uppercase italic neon-text-pink text-primary">
-            SeedGuard
-          </span>
+        <Link href="/" className="flex items-center gap-3 px-2 hover:opacity-80 transition-opacity">
+          <SeedGuardLogo size="md" />
         </Link>
 
         {/* Navigation */}
@@ -86,10 +78,10 @@ export function Sidebar() {
 
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between h-16 px-4 border-b border-primary/10 glass-effect sticky top-0 z-50">
-        <Link href="/" className="flex items-center gap-2">
-          <Shield className="w-6 h-6 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.8)]" />
-          <span className="font-display font-bold text-sm tracking-wider uppercase italic neon-text-pink text-primary">
-            SeedGuard
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <SeedGuardLogo size="sm" />
+          <span className="font-black text-sm tracking-[0.2em] uppercase text-[#ff2d9b] drop-shadow-[0_0_8px_rgba(255,45,155,0.7)]">
+            SEEDGUARD
           </span>
         </Link>
 

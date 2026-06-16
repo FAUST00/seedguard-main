@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SeedGuard Shield Icon — "Flat Crown"  (collapsed sidebar + mobile header)
+  =========================================================================
+  Shield silhouette ..... flat top, chamfered corners, point at bottom
+  Border ................ gradient cyan(top) -> magenta(bottom)  [#bord]
+  Crystal core .......... faceted cyan gem                       [#22d3ee]
+  Inner echo / scrolls .. magenta accents                        [#ff4db8]
+  Background ............ transparent
+
+  EDIT TIPS
+   - Change border colours: edit the <linearGradient id="bord"> stops.
+   - Change glow strength:   edit stdDeviation in <filter id="glow">.
+   - Shield shape:           edit <path id="shield"> (drawn around 0,0,
+                             then placed with translate(80,80)).
+   - Crystal:               the <g id="crystal-icon"> block near the bottom.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 176" fill="none">
+  <defs>
+    <!-- Flat-crown shield, centred on (0,0): flat top, chamfered shoulders, point at bottom -->
+    <path id="shield" d="M -42,-50 L 42,-50 L 54,-30 L 54,6 C 52,34 36,60 0,86 C -36,60 -52,34 -54,6 L -54,-30 Z"/>
+    <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#00e5ff"/>
+      <stop offset="0.5" stop-color="#22d3ee"/>
+      <stop offset="1"   stop-color="#ff2d9b"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b2"/>
+      <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="cglow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ── SHIELD ── glow halo -> opaque dark fill -> crisp border -->
+  <use href="#shield" transform="translate(80,80)" fill="none" stroke="url(#bord)" stroke-width="3"   stroke-linejoin="round" filter="url(#glow)" opacity="0.85"/>
+  <use href="#shield" transform="translate(80,80)" fill="#070420" stroke="none"/>
+  <use href="#shield" transform="translate(80,80)" fill="none" stroke="url(#bord)" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- inner plating echo -->
+  <use href="#shield" transform="translate(80,80) scale(0.82)" fill="none" stroke="#ff4db8" stroke-width="1" stroke-opacity="0.32" stroke-linejoin="round"/>
+
+  <!-- Top decorative rule + corner / shoulder accent dots -->
+  <line x1="38" y1="30" x2="122" y2="30" stroke="#00e5ff" stroke-width="0.5" opacity="0.25"/>
+  <circle cx="38"  cy="30"  r="2.3" fill="#67e8f9" opacity="0.8"/>
+  <circle cx="122" cy="30"  r="2.3" fill="#67e8f9" opacity="0.8"/>
+  <circle cx="26"  cy="50"  r="2"   fill="#22d3ee" opacity="0.55"/>
+  <circle cx="134" cy="50"  r="2"   fill="#22d3ee" opacity="0.55"/>
+  <circle cx="80"  cy="166" r="2.5" fill="#ff2d9b" opacity="0.9"/>
+
+  <!-- Side scroll accents framing the crystal -->
+  <path d="M 48,68 Q 61,72 57,86 Q 54,98 48,104"   fill="none" stroke="#ff4db8" stroke-width="0.9" opacity="0.5"/>
+  <path d="M 112,68 Q 99,72 103,86 Q 106,98 112,104" fill="none" stroke="#ff4db8" stroke-width="0.9" opacity="0.5"/>
+
+  <!-- ── CRYSTAL CORE ── centred (80,82) -->
+  <g id="crystal-icon">
+    <polygon points="80,62 96,82 80,106 64,82" fill="none" stroke="#22d3ee" stroke-width="2.4" filter="url(#cglow)" opacity="0.8"/>
+    <polygon points="80,62 96,82 80,106 64,82" fill="#0c0820"/>
+    <polygon points="80,62 96,82 80,106 64,82" fill="none" stroke="#22d3ee" stroke-width="1.4"/>
+    <!-- crown facets -->
+    <line x1="80" y1="62" x2="73" y2="71" stroke="#22d3ee" stroke-width="0.7" opacity="0.7"/>
+    <line x1="80" y1="62" x2="87" y2="71" stroke="#22d3ee" stroke-width="0.7" opacity="0.7"/>
+    <line x1="73" y1="71" x2="87" y2="71" stroke="#22d3ee" stroke-width="0.6" opacity="0.55"/>
+    <line x1="73" y1="71" x2="64" y2="82" stroke="#22d3ee" stroke-width="0.5" opacity="0.45"/>
+    <line x1="87" y1="71" x2="96" y2="82" stroke="#22d3ee" stroke-width="0.5" opacity="0.45"/>
+    <!-- girdle -->
+    <line x1="64" y1="82" x2="96" y2="82" stroke="#22d3ee" stroke-width="0.6" opacity="0.5"/>
+    <!-- pavilion facets -->
+    <line x1="80" y1="106" x2="64" y2="82" stroke="#22d3ee" stroke-width="0.5" opacity="0.42"/>
+    <line x1="80" y1="106" x2="96" y2="82" stroke="#22d3ee" stroke-width="0.5" opacity="0.42"/>
+    <line x1="80" y1="106" x2="73" y2="82" stroke="#22d3ee" stroke-width="0.4" opacity="0.32"/>
+    <line x1="80" y1="106" x2="87" y2="82" stroke="#22d3ee" stroke-width="0.4" opacity="0.32"/>
+    <!-- centre line + highlights -->
+    <line x1="80" y1="62" x2="80" y2="106" stroke="#22d3ee" stroke-width="0.4" opacity="0.3"/>
+    <circle cx="75" cy="70" r="3"   fill="#ffffff" opacity="0.85"/>
+    <circle cx="84" cy="86" r="1.4" fill="#a5f3fc" opacity="0.55"/>
+  </g>
+</svg>

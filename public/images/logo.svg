@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SeedGuard Full Logo — "Flat Crown"  (hero page + expanded sidebar)
+  ==================================================================
+  Shield silhouette ..... flat top, chamfered corners, point at bottom
+  Border ................ gradient cyan(top) -> magenta(bottom)  [#bord]
+  Crystal core .......... faceted cyan gem                       [#22d3ee]
+  Inner echo / scrolls .. magenta accents                        [#ff4db8]
+  SEEDGUARD wordmark .... neon cyan, glow filter                 [#00e5ff]
+  Sub-label ............. violet                                 [#7c3aed]
+  Background ............ transparent
+
+  EDIT TIPS
+   - Border colours:    <linearGradient id="bord"> stops.
+   - Glow strength:     stdDeviation in <filter id="glow"> / <filter id="tglow">.
+   - Shield shape:      <path id="shield"> (drawn at 0,0, placed via translate(180,92)).
+   - Wordmark text:     the <text> element near the bottom — change content, size,
+                        letter-spacing, or fill colour there.
+   - Remove sub-label:  delete the second <text> + underline block.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" fill="none">
+  <defs>
+    <path id="shield" d="M -42,-50 L 42,-50 L 54,-30 L 54,6 C 52,34 36,60 0,86 C -36,60 -52,34 -54,6 L -54,-30 Z"/>
+    <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#00e5ff"/>
+      <stop offset="0.5" stop-color="#22d3ee"/>
+      <stop offset="1"   stop-color="#ff2d9b"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b2"/>
+      <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="cglow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="tglow" x="-20%" y="-120%" width="140%" height="340%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4"  result="b1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="9"  result="b2"/>
+      <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ── SHIELD ── glow halo -> opaque dark fill -> crisp border -->
+  <use href="#shield" transform="translate(180,92)" fill="none" stroke="url(#bord)" stroke-width="3.4" stroke-linejoin="round" filter="url(#glow)" opacity="0.85"/>
+  <use href="#shield" transform="translate(180,92)" fill="#070420" stroke="none"/>
+  <use href="#shield" transform="translate(180,92)" fill="none" stroke="url(#bord)" stroke-width="2"   stroke-linejoin="round"/>
+  <use href="#shield" transform="translate(180,92) scale(0.82)" fill="none" stroke="#ff4db8" stroke-width="1.1" stroke-opacity="0.32" stroke-linejoin="round"/>
+
+  <!-- Top decorative rule + accent dots -->
+  <line x1="138" y1="42" x2="222" y2="42" stroke="#00e5ff" stroke-width="0.5" opacity="0.25"/>
+  <circle cx="138" cy="42"  r="2.5" fill="#67e8f9" opacity="0.8"/>
+  <circle cx="222" cy="42"  r="2.5" fill="#67e8f9" opacity="0.8"/>
+  <circle cx="126" cy="62"  r="2.2" fill="#22d3ee" opacity="0.55"/>
+  <circle cx="234" cy="62"  r="2.2" fill="#22d3ee" opacity="0.55"/>
+  <circle cx="180" cy="178" r="2.8" fill="#ff2d9b" opacity="0.9"/>
+
+  <!-- Side scroll accents -->
+  <path d="M 148,80 Q 161,84 157,98 Q 154,110 148,116"   fill="none" stroke="#ff4db8" stroke-width="1" opacity="0.5"/>
+  <path d="M 212,80 Q 199,84 203,98 Q 206,110 212,116" fill="none" stroke="#ff4db8" stroke-width="1" opacity="0.5"/>
+
+  <!-- ── CRYSTAL CORE ── centred (180,94) -->
+  <g id="crystal">
+    <polygon points="180,74 196,94 180,118 164,94" fill="none" stroke="#22d3ee" stroke-width="2.6" filter="url(#cglow)" opacity="0.8"/>
+    <polygon points="180,74 196,94 180,118 164,94" fill="#0c0820"/>
+    <polygon points="180,74 196,94 180,118 164,94" fill="none" stroke="#22d3ee" stroke-width="1.5"/>
+    <line x1="180" y1="74" x2="173" y2="83" stroke="#22d3ee" stroke-width="0.7" opacity="0.7"/>
+    <line x1="180" y1="74" x2="187" y2="83" stroke="#22d3ee" stroke-width="0.7" opacity="0.7"/>
+    <line x1="173" y1="83" x2="187" y2="83" stroke="#22d3ee" stroke-width="0.6" opacity="0.55"/>
+    <line x1="173" y1="83" x2="164" y2="94" stroke="#22d3ee" stroke-width="0.5" opacity="0.45"/>
+    <line x1="187" y1="83" x2="196" y2="94" stroke="#22d3ee" stroke-width="0.5" opacity="0.45"/>
+    <line x1="164" y1="94" x2="196" y2="94" stroke="#22d3ee" stroke-width="0.6" opacity="0.5"/>
+    <line x1="180" y1="118" x2="164" y2="94" stroke="#22d3ee" stroke-width="0.5" opacity="0.42"/>
+    <line x1="180" y1="118" x2="196" y2="94" stroke="#22d3ee" stroke-width="0.5" opacity="0.42"/>
+    <line x1="180" y1="118" x2="173" y2="94" stroke="#22d3ee" stroke-width="0.4" opacity="0.32"/>
+    <line x1="180" y1="118" x2="187" y2="94" stroke="#22d3ee" stroke-width="0.4" opacity="0.32"/>
+    <line x1="180" y1="74" x2="180" y2="118" stroke="#22d3ee" stroke-width="0.4" opacity="0.3"/>
+    <circle cx="174" cy="82" r="3.4" fill="#ffffff" opacity="0.85"/>
+    <circle cx="184" cy="98" r="1.5" fill="#a5f3fc" opacity="0.55"/>
+  </g>
+
+  <!-- ── SEEDGUARD WORDMARK ── -->
+  <text x="180" y="230"
+    font-family="'Courier New','Lucida Console',monospace"
+    font-size="26" font-weight="900" letter-spacing="9"
+    text-anchor="middle" fill="#00e5ff" filter="url(#tglow)">SEEDGUARD</text>
+
+  <!-- Sub-label -->
+  <text x="180" y="246"
+    font-family="'Courier New',monospace"
+    font-size="8.5" letter-spacing="3.5"
+    text-anchor="middle" fill="#7c3aed" opacity="0.8">NOFAP · PMO FREEDOM TRACKER</text>
+
+  <!-- Underline accent -->
+  <line x1="96" y1="254" x2="264" y2="254" stroke="#7c3aed" stroke-width="0.6" opacity="0.4"/>
+  <circle cx="96"  cy="254" r="2" fill="#f0abfc" opacity="0.6"/>
+  <circle cx="264" cy="254" r="2" fill="#f0abfc" opacity="0.6"/>
+</svg>
