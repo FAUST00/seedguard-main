@@ -18,6 +18,7 @@ import { syncProfileStreak } from '@/lib/social';
 import { supabase } from '@/lib/supabase';
 import { playSound, unlockAudio } from '@/lib/sound';
 import { useToast } from '@/components/toast';
+import { AccountSkeleton } from '@/components/skeleton';
 import { ImageBanner } from '@/components/synth-background';
 import { ART } from '@/lib/assets';
 import { useRouter } from 'next/navigation';
@@ -210,11 +211,7 @@ export default function AccountPage() {
 
   // ── Loading ────────────────────────────────────────────────────────────────
   if (step === 'loading') {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Shield className="w-8 h-8 text-primary animate-pulse neon-text-pink" aria-label="Loading" />
-      </div>
-    );
+    return <AccountSkeleton />;
   }
 
   // ── Verification pending ───────────────────────────────────────────────────

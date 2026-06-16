@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Flame, TrendingUp, Award, Calendar, Clock, Users, ChevronRight,
-  Quote, AlertTriangle, X, Wind, Lock, Cloud, Plus, ShieldCheck,
+  Quote, AlertTriangle, X, Wind, Lock, Cloud, Plus,
 } from 'lucide-react';
 import { syncWithCloud, getStreakFromCloud, getUser } from '@/lib/sync';
 import { playSound } from '@/lib/sound';
@@ -19,6 +19,12 @@ import { RecoveryHeatmap } from '@/components/recovery-heatmap';
 import { RecoveryScore } from '@/components/recovery-score';
 import { WeeklyTrend } from '@/components/weekly-trend';
 import { MilestoneRoadmap } from '@/components/milestone-roadmap';
+import { QUOTES, randomQuoteIndex } from '@/lib/quotes';
+import { MILESTONE_DAYS, MILESTONE_MESSAGES } from '@/lib/milestones';
+import { MOODS, todayMoodKey } from '@/lib/mood';
+import { Confetti } from '@/components/confetti';
+import { BreathingTimer } from '@/components/breathing-timer';
+import { QuickLogSheet } from '@/components/quick-log-sheet';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -34,80 +40,6 @@ interface TimerParts {
 
 function pad(n: number): string { return String(n).padStart(2, '0'); }
 
-// ── Milestones ────────────────────────────────────────────────────────────────
-const MILESTONE_DAYS = [7, 14, 30, 60, 90, 100, 180, 365];
-
-const MILESTONE_MESSAGES: Record<number, { title: string; body: string }> = {
-  7:   { title: '🔥 One Week!',        body: 'You survived the hardest stretch. The dopamine fog is lifting. Most men never make it here.' },
-  14:  { title: '💪 Two Weeks!',       body: 'Flatline territory. You are still standing. The brain is rewiring itself right now.' },
-  30:  { title: '🏆 30 Days!',         body: 'One month of total mastery. Testosterone is climbing. Mental clarity is arriving. This is real.' },
-  60:  { title: '⚔️ 60 Days!',         body: 'Two months in. Your dopamine system is healing. Energy and focus are noticeably stronger.' },
-  90:  { title: '💎 Diamond Mind!',    body: '90 days. This is the legendary threshold. You have rewired your brain. You are a different man.' },
-  100: { title: '🛡️ Centurion!',       body: '100 days of iron discipline. Elite-level self-mastery. Less than 1% of men reach this.' },
-  180: { title: '🗡️ Iron Will!',       body: 'Six months. Sustained transformation. The habits you\'ve built are now who you are.' },
-  365: { title: '👑 Legend!',          body: 'One full year. You have achieved something that most men will never even attempt. Legendary.' },
-};
-
-// ── Quotes ───────────────────────────────────────────────────────────────────
-const QUOTES = [
-  { text: 'You have power over your mind, not outside events. Realize this, and you will find strength.', author: 'Marcus Aurelius' },
-  { text: 'The first and greatest victory is to conquer yourself.', author: 'Plato' },
-  { text: 'Discipline is the bridge between goals and accomplishment.', author: 'Jim Rohn' },
-  { text: 'We suffer more in imagination than in reality.', author: 'Seneca' },
-  { text: 'He who conquers himself is the mightiest warrior.', author: 'Confucius' },
-  { text: 'Difficulties strengthen the mind, as labor does the body.', author: 'Seneca' },
-  { text: 'What we do in life echoes in eternity.', author: 'Marcus Aurelius' },
-  { text: 'The successful warrior is the average man with laser-like focus.', author: 'Bruce Lee' },
-  { text: 'We become what we repeatedly do. Excellence, then, is not an act, but a habit.', author: 'Aristotle' },
-  { text: 'It does not matter how slowly you go as long as you do not stop.', author: 'Confucius' },
-  { text: 'If it is not right, do not do it; if it is not true, do not say it.', author: 'Marcus Aurelius' },
-  { text: 'Self-control is the chief element in self-respect, and self-respect is the chief element in courage.', author: 'Thucydides' },
-  { text: 'The cave you fear to enter holds the treasure you seek.', author: 'Joseph Campbell' },
-  { text: 'Real freedom is not freedom from responsibility — it is the freedom that comes from mastering yourself.', author: '' },
-  { text: 'Waste no more time arguing what a good man should be. Be one.', author: 'Marcus Aurelius' },
-  { text: 'The more you sweat in training, the less you bleed in battle.', author: 'Sun Tzu' },
-  { text: 'One day or day one. You decide.', author: '' },
-  { text: 'Every battle is won before it is ever fought.', author: 'Sun Tzu' },
-  { text: 'Between stimulus and response there is a space. In that space is our power to choose our response.', author: 'Viktor Frankl' },
-  { text: 'The impediment to action advances action. What stands in the way becomes the way.', author: 'Marcus Aurelius' },
-  { text: 'Strength does not come from physical capacity. It comes from an indomitable will.', author: 'Mahatma Gandhi' },
-  { text: 'Your future self is watching you right now through your memories. Make him proud.', author: '' },
-  { text: 'No man is free who is not master of himself.', author: 'Epictetus' },
-  { text: 'He who has a why to live can bear almost any how.', author: 'Friedrich Nietzsche' },
-  { text: 'The secret of discipline is motivation. When a man is sufficiently motivated, discipline will take care of itself.', author: 'Sir Alexander Paterson' },
-  { text: 'We must all suffer one of two things: the pain of discipline or the pain of regret.', author: 'Jim Rohn' },
-  { text: 'Either you run the day, or the day runs you.', author: 'Jim Rohn' },
-  { text: 'Fall seven times, stand up eight.', author: 'Japanese Proverb' },
-  { text: 'Our greatest glory is not in never falling, but in rising every time we fall.', author: 'Confucius' },
-  { text: 'Pain is temporary. Quitting lasts forever.', author: 'Lance Armstrong' },
-  { text: 'Do not pray for an easy life. Pray for the strength to endure a difficult one.', author: 'Bruce Lee' },
-  { text: 'What you resist, persists. What you accept, you can change.', author: 'Carl Jung' },
-  { text: 'Until you make the unconscious conscious, it will direct your life and you will call it fate.', author: 'Carl Jung' },
-  { text: 'An unexamined life is not worth living.', author: 'Socrates' },
-  { text: 'Excellence is never an accident. It is always the result of high intention, sincere effort, and intelligent execution.', author: 'Aristotle' },
-  { text: 'The energy you put into controlling yourself is the same energy others waste on excuses.', author: '' },
-  { text: 'Every day is a new opportunity to be better than yesterday.', author: '' },
-  { text: 'The strongest man is not he who overcomes others, but he who overcomes himself.', author: '' },
-  { text: 'A warrior does not give up what he loves. He finds the love in what he does.', author: 'Dan Millman' },
-  { text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.', author: 'Winston Churchill' },
-  { text: 'If you are going through hell, keep going.', author: 'Winston Churchill' },
-  { text: 'Continuous effort — not strength or intelligence — is the key to unlocking our potential.', author: 'Winston Churchill' },
-  { text: 'In the middle of every difficulty lies opportunity.', author: 'Albert Einstein' },
-  { text: 'The best time to plant a tree was 20 years ago. The second best time is now.', author: 'Chinese Proverb' },
-  { text: 'Your life does not get better by chance. It gets better by change.', author: 'Jim Rohn' },
-  { text: 'It always seems impossible until it is done.', author: 'Nelson Mandela' },
-  { text: 'I am not a product of my circumstances. I am a product of my decisions.', author: 'Stephen Covey' },
-  { text: 'By failing to prepare, you are preparing to fail.', author: 'Benjamin Franklin' },
-  { text: 'Well done is better than well said.', author: 'Benjamin Franklin' },
-  { text: 'A year from now you may wish you had started today.', author: 'Karen Lamb' },
-] as const;
-
-function randomQuoteIndex(exclude: number): number {
-  let next: number;
-  do { next = Math.floor(Math.random() * QUOTES.length); }
-  while (next === exclude && QUOTES.length > 1);
-  return next;
-}
 
 // ── Streak start resolver ──────────────────────────────────────────────────
 async function resolveStreakStart(): Promise<Date> {
@@ -162,191 +94,6 @@ function getRingProgress(days: number): { prev: number; next: number; pct: numbe
   return { prev, next, pct: Math.min(1, Math.max(0, pct)) };
 }
 
-// ── Confetti ──────────────────────────────────────────────────────────────
-const CONFETTI_COLORS = ['#ff2d9b', '#00e5ff', '#a855f7', '#fbbf24', '#34d399', '#f97316'];
-
-function Confetti() {
-  const particles = Array.from({ length: 48 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-    fallDur: `${2 + Math.random() * 2}s`,
-    fallDelay: `${Math.random() * 1.5}s`,
-    swayDur: `${0.8 + Math.random() * 0.8}s`,
-    rotate: Math.random() > 0.5 ? 'rounded-full' : 'rounded-sm',
-    size: Math.random() > 0.6 ? 'w-3 h-3' : 'w-2 h-2',
-  }));
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden" aria-hidden>
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className={`confetti-particle ${p.size} ${p.rotate}`}
-          style={{
-            left: p.left,
-            backgroundColor: p.color,
-            '--fall-dur': p.fallDur,
-            '--fall-delay': p.fallDelay,
-            '--sway-dur': p.swayDur,
-          } as React.CSSProperties}
-        />
-      ))}
-    </div>
-  );
-}
-
-// ── Breathing timer ───────────────────────────────────────────────────────
-const BREATH_PHASES = [
-  { label: 'INHALE',   secs: 4, color: '#00e5ff', scale: true },
-  { label: 'HOLD',     secs: 4, color: '#a855f7', scale: false },
-  { label: 'EXHALE',   secs: 4, color: '#ff2d9b', scale: true },
-  { label: 'HOLD',     secs: 4, color: '#a855f7', scale: false },
-];
-
-function BreathingTimer() {
-  const [phaseIdx, setPhaseIdx] = useState(0);
-  const [tick, setTick] = useState(4);
-  const [cycles, setCycles] = useState(0);
-
-  useEffect(() => {
-    if (tick <= 0) {
-      const next = (phaseIdx + 1) % BREATH_PHASES.length;
-      if (next === 0) setCycles((c) => c + 1);
-      setPhaseIdx(next);
-      setTick(BREATH_PHASES[next].secs);
-      return;
-    }
-    const id = setTimeout(() => setTick((t) => t - 1), 1000);
-    return () => clearTimeout(id);
-  }, [tick, phaseIdx]);
-
-  // Finishing one full breathing cycle completes the daily "breathe" quest
-  useEffect(() => {
-    if (cycles >= 1) completeQuest('breathe');
-  }, [cycles]);
-
-  const phase = BREATH_PHASES[phaseIdx];
-  const pct = tick / phase.secs;
-  const circumference = 2 * Math.PI * 52;
-
-  return (
-    <div className="flex flex-col items-center gap-6 py-4">
-      <div className="relative w-36 h-36 flex items-center justify-center">
-        <svg className="-rotate-90 absolute inset-0 w-full h-full">
-          <circle cx="72" cy="72" r="52" fill="none" stroke="hsl(var(--muted)/0.3)" strokeWidth="6" />
-          <circle
-            cx="72" cy="72" r="52" fill="none"
-            stroke={phase.color}
-            strokeWidth="6"
-            strokeDasharray={`${pct * circumference} ${circumference}`}
-            strokeLinecap="round"
-            style={{ transition: 'stroke-dasharray 0.9s linear', filter: `drop-shadow(0 0 8px ${phase.color})` }}
-          />
-        </svg>
-        <div
-          className="relative z-10 flex flex-col items-center transition-transform duration-1000"
-          style={{ transform: phase.scale ? `scale(${1 + (1 - pct) * 0.15})` : 'scale(1)' }}
-        >
-          <span className="text-4xl font-extrabold font-mono" style={{ color: phase.color }}>{tick}</span>
-          <span className="text-xs font-bold uppercase tracking-widest mt-1" style={{ color: phase.color }}>{phase.label}</span>
-        </div>
-      </div>
-
-      <div className="flex gap-3 text-xs text-muted-foreground">
-        {BREATH_PHASES.map((p, i) => (
-          <span key={i} className={`px-2 py-1 rounded-full font-bold uppercase tracking-wider transition-all ${i === phaseIdx ? 'text-foreground bg-muted/30' : 'opacity-40'}`}>
-            {p.label}
-          </span>
-        ))}
-      </div>
-
-      {cycles > 0 && (
-        <p className="text-xs text-muted-foreground">
-          Cycle {cycles} complete — you&apos;re doing great.
-        </p>
-      )}
-
-      <p className="text-xs text-muted-foreground/60 text-center max-w-xs">
-        4-4-4-4 box breathing. Inhale for 4 — hold for 4 — exhale for 4 — hold for 4. Repeat until the urge passes.
-      </p>
-    </div>
-  );
-}
-
-// ── Mood check-in ─────────────────────────────────────────────────────────
-const MOODS = [
-  { emoji: '😤', label: 'Struggling',   value: 1 },
-  { emoji: '😐', label: 'Neutral',      value: 2 },
-  { emoji: '🙂', label: 'Okay',         value: 3 },
-  { emoji: '😊', label: 'Good',         value: 4 },
-  { emoji: '🔥', label: 'Thriving',     value: 5 },
-];
-
-function todayKey(): string {
-  return `seedguard_mood_${new Date().toISOString().slice(0, 10)}`;
-}
-
-// ── Quick-log sheet ───────────────────────────────────────────────────────
-function QuickLogSheet({ onClose }: { onClose: () => void }) {
-  const [type, setType] = useState<'victory' | 'relapse'>('victory');
-  const [note, setNote] = useState('');
-  const [saved, setSaved] = useState(false);
-
-  const submit = () => {
-    const entry = { id: Date.now().toString(), date: new Date().toLocaleString(), type, note: note.trim() };
-    try {
-      const raw = localStorage.getItem('seedguard_history');
-      const hist = raw ? JSON.parse(raw) : [];
-      hist.unshift(entry);
-      localStorage.setItem('seedguard_history', JSON.stringify(hist));
-      if (type === 'relapse') {
-        localStorage.setItem('seedguard_streak_start', new Date().toISOString());
-        try {
-          const sr = localStorage.getItem('seedguard_stats');
-          const s = sr ? JSON.parse(sr) : {};
-          localStorage.setItem('seedguard_stats', JSON.stringify({ ...s, currentStreak: 0, relapses: (s.relapses || 0) + 1 }));
-        } catch {}
-      }
-    } catch {}
-    setSaved(true);
-    setTimeout(() => { onClose(); window.location.reload(); }, 800);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-sm rounded-2xl border border-primary/30 bg-background/97 p-6 space-y-4 animate-scale-in" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold uppercase tracking-wider text-primary neon-text-pink text-sm">Quick Log</h3>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
-        </div>
-        <div className="flex gap-3">
-          <button onClick={() => setType('victory')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border font-bold text-sm transition-all ${type === 'victory' ? 'border-secondary/60 bg-secondary/15 text-secondary' : 'border-muted/30 text-muted-foreground hover:bg-muted/20'}`}>
-            <ShieldCheck className="w-4 h-4" /> Victory
-          </button>
-          <button onClick={() => setType('relapse')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border font-bold text-sm transition-all ${type === 'relapse' ? 'border-destructive/60 bg-destructive/15 text-destructive' : 'border-muted/30 text-muted-foreground hover:bg-muted/20'}`}>
-            <Flame className="w-4 h-4" /> Relapse
-          </button>
-        </div>
-        <input
-          type="text"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder={type === 'victory' ? 'Quick note (optional)…' : 'What happened?'}
-          className="w-full rounded-lg border border-muted/30 bg-background/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
-        />
-        <button
-          onClick={submit}
-          disabled={saved}
-          className="w-full py-3 rounded-xl bg-primary/20 border border-primary/50 text-primary font-bold uppercase tracking-wider hover:bg-primary/30 transition-all disabled:opacity-60"
-        >
-          {saved ? '✓ Saved!' : 'Log Entry'}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 // ── Main dashboard ────────────────────────────────────────────────────────
 export default function Dashboard() {
   const router = useRouter();
@@ -399,7 +146,7 @@ export default function Dashboard() {
 
   // Check today's mood
   useEffect(() => {
-    const saved = localStorage.getItem(todayKey());
+    const saved = localStorage.getItem(todayMoodKey());
     if (saved) setTodayMood(Number(saved));
     else {
       // Show mood prompt after a 3-second delay (feels natural, not abrupt)
@@ -519,7 +266,7 @@ export default function Dashboard() {
 
   const handleMoodSelect = (value: number) => {
     setTodayMood(value);
-    localStorage.setItem(todayKey(), String(value));
+    localStorage.setItem(todayMoodKey(), String(value));
     setShowMood(false);
     completeQuest('checkin');
   };
