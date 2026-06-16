@@ -275,6 +275,7 @@ export default function Dashboard() {
       setAchUnlocked(fresh[0]);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 4000);
+      if (hasAccount) pushGamification().catch(() => {}); // sync seen-set so it fires once across devices
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer.days, loading, questBump, hasAccount]);
