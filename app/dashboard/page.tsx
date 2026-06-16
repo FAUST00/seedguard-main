@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Flame, TrendingUp, Award, Calendar, Clock, Users, ChevronRight,
-  Quote, AlertTriangle, X, Wind,
+  Quote, AlertTriangle, X, Wind, Lock, Cloud, Plus, ShieldCheck,
 } from 'lucide-react';
 import { syncWithCloud, getStreakFromCloud, getUser } from '@/lib/sync';
 import { playSound } from '@/lib/sound';
@@ -274,6 +274,66 @@ function todayKey(): string {
   return `seedguard_mood_${new Date().toISOString().slice(0, 10)}`;
 }
 
+// ── Quick-log sheet ───────────────────────────────────────────────────────
+function QuickLogSheet({ onClose }: { onClose: () => void }) {
+  const [type, setType] = useState<'victory' | 'relapse'>('victory');
+  const [note, setNote] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  const submit = () => {
+    const entry = { id: Date.now().toString(), date: new Date().toLocaleString(), type, note: note.trim() };
+    try {
+      const raw = localStorage.getItem('seedguard_history');
+      const hist = raw ? JSON.parse(raw) : [];
+      hist.unshift(entry);
+      localStorage.setItem('seedguard_history', JSON.stringify(hist));
+      if (type === 'relapse') {
+        localStorage.setItem('seedguard_streak_start', new Date().toISOString());
+        try {
+          const sr = localStorage.getItem('seedguard_stats');
+          const s = sr ? JSON.parse(sr) : {};
+          localStorage.setItem('seedguard_stats', JSON.stringify({ ...s, currentStreak: 0, relapses: (s.relapses || 0) + 1 }));
+        } catch {}
+      }
+    } catch {}
+    setSaved(true);
+    setTimeout(() => { onClose(); window.location.reload(); }, 800);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-full max-w-sm rounded-2xl border border-primary/30 bg-background/97 p-6 space-y-4 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold uppercase tracking-wider text-primary neon-text-pink text-sm">Quick Log</h3>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+        </div>
+        <div className="flex gap-3">
+          <button onClick={() => setType('victory')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border font-bold text-sm transition-all ${type === 'victory' ? 'border-secondary/60 bg-secondary/15 text-secondary' : 'border-muted/30 text-muted-foreground hover:bg-muted/20'}`}>
+            <ShieldCheck className="w-4 h-4" /> Victory
+          </button>
+          <button onClick={() => setType('relapse')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border font-bold text-sm transition-all ${type === 'relapse' ? 'border-destructive/60 bg-destructive/15 text-destructive' : 'border-muted/30 text-muted-foreground hover:bg-muted/20'}`}>
+            <Flame className="w-4 h-4" /> Relapse
+          </button>
+        </div>
+        <input
+          type="text"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder={type === 'victory' ? 'Quick note (optional)…' : 'What happened?'}
+          className="w-full rounded-lg border border-muted/30 bg-background/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
+        />
+        <button
+          onClick={submit}
+          disabled={saved}
+          className="w-full py-3 rounded-xl bg-primary/20 border border-primary/50 text-primary font-bold uppercase tracking-wider hover:bg-primary/30 transition-all disabled:opacity-60"
+        >
+          {saved ? '✓ Saved!' : 'Log Entry'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Main dashboard ────────────────────────────────────────────────────────
 export default function Dashboard() {
   const router = useRouter();
@@ -284,6 +344,9 @@ export default function Dashboard() {
   const [showStreakEdit, setShowStreakEdit] = useState(false);
   const [editDateInput, setEditDateInput] = useState('');
   const [streakDisplayDate, setStreakDisplayDate] = useState('');
+  const [isAnonMode, setIsAnonMode] = useState(false);
+  const [showAnonExitConfirm, setShowAnonExitConfirm] = useState(false);
+  const [showQuickLog, setShowQuickLog] = useState(false);
 
   // Quote
   const [quoteIndex, setQuoteIndex] = useState(() => Math.floor(Math.random() * QUOTES.length));
@@ -310,10 +373,11 @@ export default function Dashboard() {
   const prevDaysRef = useRef(0);
   const streakStartRef = useRef<Date | null>(null);
 
-  // Check onboarding on first render
+  // Check onboarding + anon mode on first render
   useEffect(() => {
     const done = localStorage.getItem('seedguard_onboarded');
     if (!done) router.replace('/onboarding');
+    setIsAnonMode(localStorage.getItem('seedguard_anon_mode') === '1');
   }, [router]);
 
   // Check today's mood
@@ -428,6 +492,69 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-6xl space-y-8 page-entry">
+
+      {/* ── Quick Log Sheet ───────────────────────────────────────────── */}
+      {showQuickLog && <QuickLogSheet onClose={() => setShowQuickLog(false)} />}
+
+      {/* ── Quick Log FAB (mobile) ────────────────────────────────────── */}
+      <button
+        onClick={() => setShowQuickLog(true)}
+        aria-label="Quick log entry"
+        className="fixed bottom-24 right-4 z-40 md:hidden w-14 h-14 rounded-full bg-primary/80 border-2 border-primary text-white flex items-center justify-center neon-box-pink shadow-xl hover:bg-primary transition-all active:scale-95"
+      >
+        <Plus className="w-7 h-7" aria-hidden />
+      </button>
+
+      {/* ── Anon mode banner ─────────────────────────────────────────── */}
+      {isAnonMode && (
+        <div className="rounded-xl border border-muted/30 bg-muted/10 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground flex-1">
+            <Lock className="w-4 h-4 flex-shrink-0" aria-hidden />
+            <span><strong className="text-foreground">Anonymous Mode</strong> — data stored on this device only.</span>
+          </div>
+          <div className="flex gap-2 flex-shrink-0">
+            <Link href="/account" className="text-xs px-3 py-1.5 rounded-lg border border-secondary/50 bg-secondary/10 text-secondary hover:bg-secondary/20 font-semibold transition-all flex items-center gap-1">
+              <Cloud className="w-3 h-3" /> Sign in to sync
+            </Link>
+            <button
+              onClick={() => setShowAnonExitConfirm(true)}
+              className="text-xs px-3 py-1.5 rounded-lg border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 font-semibold transition-all"
+            >
+              Exit &amp; Reset
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Anon exit confirm modal ───────────────────────────────────── */}
+      {showAnonExitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setShowAnonExitConfirm(false)}>
+          <div className="w-full max-w-sm rounded-2xl border border-destructive/40 bg-background/97 p-6 space-y-5 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden />
+              <h3 className="font-bold text-destructive uppercase tracking-wider text-sm">Exit Anonymous Mode</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              This will <strong className="text-foreground">permanently delete</strong> all your local streak data, history, and settings, then return you to the landing page. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  const keys = Object.keys(localStorage).filter(k => k.startsWith('seedguard_'));
+                  keys.forEach(k => localStorage.removeItem(k));
+                  window.location.href = '/seedguard-main/';
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-destructive/20 border border-destructive/50 text-destructive font-bold text-sm hover:bg-destructive/30 transition-all"
+              >
+                Yes, Exit &amp; Reset
+              </button>
+              <button onClick={() => setShowAnonExitConfirm(false)} className="flex-1 py-2.5 rounded-xl border border-muted/40 text-muted-foreground text-sm hover:bg-muted/20 transition-all">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confetti overlay */}
       {showConfetti && <Confetti />}
@@ -608,26 +735,32 @@ export default function Dashboard() {
         </div>
 
         {/* Streak start / edit */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#e87f9f' }}>Started: {streakDisplayDate}</span>
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-sm font-bold text-primary/80">Started: {streakDisplayDate}</span>
           <button
             onClick={() => {
               setShowStreakEdit(v => !v);
               const s = localStorage.getItem('seedguard_streak_start');
               setEditDateInput(s ? new Date(s).toISOString().slice(0, 10) : '');
             }}
-            style={{ background: 'transparent', border: '1px solid #a21caf', borderRadius: '6px', padding: '2px 10px', color: '#e87f9f', cursor: 'pointer', fontSize: '0.8rem' }}
-          >✏️ Edit</button>
+            className="text-xs px-3 py-1 rounded-lg border border-accent/40 bg-accent/10 text-accent hover:bg-accent/20 transition-all"
+          >
+            ✏️ Edit
+          </button>
         </div>
 
         {showStreakEdit && (
-          <div style={{ marginTop: '10px', padding: '12px', background: '#1a0a2e', border: '1px solid #7c3aed', borderRadius: '8px' }}>
-            <p style={{ color: '#ddb4fe', fontSize: '0.8rem', marginBottom: '8px' }}>Set streak start date:</p>
-            <input type="date" value={editDateInput} onChange={e => setEditDateInput(e.target.value)}
-              style={{ background: '#1a0b2e', border: '1px solid #7c3aed', borderRadius: '6px', padding: '6px 10px', color: '#e2b4ff', width: '100%', marginBottom: '8px' }} />
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={handleSaveStreak} style={{ background: '#2c1aae', border: 'none', borderRadius: '6px', padding: '6px 16px', color: 'white', cursor: 'pointer', fontWeight: 600 }}>Save</button>
-              <button onClick={() => setShowStreakEdit(false)} style={{ background: 'transparent', border: '1px solid #6b7280', borderRadius: '6px', padding: '6px 16px', color: '#9ca3af', cursor: 'pointer' }}>Cancel</button>
+          <div className="mt-3 p-4 rounded-xl border border-accent/30 bg-accent/5 space-y-3">
+            <p className="text-sm text-accent/80 font-medium">Set streak start date:</p>
+            <input
+              type="date"
+              value={editDateInput}
+              onChange={e => setEditDateInput(e.target.value)}
+              className="w-full rounded-lg border border-accent/30 bg-background/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:border-accent/60 focus:ring-1 focus:ring-accent/30 transition-all"
+            />
+            <div className="flex gap-2">
+              <button onClick={handleSaveStreak} className="flex-1 py-2 rounded-lg bg-primary/20 border border-primary/50 text-primary text-sm font-bold hover:bg-primary/30 transition-all">Save</button>
+              <button onClick={() => setShowStreakEdit(false)} className="flex-1 py-2 rounded-lg border border-muted/40 text-muted-foreground text-sm hover:bg-muted/20 transition-all">Cancel</button>
             </div>
           </div>
         )}
@@ -682,11 +815,50 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-          {earnedBadges.length < ALL_BADGES.length && (
-            <p className="text-[10px] text-muted-foreground/40 mt-3">
-              {ALL_BADGES.length - earnedBadges.length} badge{ALL_BADGES.length - earnedBadges.length !== 1 ? 's' : ''} remaining — keep going.
-            </p>
-          )}
+          {earnedBadges.length < ALL_BADGES.length && (() => {
+            // Show up to 3 nearest unearned badges with proximity hint
+            const streakBadgeThresholds: Record<string, number> = {
+              first_blood: 1, one_week: 7, fortnight: 14, threshold: 30,
+              iron_60: 60, diamond_mind: 90, centurion: 100, iron_will: 180, legend: 365,
+            };
+            const unearned = ALL_BADGES.filter(b => !earnedBadgeIds.includes(b.id));
+            const withDist = unearned.map(b => ({
+              badge: b,
+              daysLeft: streakBadgeThresholds[b.id] != null
+                ? Math.max(0, streakBadgeThresholds[b.id] - timer.days)
+                : null,
+            })).sort((a, b) => {
+              if (a.daysLeft === null && b.daysLeft === null) return 0;
+              if (a.daysLeft === null) return 1;
+              if (b.daysLeft === null) return -1;
+              return a.daysLeft - b.daysLeft;
+            }).slice(0, 3);
+
+            return (
+              <div className="mt-4 pt-4 border-t border-gold/10 space-y-2">
+                <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider font-bold">Next to unlock</p>
+                <div className="flex flex-wrap gap-2">
+                  {withDist.map(({ badge, daysLeft }) => (
+                    <div
+                      key={badge.id}
+                      title={badge.description}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl border border-muted/20 bg-muted/10 opacity-60 cursor-default"
+                    >
+                      <span className="text-lg grayscale">{badge.emoji}</span>
+                      <div>
+                        <p className="text-xs font-bold text-muted-foreground leading-none">{badge.name}</p>
+                        {daysLeft !== null && (
+                          <p className="text-[9px] text-muted-foreground/50 mt-0.5">
+                            {daysLeft === 0 ? 'Almost there!' : `${daysLeft} day${daysLeft !== 1 ? 's' : ''} to go`}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 

@@ -1,7 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Flame, ShieldCheck, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import {
+  Flame, ShieldCheck, Plus, Trash2, CheckCircle2, AlertCircle,
+  ChevronDown, ChevronUp, Search, X,
+} from 'lucide-react';
 import {
   syncWithCloud,
   getUser,
@@ -21,7 +24,6 @@ function CalendarHeatmap({ entries }: { entries: HistoryEntry[] }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Build a map of date string → type
   const dayMap: Record<string, 'victory' | 'relapse' | 'both'> = {};
   for (const e of entries) {
     const d = new Date(e.date);
@@ -32,9 +34,7 @@ function CalendarHeatmap({ entries }: { entries: HistoryEntry[] }) {
     else if (prev !== e.type) dayMap[key] = 'both';
   }
 
-  // Build grid: WEEKS columns × 7 rows (Mon–Sun)
-  // Start from the Monday WEEKS weeks ago
-  const todayDow = (today.getDay() + 6) % 7; // Mon=0 … Sun=6
+  const todayDow = (today.getDay() + 6) % 7;
   const gridStart = new Date(today);
   gridStart.setDate(today.getDate() - todayDow - (WEEKS - 1) * 7);
 
@@ -65,9 +65,8 @@ function CalendarHeatmap({ entries }: { entries: HistoryEntry[] }) {
       </div>
 
       <div className="flex gap-1 overflow-x-auto pb-1">
-        {/* Day-of-week labels */}
         <div className="flex flex-col gap-1 mr-1 flex-shrink-0">
-          <div className="h-4" /> {/* spacer for month label row */}
+          <div className="h-4" />
           {dayLabels.map((l, i) => (
             <div key={i} className="w-3 h-3 text-[8px] text-muted-foreground/50 flex items-center justify-center">{l}</div>
           ))}
@@ -114,6 +113,89 @@ function CalendarHeatmap({ entries }: { entries: HistoryEntry[] }) {
   );
 }
 
+// ── Collapsible log entry ─────────────────────────────────────────────────────
+const PREVIEW_LEN = 80;
+
+function LogEntry({
+  entry,
+  onDelete,
+  expanded,
+  onToggle,
+}: {
+  entry: HistoryEntry;
+  onDelete: (id: string) => void;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const isVictory = entry.type === 'victory';
+  const borderColor = isVictory ? 'border-secondary/20 hover:border-secondary/50' : 'border-destructive/20 hover:border-destructive/50';
+  const noteText = entry.note || (isVictory ? '' : 'Relapse recorded');
+  const isLong = noteText.length > PREVIEW_LEN;
+
+  return (
+    <div className={`rounded-lg border ${borderColor} bg-background/50 transition-all group`}>
+      {/* Header row — always visible */}
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center gap-3 p-4 text-left"
+        aria-expanded={expanded}
+      >
+        <span className={`flex-shrink-0 w-2 h-2 rounded-full ${isVictory ? 'bg-emerald-400' : 'bg-red-400'}`} aria-hidden />
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] text-muted-foreground/60 mb-0.5">{entry.date}</p>
+          <p className="text-sm text-foreground truncate">
+            {isLong && !expanded
+              ? noteText.slice(0, PREVIEW_LEN) + '…'
+              : noteText || <span className="text-muted-foreground/40 italic">No note</span>}
+          </p>
+        </div>
+        {isLong && (
+          <span className="flex-shrink-0 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors">
+            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </span>
+        )}
+      </button>
+
+      {/* Expanded content */}
+      {expanded && isLong && (
+        <div className="px-4 pb-4 pt-0 border-t border-muted/10 mt-0">
+          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{noteText}</p>
+        </div>
+      )}
+
+      {/* Delete button — shown when expanded */}
+      {expanded && (
+        <div className="px-4 pb-4 flex justify-end">
+          <button
+            onClick={() => onDelete(entry.id)}
+            className="flex items-center gap-1 text-xs text-destructive/60 hover:text-destructive transition-colors px-2 py-1 rounded hover:bg-destructive/10"
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Delete
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Filter chip ───────────────────────────────────────────────────────────────
+type FilterType = 'all' | 'victory' | 'relapse' | 'week' | 'month';
+
+function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
+        active
+          ? 'bg-primary/20 text-primary border-primary/50 neon-text-pink'
+          : 'text-muted-foreground border-muted/30 hover:border-muted/60 hover:text-foreground'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function History() {
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
@@ -123,6 +205,14 @@ export default function History() {
   const [newNote, setNewNote] = useState('');
   const [entryType, setEntryType] = useState<'victory' | 'relapse'>('victory');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Accordion
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [allExpanded, setAllExpanded] = useState(false);
+
+  // Search + filter
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
   useEffect(() => {
     async function loadHistory() {
@@ -213,6 +303,54 @@ export default function History() {
     }
   };
 
+  const toggleEntry = (id: string) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllExpanded = () => {
+    if (allExpanded) {
+      setExpandedIds(new Set());
+    } else {
+      setExpandedIds(new Set(entries.map(e => e.id)));
+    }
+    setAllExpanded(!allExpanded);
+  };
+
+  // Filtered + searched entries
+  const filteredEntries = useMemo(() => {
+    const now = Date.now();
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+    const monthMs = 30 * 24 * 60 * 60 * 1000;
+
+    return entries.filter(e => {
+      if (activeFilter === 'victory' && e.type !== 'victory') return false;
+      if (activeFilter === 'relapse' && e.type !== 'relapse') return false;
+      if (activeFilter === 'week') {
+        const d = new Date(e.date);
+        if (isNaN(d.getTime()) || now - d.getTime() > weekMs) return false;
+      }
+      if (activeFilter === 'month') {
+        const d = new Date(e.date);
+        if (isNaN(d.getTime()) || now - d.getTime() > monthMs) return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        if (!e.note?.toLowerCase().includes(q) && !e.date.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  }, [entries, activeFilter, searchQuery]);
+
+  const victories = filteredEntries.filter((e) => e.type === 'victory');
+  const relapses = filteredEntries.filter((e) => e.type === 'relapse');
+  const allVictories = entries.filter(e => e.type === 'victory');
+  const allRelapses = entries.filter(e => e.type === 'relapse');
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -222,9 +360,6 @@ export default function History() {
       </div>
     );
   }
-
-  const victories = entries.filter((e) => e.type === 'victory');
-  const relapses = entries.filter((e) => e.type === 'relapse');
 
   if (typeof window === 'undefined') return null;
 
@@ -300,34 +435,66 @@ export default function History() {
         </div>
       </div>
 
+      {/* Search + filter bar */}
+      {entries.length > 0 && (
+        <div className="space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" aria-hidden />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search entries…"
+              className="w-full rounded-xl border border-muted/30 bg-background/50 pl-9 pr-9 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-muted-foreground">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2 items-center">
+            {(['all', 'victory', 'relapse', 'week', 'month'] as FilterType[]).map(f => (
+              <FilterChip key={f} active={activeFilter === f} onClick={() => setActiveFilter(f)}>
+                {f === 'all' ? 'All' : f === 'victory' ? 'Victories' : f === 'relapse' ? 'Relapses' : f === 'week' ? 'This Week' : 'This Month'}
+              </FilterChip>
+            ))}
+            <button
+              onClick={toggleAllExpanded}
+              className="ml-auto text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors underline"
+            >
+              {allExpanded ? 'Collapse all' : 'Expand all'}
+            </button>
+          </div>
+          {(searchQuery || activeFilter !== 'all') && (
+            <p className="text-xs text-muted-foreground/50">
+              Showing {filteredEntries.length} of {entries.length} entries
+            </p>
+          )}
+        </div>
+      )}
+
       {/* History Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-4 animate-scale-in">
           <h2 className="text-xl font-bold uppercase tracking-widest flex items-center gap-2 text-secondary neon-text-cyan">
             <ShieldCheck className="w-6 h-6" />
-            Victories & Notes
+            Victories &amp; Notes
           </h2>
           {victories.length === 0 ? (
             <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
-              No wins logged yet. Start your journey today!
+              {entries.length === 0 ? 'No wins logged yet. Start your journey today!' : 'No victories match this filter.'}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {victories.map((entry) => (
-                <div key={entry.id} className="rounded-lg border border-secondary/20 bg-background/50 p-4 hover:border-secondary/50 transition-all group">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <p className="text-xs text-muted-foreground mb-2">{entry.date}</p>
-                      <p className="text-foreground">{entry.note}</p>
-                    </div>
-                    <button
-                      onClick={() => deleteEntry(entry.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-destructive/20 rounded text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                <LogEntry
+                  key={entry.id}
+                  entry={entry}
+                  onDelete={deleteEntry}
+                  expanded={expandedIds.has(entry.id)}
+                  onToggle={() => toggleEntry(entry.id)}
+                />
               ))}
             </div>
           )}
@@ -340,25 +507,18 @@ export default function History() {
           </h2>
           {relapses.length === 0 ? (
             <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
-              No relapses logged yet. Keep it up!
+              {entries.length === 0 ? 'No relapses logged yet. Keep it up!' : 'No relapses match this filter.'}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {relapses.map((entry) => (
-                <div key={entry.id} className="rounded-lg border border-destructive/20 bg-background/50 p-4 hover:border-destructive/50 transition-all group">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <p className="text-xs text-muted-foreground mb-2">{entry.date}</p>
-                      <p className="text-foreground">{entry.note || 'Relapse recorded'}</p>
-                    </div>
-                    <button
-                      onClick={() => deleteEntry(entry.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-destructive/20 rounded text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                <LogEntry
+                  key={entry.id}
+                  entry={entry}
+                  onDelete={deleteEntry}
+                  expanded={expandedIds.has(entry.id)}
+                  onToggle={() => toggleEntry(entry.id)}
+                />
               ))}
             </div>
           )}
@@ -370,16 +530,16 @@ export default function History() {
           <h3 className="font-bold text-lg mb-4 uppercase tracking-wider">Session Stats</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-secondary neon-text-cyan">{victories.length}</p>
+              <p className="text-3xl font-bold text-secondary neon-text-cyan">{allVictories.length}</p>
               <p className="text-sm text-muted-foreground mt-1">Victories</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-destructive">{relapses.length}</p>
+              <p className="text-3xl font-bold text-destructive">{allRelapses.length}</p>
               <p className="text-sm text-muted-foreground mt-1">Relapses</p>
             </div>
             <div className="text-center">
               <p className="text-3xl font-bold text-primary neon-text-pink">
-                {entries.length > 0 ? Math.round((victories.length / entries.length) * 100) : 0}%
+                {entries.length > 0 ? Math.round((allVictories.length / entries.length) * 100) : 0}%
               </p>
               <p className="text-sm text-muted-foreground mt-1">Success Rate</p>
             </div>

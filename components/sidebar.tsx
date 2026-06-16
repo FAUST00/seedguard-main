@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   History,
@@ -15,6 +15,9 @@ import {
   Flame,
   BookOpen,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  Lock,
 } from 'lucide-react';
 import { SeedGuardLogo } from '@/components/seedguard-logo';
 
@@ -41,6 +44,21 @@ const bottomTabs = [
 export function Sidebar() {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [isAnonMode, setIsAnonMode] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem('seedguard_sidebar_collapsed') === '1');
+      setIsAnonMode(localStorage.getItem('seedguard_anon_mode') === '1');
+    } catch {}
+  }, []);
+
+  const toggleCollapse = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    try { localStorage.setItem('seedguard_sidebar_collapsed', next ? '1' : '0'); } catch {}
+  };
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -50,12 +68,29 @@ export function Sidebar() {
   return (
     <>
       {/* ── Desktop Sidebar ───────────────────────────────────────────── */}
-      <aside className="hidden md:flex w-64 border-r border-primary/10 glass-effect p-6 flex-col gap-8 md:min-h-screen shrink-0 sticky top-0">
-        <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-          <SeedGuardLogo size="md" showTagline />
-        </Link>
+      <aside
+        className={`hidden md:flex border-r border-primary/10 glass-effect flex-col gap-6 md:min-h-screen shrink-0 sticky top-0 transition-[width] duration-200 ease-in-out overflow-hidden ${collapsed ? 'w-16 p-3' : 'w-64 p-6'}`}
+      >
+        {/* Logo */}
+        <div className={`flex items-center ${collapsed ? 'justify-center' : ''}`}>
+          {collapsed ? (
+            <Link href="/" className="flex items-center justify-center w-8 h-8 hover:opacity-80 transition-opacity" aria-label="SeedGuard home">
+              <span className="text-xl">🛡️</span>
+            </Link>
+          ) : (
+            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+              <SeedGuardLogo size="md" showTagline />
+            </Link>
+          )}
+          {isAnonMode && !collapsed && (
+            <span className="ml-auto text-[10px] text-muted-foreground/60 flex items-center gap-1">
+              <Lock className="w-3 h-3" /> Local
+            </span>
+          )}
+        </div>
 
-        <nav className="flex flex-col gap-2 flex-1" aria-label="Main navigation">
+        {/* Nav items */}
+        <nav className="flex flex-col gap-1 flex-1" aria-label="Main navigation">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -64,22 +99,32 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
+                title={collapsed ? item.label : undefined}
                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 whitespace-nowrap
+                  flex items-center gap-3 rounded-lg transition-all duration-200 whitespace-nowrap
+                  ${collapsed ? 'px-2 py-3 justify-center' : 'px-4 py-3'}
                   ${active
                     ? 'bg-primary/20 text-primary neon-text-pink shadow-lg neon-box-pink'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
                 `}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" aria-hidden />
-                <span className="font-medium hidden sm:inline">{item.label}</span>
+                {!collapsed && <span className="font-medium">{item.label}</span>}
               </Link>
             );
           })}
         </nav>
 
-        <div className="pt-4 border-t border-primary/10">
-          <p className="text-xs text-muted-foreground text-center">v3.1.0</p>
+        {/* Collapse toggle + version */}
+        <div className={`pt-4 border-t border-primary/10 flex ${collapsed ? 'justify-center' : 'items-center justify-between'}`}>
+          {!collapsed && <p className="text-xs text-muted-foreground">v3.2.0</p>}
+          <button
+            onClick={toggleCollapse}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all"
+          >
+            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          </button>
         </div>
       </aside>
 
@@ -88,7 +133,11 @@ export function Sidebar() {
         <Link href="/" className="flex items-center gap-2">
           <SeedGuardLogo size="sm" showTagline={false} />
         </Link>
-
+        {isAnonMode && (
+          <span className="flex items-center gap-1 text-[10px] text-muted-foreground/60 mr-auto ml-3">
+            <Lock className="w-3 h-3" /> Local
+          </span>
+        )}
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           className="p-2 hover:bg-muted/50 rounded-lg transition-colors"

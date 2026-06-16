@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Shield, ArrowRight, Check } from 'lucide-react';
+import { Shield, ArrowRight, Check, Lock, Cloud } from 'lucide-react';
 
 const MODES = [
   {
@@ -31,6 +31,8 @@ const MODES = [
 
 type Mode = (typeof MODES)[number]['id'];
 
+const TOTAL_STEPS = 4;
+
 export default function Onboarding() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -38,17 +40,35 @@ export default function Onboarding() {
   const [mode, setMode] = useState<Mode>('hard');
 
   const handleNext = () => {
-    if (step < 3) {
+    if (step < TOTAL_STEPS - 1) {
       setStep(step + 1);
-    } else {
-      localStorage.setItem('seedguard_user', JSON.stringify({ name, mode }));
-      localStorage.setItem('seedguard_onboarded', '1');
-      router.push('/dashboard');
+    } else if (step === TOTAL_STEPS - 1) {
+      // Step 3 — show the local-vs-cloud fork (step 4)
+      setStep(TOTAL_STEPS);
     }
   };
 
+  const startLocally = () => {
+    try {
+      localStorage.setItem('seedguard_user', JSON.stringify({ name, mode }));
+      localStorage.setItem('seedguard_onboarded', '1');
+      localStorage.setItem('seedguard_anon_mode', '1');
+    } catch {}
+    router.push('/dashboard');
+  };
+
+  const startWithAccount = () => {
+    try {
+      localStorage.setItem('seedguard_user', JSON.stringify({ name, mode }));
+      localStorage.setItem('seedguard_onboarded', '1');
+    } catch {}
+    router.push('/account');
+  };
+
   const handleSkip = () => {
-    localStorage.setItem('seedguard_onboarded', '1');
+    try {
+      localStorage.setItem('seedguard_onboarded', '1');
+    } catch {}
     router.push('/dashboard');
   };
 
@@ -69,11 +89,11 @@ export default function Onboarding() {
 
         {/* Progress dots */}
         <div className="flex gap-2 justify-center">
-          {[1, 2, 3].map((i) => (
+          {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
             <div
               key={i}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i <= step ? 'bg-primary w-10' : 'bg-muted w-5'
+                i + 1 <= step ? 'bg-primary w-10' : 'bg-muted w-5'
               }`}
             />
           ))}
@@ -160,7 +180,7 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Step 3: Ready */}
+          {/* Step 3: Ready summary */}
           {step === 3 && (
             <div className="space-y-6 animate-fade-in text-center">
               <div className="space-y-4">
@@ -182,28 +202,76 @@ export default function Onboarding() {
               </div>
             </div>
           )}
-        </div>
 
-        {/* Nav buttons */}
-        <div className="flex gap-3 pt-2">
-          {step > 1 && (
-            <button
-              onClick={() => setStep(step - 1)}
-              className="flex-1 px-6 py-3 rounded-lg border border-muted/50 text-muted-foreground hover:text-foreground hover:border-muted/70 transition-all font-medium uppercase tracking-wider"
-            >
-              Back
-            </button>
+          {/* Step 4: Local vs Cloud fork */}
+          {step === 4 && (
+            <div className="space-y-5 animate-fade-in">
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-bold uppercase tracking-wider text-primary neon-text-pink">
+                  How do you want to track?
+                </h2>
+                <p className="text-muted-foreground text-sm">You can always switch later.</p>
+              </div>
+
+              <button
+                onClick={startLocally}
+                className="w-full text-left p-5 rounded-xl border-2 border-muted/40 bg-muted/10 hover:border-primary/40 hover:bg-primary/5 transition-all group"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-muted/20 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <Lock className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-base text-foreground">Start Locally</p>
+                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                      Track on this device only. No account needed. Sign in later to unlock cloud sync, leaderboards, and DMs.
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={startWithAccount}
+                className="w-full text-left p-5 rounded-xl border-2 border-secondary/40 bg-secondary/5 hover:border-secondary/70 hover:bg-secondary/10 transition-all group"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-secondary/25 transition-colors">
+                    <Cloud className="w-5 h-5 text-secondary" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-base text-secondary">Create Account</p>
+                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                      Sync across all devices, join the leaderboard, earn public badges, and message friends.
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
           )}
-          <button
-            onClick={handleNext}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary/20 text-primary border border-primary/50 rounded-lg hover:bg-primary/30 transition-all font-bold uppercase tracking-wider"
-          >
-            {step === 3 ? 'Start Now' : 'Next'}
-            <ArrowRight className="w-4 h-4" aria-hidden />
-          </button>
         </div>
 
-        {step < 3 && (
+        {/* Nav buttons — hidden on step 4 (has its own fork buttons) */}
+        {step < 4 && (
+          <div className="flex gap-3 pt-2">
+            {step > 1 && (
+              <button
+                onClick={() => setStep(step - 1)}
+                className="flex-1 px-6 py-3 rounded-lg border border-muted/50 text-muted-foreground hover:text-foreground hover:border-muted/70 transition-all font-medium uppercase tracking-wider"
+              >
+                Back
+              </button>
+            )}
+            <button
+              onClick={handleNext}
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary/20 text-primary border border-primary/50 rounded-lg hover:bg-primary/30 transition-all font-bold uppercase tracking-wider"
+            >
+              Next
+              <ArrowRight className="w-4 h-4" aria-hidden />
+            </button>
+          </div>
+        )}
+
+        {step < 4 && (
           <button
             onClick={handleSkip}
             className="block w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
