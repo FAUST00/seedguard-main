@@ -8,14 +8,21 @@ import { SynthBackground } from '@/components/synth-background';
 
 export const metadata: Metadata = {
   title: {
-    default: 'SeedGuard | PMO Freedom Tracker',
+    default: 'SeedGuard | NoFap & PMO Freedom Tracker',
     template: '%s | SeedGuard',
   },
   description:
-    'Track your progress, build discipline, and reclaim your freedom. Streak tracking, friends, leaderboards, and messaging — synced across all your devices.',
-  keywords: ['streak tracker', 'recovery', 'discipline', 'habit tracker', 'seedguard'],
+    'The #1 NoFap streak tracker and semen retention counter. Build discipline, compete on the leaderboard, and reclaim your freedom — synced across all your devices.',
+  keywords: [
+    'nofap tracker', 'semen retention tracker', 'PMO streak counter',
+    'nofap streak app', 'no fap counter', 'PMO recovery app',
+    'semen retention app', 'nofap challenge', 'streak tracker free',
+    'nofap leaderboard', 'discipline tracker', 'nofap app',
+    'semen retention benefits', 'pmo addiction recovery', 'nofap timer',
+    'no porn tracker', 'habit tracker men', 'seedguard',
+  ],
   openGraph: {
-    title: 'SeedGuard | PMO Freedom Tracker',
+    title: 'SeedGuard | NoFap & PMO Freedom Tracker',
     description: 'Build unbreakable streaks. Compete with friends. Reclaim your freedom.',
     type: 'website',
     siteName: 'SeedGuard',
@@ -24,13 +31,13 @@ export const metadata: Metadata = {
         url: '/seedguard-main/images/wp4787824-retrowave-night-wallpapers.jpg',
         width: 1920,
         height: 1080,
-        alt: 'SeedGuard — PMO Freedom Tracker',
+        alt: 'SeedGuard — NoFap & PMO Freedom Tracker',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SeedGuard | PMO Freedom Tracker',
+    title: 'SeedGuard | NoFap & PMO Freedom Tracker',
     description: 'Build unbreakable streaks. Compete with friends. Reclaim your freedom.',
     images: ['/seedguard-main/images/wp4787824-retrowave-night-wallpapers.jpg'],
   },
@@ -41,15 +48,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0d0a1f',
+  themeColor: '#ff2d9b',
   width: 'device-width',
   initialScale: 1,
 };
 
-/**
- * Applies the saved theme class before React hydrates so there is never
- * a flash of the wrong theme. Mirrors components/theme-provider.tsx.
- */
 const themeInitScript = `
 try {
   var t = localStorage.getItem('seedguard_theme');
@@ -59,15 +62,10 @@ try {
 } catch (e) {}
 `;
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        {/* Retro display font for headings (font-display utility) */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -79,11 +77,11 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground antialiased">
         <ThemeProvider>
           <ToastProvider>
-            {/* Animated synthwave atmosphere behind everything */}
             <SynthBackground />
             <div className="relative z-10 min-h-screen flex flex-col md:flex-row">
               <Sidebar />
-              <main className="flex-1 overflow-y-auto page-entry">
+              {/* pb-20 on mobile leaves room for the fixed bottom tab bar */}
+              <main className="flex-1 overflow-y-auto page-entry pb-20 md:pb-0">
                 <ErrorBoundary>{children}</ErrorBoundary>
               </main>
             </div>

@@ -82,6 +82,38 @@ export async function getFriendsLeaderboard(): Promise<StreakEntry[]> {
   }));
 }
 
+/** Leaderboard filtered to users active in the last N days. */
+async function getRecentLeaderboard(windowDays: number): Promise<StreakEntry[]> {
+  const user = await getUser();
+  const since = new Date(Date.now() - windowDays * 86_400_000).toISOString();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, avatar_url, current_streak, best_streak, streak_start, last_active')
+    .gte('last_active', since)
+    .order('current_streak', { ascending: false })
+    .limit(50);
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((row, i) => ({
+    rank: i + 1,
+    id: row.id,
+    username: row.username ?? 'Anonymous',
+    avatar_url: row.avatar_url ?? null,
+    current_streak: row.current_streak ?? 0,
+    best_streak: row.best_streak ?? 0,
+    streak_start: row.streak_start ?? null,
+    last_active: row.last_active ?? null,
+    isMe: user?.id === row.id,
+  }));
+}
+
+export async function getWeeklyLeaderboard(): Promise<StreakEntry[]> {
+  return getRecentLeaderboard(7);
+}
+
+export async function getMonthlyLeaderboard(): Promise<StreakEntry[]> {
+  return getRecentLeaderboard(30);
+}
+
 /** Format an ISO date string for display. */
 export function fmtDate(iso: string | null): string {
   if (!iso) return '—';

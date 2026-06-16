@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Flame, Trophy, Medal, Crown, RefreshCw, Loader2, Globe, Users } from 'lucide-react';
+import { Flame, Trophy, Medal, Crown, RefreshCw, Loader2, Globe, Users, Calendar, Clock } from 'lucide-react';
 import { ImageBanner } from '@/components/synth-background';
 import { LeaderboardRowSkeleton } from '@/components/skeleton';
 import { ProfileCard } from '@/components/profile-card';
 import { useToast } from '@/components/toast';
 import {
   getGlobalLeaderboard, getFriendsLeaderboard,
+  getWeeklyLeaderboard, getMonthlyLeaderboard,
   fmtDate, daysSince, streakTier,
   type StreakEntry,
 } from '@/lib/streaks';
@@ -16,7 +17,7 @@ import { getUser } from '@/lib/sync';
 import { supabase } from '@/lib/supabase';
 import { ART } from '@/lib/assets';
 
-type View = 'friends' | 'global';
+type View = 'friends' | 'global' | 'weekly' | 'monthly';
 
 // ── Rank badge ────────────────────────────────────────────────────────────────
 function RankBadge({ rank }: { rank: number }) {
@@ -42,24 +43,20 @@ function RankBadge({ rank }: { rank: number }) {
   );
 }
 
-// ── Flame indicator row ───────────────────────────────────────────────────────
+// ── Flame row ────────────────────────────────────────────────────────────────
 function FlameRow({ days }: { days: number }) {
   const { flames, color } = streakTier(days);
   if (flames === 0) return null;
   return (
     <div className="flex gap-0.5" aria-label={`${flames} out of 5 flames`}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <Flame
-          key={i}
-          className={`w-3.5 h-3.5 ${i < flames ? `${color} flame-glow` : 'text-muted/25'}`}
-          aria-hidden
-        />
+        <Flame key={i} className={`w-3.5 h-3.5 ${i < flames ? `${color} flame-glow` : 'text-muted/25'}`} aria-hidden />
       ))}
     </div>
   );
 }
 
-// ── Single leaderboard row ────────────────────────────────────────────────────
+// ── Leaderboard row ──────────────────────────────────────────────────────────
 function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
   const tier = streakTier(entry.current_streak);
   const stale = daysSince(entry.last_active ?? null);
@@ -72,19 +69,13 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
     'border-muted/20';
 
   return (
-    <li
-      className={`
-        rounded-2xl border ${rankBorder} glass-effect p-4 flex items-center gap-3
-        neon-hover transition-all duration-200
-        ${entry.isMe ? 'ring-1 ring-primary/40' : ''}
-      `}
-    >
+    <li className={`rounded-2xl border ${rankBorder} glass-effect p-4 flex items-center gap-3 neon-hover transition-all duration-200 ${entry.isMe ? 'ring-1 ring-primary/40' : ''}`}>
       <RankBadge rank={rank} />
 
       <ProfileCard entry={entry}>
         <div
           className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm border-2 flex-shrink-0 ${tier.color}`}
-          style={{ borderColor: `hsl(var(--primary) / 0.45)` }}
+          style={{ borderColor: 'hsl(var(--primary) / 0.45)' }}
         >
           {entry.avatar_url ? (
             <img src={entry.avatar_url} alt="" className="w-full h-full rounded-full object-cover" loading="lazy" />
@@ -94,18 +85,12 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`font-bold text-sm truncate ${entry.isMe ? 'neon-text-pink text-primary' : ''}`}>
-            {entry.username}
-          </span>
+          <span className={`font-bold text-sm truncate ${entry.isMe ? 'neon-text-pink text-primary' : ''}`}>{entry.username}</span>
           {entry.isMe && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-semibold uppercase tracking-wider">
-              You
-            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-semibold uppercase tracking-wider">You</span>
           )}
           {tier.label && (
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-full bg-muted/20 ${tier.color} uppercase tracking-wider font-semibold`}>
-              {tier.label}
-            </span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full bg-muted/20 ${tier.color} uppercase tracking-wider font-semibold`}>{tier.label}</span>
           )}
         </div>
         <div className="flex items-center gap-3 mt-1 flex-wrap">
@@ -130,6 +115,14 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
   );
 }
 
+// ── Tab config ───────────────────────────────────────────────────────────────
+const TABS: { id: View; label: string; icon: typeof Globe; desc: string }[] = [
+  { id: 'friends', label: 'Friends', icon: Users,    desc: 'Your circle ranked by current streak.' },
+  { id: 'weekly',  label: 'This Week', icon: Clock,  desc: 'Warriors active in the last 7 days.' },
+  { id: 'monthly', label: 'Monthly',  icon: Calendar, desc: 'Warriors active in the last 30 days.' },
+  { id: 'global',  label: 'All Time', icon: Globe,   desc: 'Top 50 warriors site-wide, all time.' },
+];
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function StreaksPage() {
   const { toast } = useToast();
@@ -139,31 +132,27 @@ export default function StreaksPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // Read-only fetch — no DB write.
-  // Safe to call from realtime listener and polling without triggering a loop.
   const fetchEntries = useCallback(async () => {
     try {
-      const data = view === 'global'
-        ? await getGlobalLeaderboard()
-        : await getFriendsLeaderboard();
+      let data: StreakEntry[];
+      if (view === 'global')        data = await getGlobalLeaderboard();
+      else if (view === 'weekly')   data = await getWeeklyLeaderboard();
+      else if (view === 'monthly')  data = await getMonthlyLeaderboard();
+      else                          data = await getFriendsLeaderboard();
       setEntries(data);
-    } catch {
-      // Background refresh — suppress toast noise
-    }
+    } catch {}
   }, [view]);
 
-  // Full load — syncs your profile to the DB first, then fetches.
-  // Only called on mount, view change, and manual Refresh button.
-  // NOT called from the realtime listener (that would cause an infinite loop:
-  // syncProfileStreak writes to profiles → realtime fires → syncProfileStreak → repeat).
   const loadData = useCallback(async (showSpinner = false) => {
     if (showSpinner) setRefreshing(true);
     else setLoading(true);
     try {
       await syncProfileStreak();
-      const data = view === 'global'
-        ? await getGlobalLeaderboard()
-        : await getFriendsLeaderboard();
+      let data: StreakEntry[];
+      if (view === 'global')        data = await getGlobalLeaderboard();
+      else if (view === 'weekly')   data = await getWeeklyLeaderboard();
+      else if (view === 'monthly')  data = await getMonthlyLeaderboard();
+      else                          data = await getFriendsLeaderboard();
       setEntries(data);
     } catch (err: unknown) {
       toast((err as Error).message ?? 'Failed to load leaderboard.', 'error');
@@ -177,28 +166,19 @@ export default function StreaksPage() {
     getUser().then((u) => setLoggedIn(!!u));
   }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useEffect(() => { loadData(); }, [loadData]);
 
-  // Keep a stable ref to fetchEntries for use inside the realtime/polling effect
   const fetchEntriesRef = useRef(fetchEntries);
   useEffect(() => { fetchEntriesRef.current = fetchEntries; }, [fetchEntries]);
 
-  // Live updates: Realtime + 60-second polling fallback.
-  // Uses fetchEntries (read-only) — never loadData — to avoid the sync loop.
   useEffect(() => {
     const channel = supabase
       .channel('leaderboard-profiles')
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'profiles' },
-        () => { fetchEntriesRef.current(); }
-      )
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, () => {
+        fetchEntriesRef.current();
+      })
       .subscribe();
-
     const interval = setInterval(() => { fetchEntriesRef.current(); }, 60_000);
-
     return () => {
       supabase.removeChannel(channel);
       clearInterval(interval);
@@ -206,6 +186,7 @@ export default function StreaksPage() {
   }, []);
 
   const myEntry = entries.find((e) => e.isMe);
+  const activeTab = TABS.find((t) => t.id === view)!;
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-3xl space-y-6 page-entry">
@@ -216,52 +197,53 @@ export default function StreaksPage() {
               <Trophy className="w-8 h-8" aria-hidden />
               Streaks
             </h1>
-            <p className="text-muted-foreground text-base mt-1">
-              {view === 'friends' ? 'Your circle ranked by current streak.' : 'Top 50 warriors site-wide.'}
-            </p>
+            <p className="text-muted-foreground text-base mt-1">{activeTab.desc}</p>
           </div>
-
           <button
             onClick={() => loadData(true)}
             disabled={refreshing}
             aria-label="Refresh leaderboard"
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gold/30 text-gold bg-gold/10 hover:bg-gold/20 text-sm font-bold uppercase tracking-wider transition-all disabled:opacity-50"
           >
-            {refreshing
-              ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
-              : <RefreshCw className="w-4 h-4" aria-hidden />}
+            {refreshing ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> : <RefreshCw className="w-4 h-4" aria-hidden />}
             Refresh
           </button>
         </div>
       </ImageBanner>
 
-      <div
-        className="inline-flex rounded-xl border border-muted/30 bg-muted/10 p-1 gap-1 w-full sm:w-auto"
-        role="tablist"
-        aria-label="Leaderboard scope"
-      >
-        {([
-          { id: 'friends', label: 'Friends', icon: Users },
-          { id: 'global',  label: 'Global',  icon: Globe },
-        ] as { id: View; label: string; icon: typeof Globe }[]).map(({ id, label, icon: Icon }) => (
+      {/* Tab switcher */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="tablist" aria-label="Leaderboard scope">
+        {TABS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             role="tab"
             aria-selected={view === id}
             onClick={() => setView(id)}
             className={`
-              flex-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold uppercase tracking-wider text-sm transition-all
+              flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-bold uppercase tracking-wider text-xs transition-all border
               ${view === id
-                ? 'bg-gold/20 text-gold border border-gold/40 neon-box-gold'
-                : 'text-muted-foreground hover:text-foreground'}
+                ? 'bg-gold/20 text-gold border-gold/40 neon-box-gold'
+                : 'text-muted-foreground border-muted/20 hover:text-foreground hover:bg-muted/20'}
             `}
           >
-            <Icon className="w-4 h-4" aria-hidden />
+            <Icon className="w-3.5 h-3.5" aria-hidden />
             {label}
           </button>
         ))}
       </div>
 
+      {/* Weekly/Monthly context banner */}
+      {(view === 'weekly' || view === 'monthly') && (
+        <div className="rounded-xl border border-secondary/20 bg-secondary/5 px-4 py-3 text-xs text-muted-foreground">
+          <span className="text-secondary font-semibold">
+            {view === 'weekly' ? '📅 This Week' : '🗓️ This Month'}:
+          </span>{' '}
+          Shows everyone who has been active in the last {view === 'weekly' ? '7' : '30'} days, ranked by their current streak.
+          A fresh start still earns you a spot here.
+        </div>
+      )}
+
+      {/* My rank card */}
       {loggedIn && myEntry && !loading && (
         <div className="rounded-2xl border border-primary/30 glass-effect p-4 flex items-center gap-4 neon-box-pink animate-scale-in">
           <RankBadge rank={myEntry.rank} />
@@ -279,6 +261,7 @@ export default function StreaksPage() {
         </div>
       )}
 
+      {/* List */}
       {loading ? (
         <ul className="space-y-3" aria-label="Loading leaderboard">
           {Array.from({ length: 6 }).map((_, i) => <li key={i}><LeaderboardRowSkeleton /></li>)}
@@ -300,36 +283,23 @@ export default function StreaksPage() {
         </div>
       ) : (
         <>
-          <ul className="space-y-3" role="list" aria-label={`${view === 'global' ? 'Global' : 'Friends'} leaderboard`}>
+          <ul className="space-y-3" role="list" aria-label={`${activeTab.label} leaderboard`}>
             {entries.map((entry) => (
               <LeaderboardRow key={entry.id} entry={entry} rank={entry.rank} />
             ))}
           </ul>
 
           <div className="rounded-xl border border-muted/15 bg-muted/5 p-4 flex flex-wrap gap-6 justify-center text-sm text-muted-foreground">
-            <span>
-              <strong className="text-foreground">{entries.length}</strong>{' '}
-              {view === 'global' ? 'users ranked' : 'friends tracked'}
-            </span>
-            <span>
-              Top streak:{' '}
-              <strong className={streakTier(entries[0]?.current_streak ?? 0).color}>
-                {entries[0]?.current_streak ?? 0} days
-              </strong>
-            </span>
-            <span>
-              Avg streak:{' '}
-              <strong className="text-foreground">
-                {Math.round(entries.reduce((s, e) => s + e.current_streak, 0) / (entries.length || 1))} days
-              </strong>
-            </span>
+            <span><strong className="text-foreground">{entries.length}</strong> {view === 'global' ? 'users ranked' : view === 'friends' ? 'friends tracked' : 'warriors'}</span>
+            <span>Top streak: <strong className={streakTier(entries[0]?.current_streak ?? 0).color}>{entries[0]?.current_streak ?? 0} days</strong></span>
+            <span>Avg: <strong className="text-foreground">{Math.round(entries.reduce((s, e) => s + e.current_streak, 0) / (entries.length || 1))} days</strong></span>
           </div>
         </>
       )}
 
       <div className="rounded-xl border border-muted/15 bg-muted/5 p-5 text-xs text-muted-foreground space-y-1.5">
-        <p className="font-bold text-foreground uppercase tracking-wider text-xs">How the leaderboard updates</p>
-        <p>Your streak is pushed to the board every time you open this tab or the Dashboard. Friends appear automatically once you&apos;re connected in the Social tab. Global rankings refresh in real-time as users sync.</p>
+        <p className="font-bold text-foreground uppercase tracking-wider text-xs">How it updates</p>
+        <p>Your streak syncs every time you open this tab or the Dashboard. Friends appear once connected in the Social tab. Weekly and Monthly boards reset automatically — a fresh start still earns you a place.</p>
       </div>
     </div>
   );

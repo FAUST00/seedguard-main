@@ -11,6 +11,110 @@ import {
   type HistoryEntry,
 } from '@/lib/sync';
 
+// ── Calendar Heatmap ─────────────────────────────────────────────────────────
+function toYMD(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function CalendarHeatmap({ entries }: { entries: HistoryEntry[] }) {
+  const WEEKS = 15;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Build a map of date string → type
+  const dayMap: Record<string, 'victory' | 'relapse' | 'both'> = {};
+  for (const e of entries) {
+    const d = new Date(e.date);
+    if (isNaN(d.getTime())) continue;
+    const key = toYMD(d);
+    const prev = dayMap[key];
+    if (!prev) dayMap[key] = e.type;
+    else if (prev !== e.type) dayMap[key] = 'both';
+  }
+
+  // Build grid: WEEKS columns × 7 rows (Mon–Sun)
+  // Start from the Monday WEEKS weeks ago
+  const todayDow = (today.getDay() + 6) % 7; // Mon=0 … Sun=6
+  const gridStart = new Date(today);
+  gridStart.setDate(today.getDate() - todayDow - (WEEKS - 1) * 7);
+
+  const weeks: Date[][] = [];
+  for (let w = 0; w < WEEKS; w++) {
+    const week: Date[] = [];
+    for (let d = 0; d < 7; d++) {
+      const cell = new Date(gridStart);
+      cell.setDate(gridStart.getDate() + w * 7 + d);
+      week.push(cell);
+    }
+    weeks.push(week);
+  }
+
+  const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+  return (
+    <div className="rounded-xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-sm uppercase tracking-wider text-secondary neon-text-cyan">
+          Activity Heatmap
+        </h3>
+        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-emerald-500/70 inline-block" />Victory</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-red-500/70 inline-block" />Relapse</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-muted/30 inline-block" />None</span>
+        </div>
+      </div>
+
+      <div className="flex gap-1 overflow-x-auto pb-1">
+        {/* Day-of-week labels */}
+        <div className="flex flex-col gap-1 mr-1 flex-shrink-0">
+          <div className="h-4" /> {/* spacer for month label row */}
+          {dayLabels.map((l, i) => (
+            <div key={i} className="w-3 h-3 text-[8px] text-muted-foreground/50 flex items-center justify-center">{l}</div>
+          ))}
+        </div>
+
+        {weeks.map((week, wi) => {
+          const firstOfMonth = week.find((d) => d.getDate() === 1);
+          const monthLabel = firstOfMonth
+            ? firstOfMonth.toLocaleString('default', { month: 'short' })
+            : '';
+          return (
+            <div key={wi} className="flex flex-col gap-1 flex-shrink-0">
+              <div className="h-4 text-[8px] text-muted-foreground/50 flex items-end justify-center whitespace-nowrap">
+                {monthLabel}
+              </div>
+              {week.map((day, di) => {
+                const key = toYMD(day);
+                const type = dayMap[key];
+                const isFuture = day > today;
+                const isToday = toYMD(day) === toYMD(today);
+
+                let bg = 'bg-muted/20';
+                if (!isFuture) {
+                  if (type === 'victory') bg = 'bg-emerald-500/70';
+                  else if (type === 'relapse') bg = 'bg-red-500/70';
+                  else if (type === 'both') bg = 'bg-yellow-500/70';
+                }
+
+                return (
+                  <div
+                    key={di}
+                    title={`${day.toDateString()}${type ? ` — ${type}` : ''}`}
+                    className={`w-3 h-3 rounded-sm transition-all ${bg} ${isToday ? 'ring-1 ring-secondary' : ''} ${isFuture ? 'opacity-20' : ''}`}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="text-[10px] text-muted-foreground/40">Last {WEEKS} weeks</p>
+    </div>
+  );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function History() {
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,25 +127,20 @@ export default function History() {
   useEffect(() => {
     async function loadHistory() {
       try {
-        // Show local data instantly while cloud loads
         const saved = typeof window !== 'undefined'
           ? localStorage.getItem('seedguard_history')
           : null;
         if (saved) setEntries(JSON.parse(saved));
 
-        // Check auth with fresh Supabase call
         const user = await getUser();
         setIsLoggedIn(!!user);
 
         if (user) {
-          // Cloud is the source of truth when logged in
           const cloudEntries = await getHistoryFromCloud();
           if (cloudEntries.length > 0) {
-            // Cloud has data — use it and update local cache
             setEntries(cloudEntries);
             localStorage.setItem('seedguard_history', JSON.stringify(cloudEntries));
           } else if (saved) {
-            // Logged in but cloud empty — auto-migrate local data up
             const localEntries: HistoryEntry[] = JSON.parse(saved);
             if (localEntries.length > 0) {
               for (const entry of localEntries) {
@@ -69,13 +168,11 @@ export default function History() {
       note: newNote.trim(),
     };
 
-    // Optimistically update UI
     const updated = [newEntry, ...entries];
     setEntries(updated);
     localStorage.setItem('seedguard_history', JSON.stringify(updated));
     setNewNote('');
 
-    // Save to Supabase — awaited so we know if it succeeded
     if (isLoggedIn) {
       setSaving(true);
       setSaveStatus('idle');
@@ -91,7 +188,6 @@ export default function History() {
       }
     }
 
-    // Relapse: reset streak in localStorage + cloud
     if (entryType === 'relapse') {
       const now = new Date().toISOString();
       localStorage.setItem('seedguard_streak_start', now);
@@ -139,9 +235,12 @@ export default function History() {
           History
         </h1>
         <p className="text-muted-foreground text-lg mt-2">
-          Review your past relapses and check-ins.
+          Track every victory and setback — the whole picture builds discipline.
         </p>
       </div>
+
+      {/* Calendar Heatmap */}
+      <CalendarHeatmap entries={entries} />
 
       {/* Log Entry */}
       <div className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-6 space-y-4 animate-scale-in">
@@ -210,7 +309,7 @@ export default function History() {
           </h2>
           {victories.length === 0 ? (
             <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
-              No wins or notes logged yet. Start your journey today!
+              No wins logged yet. Start your journey today!
             </div>
           ) : (
             <div className="space-y-3">
