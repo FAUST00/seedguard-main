@@ -27,6 +27,7 @@ import { BreathingTimer } from '@/components/breathing-timer';
 import { QuickLogSheet } from '@/components/quick-log-sheet';
 import { WeeklyChallenge } from '@/components/weekly-challenge';
 import { AccountabilityPartner } from '@/components/accountability-partner';
+import { pullGamification, pushGamification } from '@/lib/gamification-sync';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -170,6 +171,8 @@ export default function Dashboard() {
       streakStartRef.current = start;
       setStreakDisplayDate(start.toLocaleDateString());
       setLoading(false);
+      // Pull cloud gamification + merge (no-op when logged out / column absent)
+      if (user) pullGamification().catch(() => {});
     }
     init();
   }, []);
@@ -249,10 +252,13 @@ export default function Dashboard() {
   useEffect(() => {
     if (loading) return;
     completeQuest('hold');
-    const onQuest = () => setQuestBump((n) => n + 1);
+    const onQuest = () => {
+      setQuestBump((n) => n + 1);
+      if (hasAccount) pushGamification().catch(() => {}); // sync banked XP/claims
+    };
     window.addEventListener('seedguard:quests', onQuest);
     return () => window.removeEventListener('seedguard:quests', onQuest);
-  }, [loading]);
+  }, [loading, hasAccount]);
 
   const handleSaveStreak = async () => {
     if (!editDateInput) return;

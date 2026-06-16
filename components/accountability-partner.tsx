@@ -7,6 +7,12 @@ import {
   getPartner, setPartner, clearPartner, checkInToday, checkedInToday, checkinStreak,
   type Partner,
 } from '@/lib/partner';
+import { QUEST_EVENT } from '@/lib/quests';
+
+/** Notify listeners (dashboard cloud-sync) that partner data changed. */
+function notifyChange() {
+  window.dispatchEvent(new CustomEvent(QUEST_EVENT));
+}
 
 /**
  * Accountability partner card. Local-first: name a partner and log daily
@@ -37,11 +43,13 @@ export function AccountabilityPartner() {
     setPartner(name);
     setName('');
     refresh();
+    notifyChange();
   };
 
   const handleCheckIn = () => {
     checkInToday();
     refresh();
+    notifyChange();
   };
 
   return (
@@ -79,7 +87,7 @@ export function AccountabilityPartner() {
               </p>
             </div>
             <button
-              onClick={() => { clearPartner(); refresh(); }}
+              onClick={() => { clearPartner(); refresh(); notifyChange(); }}
               aria-label="Remove partner"
               className="text-muted-foreground/50 hover:text-destructive transition-colors p-1"
             >
