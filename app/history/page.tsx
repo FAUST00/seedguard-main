@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   Flame, ShieldCheck, Plus, Trash2, CheckCircle2, AlertCircle,
-  ChevronDown, ChevronUp, Search, X,
+  ChevronDown, Search, X,
 } from 'lucide-react';
 import {
   syncWithCloud,
@@ -114,8 +114,6 @@ function CalendarHeatmap({ entries }: { entries: HistoryEntry[] }) {
 }
 
 // ── Collapsible log entry ─────────────────────────────────────────────────────
-const PREVIEW_LEN = 80;
-
 function LogEntry({
   entry,
   onDelete,
@@ -128,52 +126,76 @@ function LogEntry({
   onToggle: () => void;
 }) {
   const isVictory = entry.type === 'victory';
-  const borderColor = isVictory ? 'border-secondary/20 hover:border-secondary/50' : 'border-destructive/20 hover:border-destructive/50';
-  const noteText = entry.note || (isVictory ? '' : 'Relapse recorded');
-  const isLong = noteText.length > PREVIEW_LEN;
+  const noteText = entry.note || (isVictory ? 'Victory logged' : 'Relapse recorded');
+  const PREVIEW = 55;
 
   return (
-    <div className={`rounded-lg border ${borderColor} bg-background/50 transition-all group`}>
-      {/* Header row — always visible */}
+    <div className={`rounded-xl border overflow-hidden transition-colors ${
+      isVictory ? 'border-secondary/20 hover:border-secondary/35' : 'border-destructive/20 hover:border-destructive/35'
+    }`}>
+      {/* ── Clickable accordion header ── */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-3 p-4 text-left"
         aria-expanded={expanded}
+        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
+          isVictory
+            ? 'bg-secondary/5 hover:bg-secondary/10'
+            : 'bg-destructive/5 hover:bg-destructive/10'
+        }`}
       >
-        <span className={`flex-shrink-0 w-2 h-2 rounded-full ${isVictory ? 'bg-emerald-400' : 'bg-red-400'}`} aria-hidden />
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-muted-foreground/60 mb-0.5">{entry.date}</p>
-          <p className="text-sm text-foreground truncate">
-            {isLong && !expanded
-              ? noteText.slice(0, PREVIEW_LEN) + '…'
-              : noteText || <span className="text-muted-foreground/40 italic">No note</span>}
-          </p>
-        </div>
-        {isLong && (
-          <span className="flex-shrink-0 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors">
-            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </span>
-        )}
+        {/* Type badge */}
+        <span className={`flex-shrink-0 text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+          isVictory
+            ? 'bg-secondary/15 text-secondary border-secondary/30'
+            : 'bg-destructive/15 text-destructive border-destructive/30'
+        }`}>
+          {isVictory ? '✓ Win' : '✕ Relapse'}
+        </span>
+
+        {/* Date */}
+        <span className="flex-shrink-0 text-[10px] text-muted-foreground/50 hidden sm:block">
+          {entry.date}
+        </span>
+
+        {/* Note preview */}
+        <span className="flex-1 text-xs text-foreground/75 truncate min-w-0">
+          {noteText.length > PREVIEW ? noteText.slice(0, PREVIEW) + '…' : noteText}
+        </span>
+
+        {/* Rotating chevron */}
+        <ChevronDown
+          className={`w-4 h-4 flex-shrink-0 text-muted-foreground/40 transition-transform duration-200 ${
+            expanded ? 'rotate-180' : ''
+          }`}
+          aria-hidden
+        />
       </button>
 
-      {/* Expanded content */}
-      {expanded && isLong && (
-        <div className="px-4 pb-4 pt-0 border-t border-muted/10 mt-0">
-          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{noteText}</p>
+      {/* ── Expanded body — smooth max-height transition ── */}
+      <div
+        className="overflow-hidden transition-all duration-300 ease-in-out"
+        style={{ maxHeight: expanded ? '500px' : '0px' }}
+      >
+        <div className={`px-4 py-4 border-t space-y-3 ${
+          isVictory ? 'border-secondary/10 bg-secondary/3' : 'border-destructive/10 bg-destructive/3'
+        }`}>
+          {/* Full date on mobile */}
+          <p className="text-[10px] text-muted-foreground/50 sm:hidden">{entry.date}</p>
+          {/* Full note */}
+          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+            {noteText}
+          </p>
+          {/* Delete */}
+          <div className="flex justify-end pt-1">
+            <button
+              onClick={() => onDelete(entry.id)}
+              className="flex items-center gap-1.5 text-xs text-destructive/50 hover:text-destructive transition-colors px-3 py-1.5 rounded-lg hover:bg-destructive/10"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Delete entry
+            </button>
+          </div>
         </div>
-      )}
-
-      {/* Delete button — shown when expanded */}
-      {expanded && (
-        <div className="px-4 pb-4 flex justify-end">
-          <button
-            onClick={() => onDelete(entry.id)}
-            className="flex items-center gap-1 text-xs text-destructive/60 hover:text-destructive transition-colors px-2 py-1 rounded hover:bg-destructive/10"
-          >
-            <Trash2 className="w-3.5 h-3.5" /> Delete
-          </button>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -480,6 +502,7 @@ export default function History() {
           <h2 className="text-xl font-bold uppercase tracking-widest flex items-center gap-2 text-secondary neon-text-cyan">
             <ShieldCheck className="w-6 h-6" />
             Victories &amp; Notes
+            <span className="text-sm font-semibold text-secondary/60 normal-case tracking-normal">({victories.length})</span>
           </h2>
           {victories.length === 0 ? (
             <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
@@ -504,6 +527,7 @@ export default function History() {
           <h2 className="text-xl font-bold uppercase tracking-widest flex items-center gap-2 text-destructive">
             <Flame className="w-6 h-6" />
             Relapse Log
+            <span className="text-sm font-semibold text-destructive/60 normal-case tracking-normal">({relapses.length})</span>
           </h2>
           {relapses.length === 0 ? (
             <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">

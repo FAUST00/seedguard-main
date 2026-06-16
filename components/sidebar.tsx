@@ -74,12 +74,12 @@ export function Sidebar() {
         {/* Logo */}
         <div className={`flex items-center ${collapsed ? 'justify-center' : ''}`}>
           {collapsed ? (
-            <Link href="/" className="flex items-center justify-center w-8 h-8 hover:opacity-80 transition-opacity" aria-label="SeedGuard home">
-              <span className="text-xl">🛡️</span>
+            <Link href="/" className="hover:opacity-80 transition-opacity" aria-label="SeedGuard home">
+              <SeedGuardLogo collapsed />
             </Link>
           ) : (
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <SeedGuardLogo size="md" showTagline />
+              <SeedGuardLogo size="md" />
             </Link>
           )}
           {isAnonMode && !collapsed && (
