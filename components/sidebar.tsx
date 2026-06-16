@@ -130,8 +130,11 @@ export function Sidebar() {
 
       {/* ── Mobile Header ─────────────────────────────────────────────── */}
       <div className="md:hidden flex items-center justify-between h-14 px-4 border-b border-primary/10 glass-effect sticky top-0 z-50">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <SeedGuardLogo size="sm" showTagline={false} />
+          <span className="font-black text-sm tracking-[0.2em] uppercase text-[#ff2d9b] drop-shadow-[0_0_8px_rgba(255,45,155,0.7)]">
+            SEEDGUARD
+          </span>
         </Link>
         {isAnonMode && (
           <span className="flex items-center gap-1 text-[10px] text-muted-foreground/60 mr-auto ml-3">

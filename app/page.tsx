@@ -34,23 +34,20 @@ export default function Home() {
 
         {/* ── Left column — brand + CTA ─────────────────────────────────── */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-6 flex-1">
-          {/* Logo */}
-          <div className="animate-scale-in">
+          {/* Hero card — logo, title, description */}
+          <div className="animate-scale-in w-full rounded-2xl bg-black/45 backdrop-blur-md border border-primary/20 shadow-2xl shadow-primary/10 p-6 md:p-8 flex flex-col items-center md:items-start space-y-4">
             <SeedGuardLogo size="lg" />
+
+            <h1 className="text-4xl md:text-5xl font-black uppercase tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-[#00e5ff] to-[#ff2d9b] drop-shadow-[0_0_18px_rgba(0,229,255,0.55)] leading-none">
+              SEEDGUARD
+            </h1>
+
+            <p className="text-foreground/90 text-base md:text-lg leading-relaxed font-medium max-w-sm">
+              Your private tracker to reclaim your freedom and build unbreakable discipline.
+            </p>
+
+            <UserCountBadge />
           </div>
-
-          {/* Tagline */}
-          <p className="text-xs text-muted-foreground/60 uppercase tracking-widest -mt-2">
-            NoFap &amp; PMO Freedom Tracker
-          </p>
-
-          {/* Animated tagline */}
-          <p className="text-foreground/90 text-base md:text-lg leading-relaxed font-medium max-w-sm">
-            Your private tracker to reclaim your freedom and build unbreakable discipline.
-          </p>
-
-          {/* Social proof */}
-          <UserCountBadge />
 
           {/* Primary CTA */}
           <Link

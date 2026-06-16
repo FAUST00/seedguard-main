@@ -40,7 +40,7 @@ export function SeedGuardLogo({ size = 'md', collapsed = false }: SeedGuardLogoP
       <img
         src={LOGO_SRC}
         alt="SeedGuard"
-        style={{ width: 280, height: 'auto', display: 'block', flexShrink: 0 }}
+        style={{ width: 380, height: 'auto', display: 'block', flexShrink: 0, maxWidth: '90vw' }}
       />
     );
   }
