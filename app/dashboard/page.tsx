@@ -25,6 +25,8 @@ import { MOODS, todayMoodKey } from '@/lib/mood';
 import { Confetti } from '@/components/confetti';
 import { BreathingTimer } from '@/components/breathing-timer';
 import { QuickLogSheet } from '@/components/quick-log-sheet';
+import { WeeklyChallenge } from '@/components/weekly-challenge';
+import { AccountabilityPartner } from '@/components/accountability-partner';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -564,6 +566,12 @@ export default function Dashboard() {
 
       {/* ── Daily Quests ──────────────────────────────────────────────── */}
       <QuestBoard />
+
+      {/* ── Weekly Challenge + Accountability ─────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <WeeklyChallenge />
+        <AccountabilityPartner />
+      </div>
 
       {/* ── Recovery Visualization ────────────────────────────────────── */}
       <MilestoneRoadmap currentStreak={timer.days} />
