@@ -46,11 +46,12 @@ function WikiImage({
             src={src}
             alt={alt}
             loading="lazy"
+            decoding="async"
             className="w-full block"
             style={{ height: maxImgHeight, objectFit: 'cover', objectPosition: 'top center' }}
           />
         ) : (
-          <img src={src} alt={alt} className="w-full h-auto block" loading="lazy" />
+          <img src={src} alt={alt} className="w-full h-auto block" loading="lazy" decoding="async" />
         )}
       </button>
       <figcaption className="mt-1.5 text-[10px] text-muted-foreground/60 leading-snug text-center px-0.5">

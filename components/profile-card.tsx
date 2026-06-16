@@ -147,6 +147,7 @@ export function ProfileCard({ entry, children }: Props) {
               alt={`${entry.username} avatar`}
               className="w-full h-full rounded-full object-cover"
               loading="lazy"
+              decoding="async"
             />
           ) : initial}
         </div>

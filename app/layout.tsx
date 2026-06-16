@@ -1,6 +1,16 @@
 import type { Metadata, Viewport } from 'next';
+import { Orbitron } from 'next/font/google';
 import './globals.css';
 import { Sidebar } from '@/components/sidebar';
+
+// Self-hosted display font (replaces the render-blocking Google Fonts <link>).
+// Exposed as --font-orbitron; globals.css feeds it into --font-display.
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  weight: ['500', '700', '900'],
+  variable: '--font-orbitron',
+  display: 'swap',
+});
 import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/toast';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -67,14 +77,8 @@ try {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" className={`dark ${orbitron.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap"
-          rel="stylesheet"
-        />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased">

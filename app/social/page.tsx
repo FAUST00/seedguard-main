@@ -51,7 +51,7 @@ function Avatar({
       aria-hidden
     >
       {avatarUrl ? (
-        <img src={avatarUrl} alt="" className="w-full h-full rounded-full object-cover" loading="lazy" />
+        <img src={avatarUrl} alt="" className="w-full h-full rounded-full object-cover" loading="lazy" decoding="async" />
       ) : (
         username.charAt(0).toUpperCase()
       )}

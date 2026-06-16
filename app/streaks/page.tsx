@@ -79,7 +79,7 @@ function LeaderboardRow({ entry, rank }: { entry: StreakEntry; rank: number }) {
           style={{ borderColor: 'hsl(var(--primary) / 0.45)' }}
         >
           {entry.avatar_url ? (
-            <img src={entry.avatar_url} alt="" className="w-full h-full rounded-full object-cover" loading="lazy" />
+            <img src={entry.avatar_url} alt="" className="w-full h-full rounded-full object-cover" loading="lazy" decoding="async" />
           ) : initial}
         </div>
       </ProfileCard>
