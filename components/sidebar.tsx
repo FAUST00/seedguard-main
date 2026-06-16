@@ -78,8 +78,11 @@ export function Sidebar() {
               <SeedGuardLogo collapsed />
             </Link>
           ) : (
-            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <SeedGuardLogo size="md" />
+            <Link href="/" className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity w-full">
+              <SeedGuardLogo size="sm" />
+              <span className="font-black text-base tracking-[0.25em] uppercase text-[#ff2d9b] drop-shadow-[0_0_10px_rgba(255,45,155,0.8)]">
+                SEEDGUARD
+              </span>
             </Link>
           )}
           {isAnonMode && !collapsed && (
