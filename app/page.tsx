@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { Shield, ArrowRight, Trophy, Flame, Lock } from 'lucide-react';
+import { ArrowRight, Trophy, Flame } from 'lucide-react';
 import { ART } from '@/lib/assets';
 import { UserCountBadge } from '@/components/user-count';
+import { SeedGuardLogo } from '@/components/seedguard-logo';
 
 const TAGLINES = [
   'Day 1 is today.',
@@ -33,20 +34,15 @@ export default function Home() {
 
         {/* ── Left column — brand + CTA ─────────────────────────────────── */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-6 flex-1">
-          {/* Shield icon */}
-          <div className="rounded-full bg-primary/20 p-5 neon-box-pink animate-scale-in">
-            <Shield className="h-14 w-14 text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.8)]" aria-hidden />
+          {/* Logo */}
+          <div className="animate-scale-in">
+            <SeedGuardLogo size="lg" />
           </div>
 
-          {/* Headline */}
-          <div>
-            <h1 className="text-5xl md:text-6xl font-display font-extrabold tracking-tight neon-text-cyan text-secondary uppercase italic">
-              SeedGuard
-            </h1>
-            <p className="text-xs text-muted-foreground/60 uppercase tracking-widest mt-1">
-              NoFap &amp; PMO Freedom Tracker
-            </p>
-          </div>
+          {/* Tagline */}
+          <p className="text-xs text-muted-foreground/60 uppercase tracking-widest -mt-2">
+            NoFap &amp; PMO Freedom Tracker
+          </p>
 
           {/* Animated tagline */}
           <p className="text-foreground/90 text-base md:text-lg leading-relaxed font-medium max-w-sm">

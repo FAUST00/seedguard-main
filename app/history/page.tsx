@@ -343,6 +343,26 @@ export default function History() {
     setAllExpanded(!allExpanded);
   };
 
+  // Section-level expand/collapse helpers
+  const toggleSection = (type: 'victory' | 'relapse') => {
+    const sectionIds = filteredEntries.filter(e => e.type === type).map(e => e.id);
+    const allSectionExpanded = sectionIds.every(id => expandedIds.has(id));
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (allSectionExpanded) {
+        sectionIds.forEach(id => next.delete(id));
+      } else {
+        sectionIds.forEach(id => next.add(id));
+      }
+      return next;
+    });
+  };
+
+  const isSectionExpanded = (type: 'victory' | 'relapse') => {
+    const sectionIds = filteredEntries.filter(e => e.type === type).map(e => e.id);
+    return sectionIds.length > 0 && sectionIds.every(id => expandedIds.has(id));
+  };
+
   // Filtered + searched entries
   const filteredEntries = useMemo(() => {
     const now = Date.now();
@@ -499,11 +519,22 @@ export default function History() {
       {/* History Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-4 animate-scale-in">
-          <h2 className="text-xl font-bold uppercase tracking-widest flex items-center gap-2 text-secondary neon-text-cyan">
-            <ShieldCheck className="w-6 h-6" />
-            Victories &amp; Notes
-            <span className="text-sm font-semibold text-secondary/60 normal-case tracking-normal">({victories.length})</span>
-          </h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xl font-bold uppercase tracking-widest flex items-center gap-2 text-secondary neon-text-cyan">
+              <ShieldCheck className="w-6 h-6" />
+              Victories &amp; Notes
+              <span className="text-sm font-semibold text-secondary/60 normal-case tracking-normal">({victories.length})</span>
+            </h2>
+            {victories.length > 0 && (
+              <button
+                onClick={() => toggleSection('victory')}
+                className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-secondary/60 hover:text-secondary border border-secondary/25 hover:border-secondary/50 px-3 py-1.5 rounded-lg transition-all flex-shrink-0"
+              >
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isSectionExpanded('victory') ? 'rotate-180' : ''}`} />
+                {isSectionExpanded('victory') ? 'Collapse All' : 'Expand All'}
+              </button>
+            )}
+          </div>
           {victories.length === 0 ? (
             <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
               {entries.length === 0 ? 'No wins logged yet. Start your journey today!' : 'No victories match this filter.'}
@@ -524,11 +555,22 @@ export default function History() {
         </div>
 
         <div className="space-y-4 animate-scale-in [animation-delay:100ms]">
-          <h2 className="text-xl font-bold uppercase tracking-widest flex items-center gap-2 text-destructive">
-            <Flame className="w-6 h-6" />
-            Relapse Log
-            <span className="text-sm font-semibold text-destructive/60 normal-case tracking-normal">({relapses.length})</span>
-          </h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xl font-bold uppercase tracking-widest flex items-center gap-2 text-destructive">
+              <Flame className="w-6 h-6" />
+              Relapse Log
+              <span className="text-sm font-semibold text-destructive/60 normal-case tracking-normal">({relapses.length})</span>
+            </h2>
+            {relapses.length > 0 && (
+              <button
+                onClick={() => toggleSection('relapse')}
+                className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-destructive/60 hover:text-destructive border border-destructive/25 hover:border-destructive/50 px-3 py-1.5 rounded-lg transition-all flex-shrink-0"
+              >
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isSectionExpanded('relapse') ? 'rotate-180' : ''}`} />
+                {isSectionExpanded('relapse') ? 'Collapse All' : 'Expand All'}
+              </button>
+            )}
+          </div>
           {relapses.length === 0 ? (
             <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">
               {entries.length === 0 ? 'No relapses logged yet. Keep it up!' : 'No relapses match this filter.'}

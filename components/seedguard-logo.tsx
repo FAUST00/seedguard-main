@@ -2,28 +2,26 @@
 
 import { asset } from '@/lib/assets';
 
+// 1220×720 transparent-background PNG (watermark removed)
 const LOGO_SRC = asset('/images/logo.png');
+// Aspect ratio: 1220/720 = 1.694
 
 interface SeedGuardLogoProps {
-  /** sm = mobile header (height-constrained), md = desktop sidebar, lg = large context */
   size?: 'sm' | 'md' | 'lg';
-  /** Kept for API compat — text is baked into the logo image */
-  showTagline?: boolean;
-  /** When true, renders a cropped square showing only the shield icon */
-  collapsed?: boolean;
+  showTagline?: boolean; // kept for API compat — text is baked into image
+  collapsed?: boolean;   // collapsed sidebar: crop to shield icon only
 }
 
 export function SeedGuardLogo({ size = 'md', collapsed = false }: SeedGuardLogoProps) {
   if (collapsed) {
-    // Collapsed sidebar: crop to shield icon only.
-    // Image is 1331×784. At 210px rendered width → 124px tall.
-    // Shield is horizontally centered (~105px from left) and vertically at ~40% (~50px).
-    // To show a 38×38 crop centered on the shield:
-    //   marginLeft = -(105 - 19) = -86px
-    //   marginTop  = -(50  - 19) = -31px
+    // Show a 38×38 crop centered on the shield emblem only.
+    // At 200px rendered width → 118px tall.
+    // Shield center ≈ (50%, 35%) → (100px, 41px).
+    // marginLeft = -(100 - 19) = -81px
+    // marginTop  = -(41  - 19) = -22px
     return (
       <div
-        className="overflow-hidden rounded-lg flex-shrink-0 drop-shadow-[0_0_8px_hsl(315_100%_60%/0.5)]"
+        className="overflow-hidden rounded-lg flex-shrink-0"
         style={{ width: 38, height: 38 }}
         role="img"
         aria-label="SeedGuard"
@@ -33,11 +31,11 @@ export function SeedGuardLogo({ size = 'md', collapsed = false }: SeedGuardLogoP
           alt=""
           aria-hidden
           style={{
-            width: 210,
+            width: 200,
             height: 'auto',
             display: 'block',
-            marginLeft: -86,
-            marginTop: -31,
+            marginLeft: -81,
+            marginTop: -22,
           }}
         />
       </div>
@@ -45,24 +43,23 @@ export function SeedGuardLogo({ size = 'md', collapsed = false }: SeedGuardLogoP
   }
 
   if (size === 'sm') {
-    // Mobile header — constrain by height so it fits in h-14 (56px) header
+    // Mobile header — fixed 40px height so it fits in the h-14 (56px) top bar
     return (
       <img
         src={LOGO_SRC}
         alt="SeedGuard"
-        style={{ height: 38, width: 'auto', display: 'block', flexShrink: 0 }}
-        className="drop-shadow-[0_0_10px_hsl(315_100%_60%/0.4)]"
+        style={{ height: 40, width: 'auto', display: 'block', flexShrink: 0 }}
       />
     );
   }
 
   if (size === 'lg') {
+    // Landing page hero — wide, prominent
     return (
       <img
         src={LOGO_SRC}
         alt="SeedGuard"
-        style={{ width: 220, height: 'auto', display: 'block', flexShrink: 0 }}
-        className="drop-shadow-[0_0_14px_hsl(315_100%_60%/0.5)]"
+        style={{ width: 240, height: 'auto', display: 'block', flexShrink: 0 }}
       />
     );
   }
@@ -72,8 +69,7 @@ export function SeedGuardLogo({ size = 'md', collapsed = false }: SeedGuardLogoP
     <img
       src={LOGO_SRC}
       alt="SeedGuard"
-      style={{ width: 174, height: 'auto', display: 'block', flexShrink: 0 }}
-      className="drop-shadow-[0_0_12px_hsl(315_100%_60%/0.45)]"
+      style={{ width: 172, height: 'auto', display: 'block', flexShrink: 0 }}
     />
   );
 }
