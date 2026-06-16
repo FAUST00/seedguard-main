@@ -15,6 +15,10 @@ import { XpBar } from '@/components/xp-bar';
 import { QuestBoard } from '@/components/quest-board';
 import { computeXp, levelFromXp, type LevelInfo } from '@/lib/xp';
 import { completeQuest, getQuestXp } from '@/lib/quests';
+import { RecoveryHeatmap } from '@/components/recovery-heatmap';
+import { RecoveryScore } from '@/components/recovery-score';
+import { WeeklyTrend } from '@/components/weekly-trend';
+import { MilestoneRoadmap } from '@/components/milestone-roadmap';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -814,6 +818,14 @@ export default function Dashboard() {
 
       {/* ── Daily Quests ──────────────────────────────────────────────── */}
       <QuestBoard />
+
+      {/* ── Recovery Visualization ────────────────────────────────────── */}
+      <MilestoneRoadmap currentStreak={timer.days} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <RecoveryScore />
+        <WeeklyTrend />
+      </div>
+      <RecoveryHeatmap />
 
       {/* ── Badges ────────────────────────────────────────────────────── */}
       {earnedBadges.length > 0 && (
