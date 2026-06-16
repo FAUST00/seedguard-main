@@ -259,6 +259,26 @@ export function subscribeToConversation(
 }
 
 /**
+ * Subscribe to ALL incoming messages for the current user (any sender) — used
+ * to surface browser notifications for DMs / accountability nudges app-wide.
+ * @returns Unsubscribe function.
+ */
+export function subscribeToInbox(
+  myId: string,
+  onMessage: (msg: DirectMessage) => void
+): () => void {
+  const channel = supabase
+    .channel(`inbox:${myId}`)
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages', filter: `recipient=eq.${myId}` },
+      (payload) => onMessage(payload.new as DirectMessage)
+    )
+    .subscribe();
+  return () => { channel.unsubscribe(); };
+}
+
+/**
  * Subscribe to incoming friend requests.
  * @returns Unsubscribe function.
  */

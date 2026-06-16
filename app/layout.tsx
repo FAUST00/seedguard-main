@@ -15,6 +15,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/toast';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { SynthBackground } from '@/components/synth-background';
+import { NotificationListener } from '@/components/notification-listener';
 
 export const metadata: Metadata = {
   // Origin for resolving OG/Twitter image URLs. The image paths already carry
@@ -85,6 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <ToastProvider>
             <SynthBackground />
+            <NotificationListener />
             <div className="relative z-10 min-h-screen flex flex-col md:flex-row">
               <Sidebar />
               {/* pb-20 on mobile leaves room for the fixed bottom tab bar */}

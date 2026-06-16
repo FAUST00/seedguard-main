@@ -21,6 +21,7 @@ import { ART } from '@/lib/assets';
 import { getUser, resetStreakInCloud } from '@/lib/sync';
 import { playSound } from '@/lib/sound';
 import { supabase } from '@/lib/supabase';
+import { notificationsSupported, getPermission, requestPermission, showLocalNotification } from '@/lib/notifications';
 
 const DELETION_PHRASE = 'delete my account';
 
@@ -45,6 +46,7 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
   const [showDeletePanel, setShowDeletePanel] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
+  const [notifPerm, setNotifPerm] = useState<NotificationPermission | 'unsupported'>('default');
 
   useEffect(() => {
     try {
@@ -52,7 +54,19 @@ export default function SettingsPage() {
       if (saved) setSettings(JSON.parse(saved));
     } catch {}
     getUser().then((u) => setHasAccount(!!u));
+    setNotifPerm(notificationsSupported() ? getPermission() : 'unsupported');
   }, []);
+
+  async function handleEnableNotifications() {
+    const perm = await requestPermission();
+    setNotifPerm(perm);
+    if (perm === 'granted') {
+      showLocalNotification('Notifications on', 'You’ll get alerts for nudges and messages while SeedGuard is open.');
+      toast('Notifications enabled.', 'success');
+    } else if (perm === 'denied') {
+      toast('Notifications blocked. Enable them in your browser settings.', 'error');
+    }
+  }
 
   function updateSettings(key: keyof SettingsState, value: boolean) {
     const updated = { ...settings, [key]: value };
@@ -242,12 +256,27 @@ export default function SettingsPage() {
           Notifications
         </h2>
         <div className="space-y-4">
-          <ToggleSwitch
-            id="push-notifs"
-            label="Push Notifications"
-            checked={settings.notifications}
-            onChange={(v) => updateSettings('notifications', v)}
-          />
+          {/* Browser notifications — real permission-backed opt-in */}
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="font-medium">Browser Notifications</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Alerts for nudges &amp; messages while SeedGuard is open.</p>
+            </div>
+            {notifPerm === 'unsupported' ? (
+              <span className="text-xs text-muted-foreground/60">Not supported</span>
+            ) : notifPerm === 'granted' ? (
+              <span className="text-xs px-3 py-1.5 rounded-lg border border-secondary/40 bg-secondary/10 text-secondary font-semibold">✓ Enabled</span>
+            ) : notifPerm === 'denied' ? (
+              <span className="text-xs px-3 py-1.5 rounded-lg border border-destructive/40 bg-destructive/10 text-destructive font-semibold">Blocked</span>
+            ) : (
+              <button
+                onClick={handleEnableNotifications}
+                className="text-xs px-3 py-1.5 rounded-lg border border-secondary/50 bg-secondary/15 text-secondary font-bold hover:bg-secondary/25 transition-all"
+              >
+                Enable
+              </button>
+            )}
+          </div>
           <ToggleSwitch
             id="sound-effects"
             label="Sound Effects"
