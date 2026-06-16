@@ -20,6 +20,10 @@ import {
   Lock,
 } from 'lucide-react';
 import { SeedGuardLogo } from '@/components/seedguard-logo';
+import { XpBar } from '@/components/xp-bar';
+import { computeXp, levelFromXp, type LevelInfo } from '@/lib/xp';
+import { getQuestXp, QUEST_EVENT } from '@/lib/quests';
+import { computeEarnedBadgeIds } from '@/lib/badges';
 
 const navigationItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -46,6 +50,7 @@ export function Sidebar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [isAnonMode, setIsAnonMode] = useState(false);
+  const [levelInfo, setLevelInfo] = useState<LevelInfo | null>(null);
 
   useEffect(() => {
     try {
@@ -53,6 +58,32 @@ export function Sidebar() {
       setIsAnonMode(localStorage.getItem('seedguard_anon_mode') === '1');
     } catch {}
   }, []);
+
+  // Compute level from stored progress; refresh on quest completions + nav.
+  useEffect(() => {
+    const recompute = () => {
+      try {
+        const stats = JSON.parse(localStorage.getItem('seedguard_stats') || '{}');
+        const history = JSON.parse(localStorage.getItem('seedguard_history') || '[]');
+        const totalDays = Number(stats.totalDays) || 0;
+        const longestStreak = Number(stats.longestStreak) || 0;
+        const entryCount = Array.isArray(history) ? history.length : 0;
+        const badgeCount = computeEarnedBadgeIds({
+          streak: Number(stats.currentStreak) || 0,
+          totalDays,
+          relapses: Number(stats.relapses) || 0,
+          entryCount,
+        }).length;
+        const xp = computeXp({ totalDays, longestStreak, entryCount, badgeCount, questXp: getQuestXp() });
+        setLevelInfo(levelFromXp(xp));
+      } catch {
+        setLevelInfo(levelFromXp(0));
+      }
+    };
+    recompute();
+    window.addEventListener(QUEST_EVENT, recompute);
+    return () => window.removeEventListener(QUEST_EVENT, recompute);
+  }, [pathname]);
 
   const toggleCollapse = () => {
     const next = !collapsed;
@@ -91,6 +122,13 @@ export function Sidebar() {
             </span>
           )}
         </div>
+
+        {/* Level / XP — expanded only */}
+        {!collapsed && levelInfo && (
+          <Link href="/dashboard" className="block hover:opacity-90 transition-opacity" aria-label={`Level ${levelInfo.level} — ${levelInfo.title}`}>
+            <XpBar info={levelInfo} variant="compact" />
+          </Link>
+        )}
 
         {/* Nav items */}
         <nav className="flex flex-col gap-1 flex-1" aria-label="Main navigation">

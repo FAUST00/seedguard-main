@@ -11,6 +11,10 @@ import { syncWithCloud, getStreakFromCloud, getUser } from '@/lib/sync';
 import { playSound } from '@/lib/sound';
 import { ALL_BADGES, computeEarnedBadgeIds, type BadgeStats } from '@/lib/badges';
 import { StatCard, PageHeader, SectionHeading } from '@/components/ui';
+import { XpBar } from '@/components/xp-bar';
+import { QuestBoard } from '@/components/quest-board';
+import { computeXp, levelFromXp, type LevelInfo } from '@/lib/xp';
+import { completeQuest, getQuestXp } from '@/lib/quests';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -214,6 +218,11 @@ function BreathingTimer() {
     return () => clearTimeout(id);
   }, [tick, phaseIdx]);
 
+  // Finishing one full breathing cycle completes the daily "breathe" quest
+  useEffect(() => {
+    if (cycles >= 1) completeQuest('breathe');
+  }, [cycles]);
+
   const phase = BREATH_PHASES[phaseIdx];
   const pct = tick / phase.secs;
   const circumference = 2 * Math.PI * 52;
@@ -371,6 +380,10 @@ export default function Dashboard() {
   // Badges
   const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
 
+  // XP / level
+  const [levelInfo, setLevelInfo] = useState<LevelInfo>(() => levelFromXp(0));
+  const [questBump, setQuestBump] = useState(0); // increments when a quest completes → recomputes XP
+
   const prevDaysRef = useRef(0);
   const streakStartRef = useRef<Date | null>(null);
 
@@ -464,9 +477,30 @@ export default function Dashboard() {
       relapses: updated.relapses,
       entryCount,
     };
-    setEarnedBadgeIds(computeEarnedBadgeIds(badgeStats));
+    const badgeIds = computeEarnedBadgeIds(badgeStats);
+    setEarnedBadgeIds(badgeIds);
+
+    // XP / level — derived from progress + banked quest XP
+    const xp = computeXp({
+      totalDays: updated.totalDays,
+      longestStreak: updated.longestStreak,
+      entryCount,
+      badgeCount: badgeIds.length,
+      questXp: getQuestXp(),
+    });
+    setLevelInfo(levelFromXp(xp));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timer.days, loading]);
+  }, [timer.days, loading, questBump]);
+
+  // Just showing up and holding the streak completes the daily "hold" quest;
+  // any quest completion bumps a counter so XP recomputes with fresh stats.
+  useEffect(() => {
+    if (loading) return;
+    completeQuest('hold');
+    const onQuest = () => setQuestBump((n) => n + 1);
+    window.addEventListener('seedguard:quests', onQuest);
+    return () => window.removeEventListener('seedguard:quests', onQuest);
+  }, [loading]);
 
   const handleSaveStreak = async () => {
     if (!editDateInput) return;
@@ -484,6 +518,7 @@ export default function Dashboard() {
     setTodayMood(value);
     localStorage.setItem(todayKey(), String(value));
     setShowMood(false);
+    completeQuest('checkin');
   };
 
   const { prev: ringPrev, next: ringNext, pct: ringPct } = getRingProgress(timer.days);
@@ -680,6 +715,9 @@ export default function Dashboard() {
         }
       />
 
+      {/* ── XP / Level ────────────────────────────────────────────────── */}
+      <XpBar info={levelInfo} variant="full" className="animate-scale-in" />
+
       {/* ── SVG Progress Ring + Live Timer ────────────────────────────── */}
       <div className="rounded-xl border border-primary/30 bg-background/60 backdrop-blur-sm p-6 md:p-8 neon-box-pink animate-scale-in">
         <SectionHeading accent="primary" Icon={Clock} className="mb-6">Live Streak Timer</SectionHeading>
@@ -773,6 +811,9 @@ export default function Dashboard() {
           <StatCard key={s.label} {...s} index={i} />
         ))}
       </div>
+
+      {/* ── Daily Quests ──────────────────────────────────────────────── */}
+      <QuestBoard />
 
       {/* ── Badges ────────────────────────────────────────────────────── */}
       {earnedBadges.length > 0 && (
@@ -882,6 +923,7 @@ export default function Dashboard() {
           onClick={() => {
             playSound('click');
             setQuoteIndex((prev) => randomQuoteIndex(prev));
+            completeQuest('wisdom');
           }}
           className="mt-5 inline-flex items-center gap-1.5 text-xs text-secondary/70 hover:text-secondary font-bold uppercase tracking-wider transition-colors"
           aria-label="Next quote"
