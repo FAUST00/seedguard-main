@@ -1,137 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  SeedGuard Shield Icon  (sidebar collapsed state + mobile header)
-  ================================================================
-  Edit guide:
-    Shield border ......... stroke #00e5ff  (cyan)
-    Inner ring ............ stroke #7c3aed  (violet)
-    Iris fill ............. #5b21b6         (purple)
-    Corner accent dots .... #f0abfc         (magenta/pink)
-    Tentacles ............. #22d3ee (cyan) / #a855f7 (violet, bottom)
-    Background ............ transparent
+  SeedGuard Shield Icon — "Flat Crown"  (collapsed sidebar + mobile header)
+  =========================================================================
+  Shield silhouette ..... flat top, chamfered corners, point at bottom
+  Border ................ gradient cyan(top) -> magenta(bottom)  [#bord]
+  Crystal core .......... faceted cyan gem                       [#22d3ee]
+  Inner echo / scrolls .. magenta accents                        [#ff4db8]
+  Background ............ transparent
 
-  Shield polygon vertices  (center ~90,100  w≈130  h≈158):
-    Top-left 32,21  Top-right 148,21
-    Angle-R  162,45  Lower-R  162,137
-    Bottom   90,179
-    Lower-L  18,137  Angle-L  18,45
-
-  Eye ellipse: cx=90 cy=100 rx=39 ry=23
+  EDIT TIPS
+   - Change border colours: edit the <linearGradient id="bord"> stops.
+   - Change glow strength:   edit stdDeviation in <filter id="glow">.
+   - Shield shape:           edit <path id="shield"> (drawn around 0,0,
+                             then placed with translate(80,80)).
+   - Crystal:               the <g id="crystal-icon"> block near the bottom.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 200" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 176" fill="none">
   <defs>
-    <!-- Wide neon glow for shield border and eye sclera -->
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="5"  result="b1"/>
-      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="b2"/>
-      <feMerge>
-        <feMergeNode in="b2"/>
-        <feMergeNode in="b1"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <!-- Flat-crown shield, centred on (0,0): flat top, chamfered shoulders, point at bottom -->
+    <path id="shield" d="M -42,-50 L 42,-50 L 54,-30 L 54,6 C 52,34 36,60 0,86 C -36,60 -52,34 -54,6 L -54,-30 Z"/>
+    <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#00e5ff"/>
+      <stop offset="0.5" stop-color="#22d3ee"/>
+      <stop offset="1"   stop-color="#ff2d9b"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b2"/>
+      <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <!-- Tighter glow for iris and accent dots -->
-    <filter id="glow-sm" x="-40%" y="-40%" width="180%" height="180%">
+    <filter id="cglow" x="-60%" y="-60%" width="220%" height="220%">
       <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
-      <feMerge>
-        <feMergeNode in="b"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
-  <!-- ── SHIELD ──────────────────────────────────────────────────── -->
-  <!-- Render order: glow → opaque fill (masks inner glow) → crisp border -->
-  <polygon points="32,21 148,21 162,45 162,137 90,179 18,137 18,45"
-    stroke="#00e5ff" stroke-width="4" stroke-linejoin="round"
-    filter="url(#glow)" opacity="0.6"/>
-  <polygon points="32,21 148,21 162,45 162,137 90,179 18,137 18,45"
-    fill="#08051c"/>
-  <polygon points="32,21 148,21 162,45 162,137 90,179 18,137 18,45"
-    stroke="#00e5ff" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- ── SHIELD ── glow halo -> opaque dark fill -> crisp border -->
+  <use href="#shield" transform="translate(80,80)" fill="none" stroke="url(#bord)" stroke-width="3"   stroke-linejoin="round" filter="url(#glow)" opacity="0.85"/>
+  <use href="#shield" transform="translate(80,80)" fill="#070420" stroke="none"/>
+  <use href="#shield" transform="translate(80,80)" fill="none" stroke="url(#bord)" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- inner plating echo -->
+  <use href="#shield" transform="translate(80,80) scale(0.82)" fill="none" stroke="#ff4db8" stroke-width="1" stroke-opacity="0.32" stroke-linejoin="round"/>
 
-  <!-- Inner shield ring -->
-  <polygon points="41,34 139,34 151,54 151,131 90,166 29,131 29,54"
-    stroke="#7c3aed" stroke-width="0.8" stroke-linejoin="round" opacity="0.45"/>
+  <!-- Top decorative rule + corner / shoulder accent dots -->
+  <line x1="38" y1="30" x2="122" y2="30" stroke="#00e5ff" stroke-width="0.5" opacity="0.25"/>
+  <circle cx="38"  cy="30"  r="2.3" fill="#67e8f9" opacity="0.8"/>
+  <circle cx="122" cy="30"  r="2.3" fill="#67e8f9" opacity="0.8"/>
+  <circle cx="26"  cy="50"  r="2"   fill="#22d3ee" opacity="0.55"/>
+  <circle cx="134" cy="50"  r="2"   fill="#22d3ee" opacity="0.55"/>
+  <circle cx="80"  cy="166" r="2.5" fill="#ff2d9b" opacity="0.9"/>
 
-  <!-- Top decorative horizontal rules -->
-  <line x1="55"  y1="34" x2="125" y2="34" stroke="#00e5ff" stroke-width="0.4" opacity="0.22"/>
-  <line x1="58"  y1="38" x2="122" y2="38" stroke="#7c3aed" stroke-width="0.3" opacity="0.18"/>
+  <!-- Side scroll accents framing the crystal -->
+  <path d="M 48,68 Q 61,72 57,86 Q 54,98 48,104"   fill="none" stroke="#ff4db8" stroke-width="0.9" opacity="0.5"/>
+  <path d="M 112,68 Q 99,72 103,86 Q 106,98 112,104" fill="none" stroke="#ff4db8" stroke-width="0.9" opacity="0.5"/>
 
-  <!-- Vertex accent dots -->
-  <circle cx="32"  cy="21"  r="2.5" fill="#f0abfc" filter="url(#glow-sm)"/>
-  <circle cx="148" cy="21"  r="2.5" fill="#f0abfc" filter="url(#glow-sm)"/>
-  <circle cx="162" cy="45"  r="2"   fill="#00e5ff" opacity="0.65"/>
-  <circle cx="162" cy="137" r="2"   fill="#00e5ff" opacity="0.65"/>
-  <circle cx="90"  cy="179" r="2.5" fill="#a855f7" filter="url(#glow-sm)"/>
-  <circle cx="18"  cy="137" r="2"   fill="#00e5ff" opacity="0.65"/>
-  <circle cx="18"  cy="45"  r="2"   fill="#00e5ff" opacity="0.65"/>
-
-  <!-- Corner bracket circuit lines (top-left + top-right) -->
-  <polyline points="32,21 55,21 55,30"   stroke="#00e5ff" stroke-width="0.5" opacity="0.3"/>
-  <polyline points="148,21 125,21 125,30" stroke="#00e5ff" stroke-width="0.5" opacity="0.3"/>
-  <circle cx="55"  cy="30" r="0.9" fill="#00e5ff" opacity="0.5"/>
-  <circle cx="125" cy="30" r="0.9" fill="#00e5ff" opacity="0.5"/>
-
-  <!-- ── EYE CREATURE ─────────────────────────────────────────────── -->
-  <!-- Sclera: glow → fill → crisp border -->
-  <ellipse cx="90" cy="100" rx="39" ry="23"
-    stroke="#00e5ff" stroke-width="4" filter="url(#glow)" opacity="0.5"/>
-  <ellipse cx="90" cy="100" rx="39" ry="23" fill="#09071e"/>
-  <ellipse cx="90" cy="100" rx="39" ry="23" stroke="#00e5ff" stroke-width="1.5"/>
-
-  <!-- Upper eyelid arc -->
-  <path d="M 51,100 Q 90,72 129,100" stroke="#22d3ee" stroke-width="0.9" opacity="0.35"/>
-
-  <!-- Outer iris decorative ring -->
-  <circle cx="90" cy="100" r="27" stroke="#7c3aed" stroke-width="0.5" opacity="0.28"/>
-
-  <!-- Iris: glow → fill → crisp border -->
-  <circle cx="90" cy="100" r="20"
-    stroke="#7c3aed" stroke-width="4" filter="url(#glow-sm)" opacity="0.5"/>
-  <circle cx="90" cy="100" r="20" fill="#130840"/>
-  <circle cx="90" cy="100" r="20" stroke="#7c3aed" stroke-width="1.5"/>
-
-  <!-- Inner iris concentric ring -->
-  <circle cx="90" cy="100" r="16" stroke="#22d3ee" stroke-width="0.4" opacity="0.28"/>
-
-  <!-- Iris colour layers -->
-  <circle cx="90" cy="100" r="14" fill="#5b21b6" opacity="0.75"/>
-  <circle cx="90" cy="100" r="8.5" fill="#3b0764"/>
-
-  <!-- Vertical slit pupil -->
-  <ellipse cx="90" cy="100" rx="2.2" ry="5" fill="#07051a"/>
-
-  <!-- Highlights -->
-  <circle cx="84" cy="94"  r="3.2" fill="#ffffff" opacity="0.88"/>
-  <circle cx="96" cy="106" r="1.6" fill="#22d3ee" opacity="0.55"/>
-
-  <!-- ── TENTACLES (circuit style with elbow joints) ─────────────── -->
-  <!-- Left — from eye left edge (51, 100) -->
-  <polyline points="51,100 37,88  20,88"  stroke="#22d3ee" stroke-width="0.9" opacity="0.48"/>
-  <polyline points="51,100 21,100"         stroke="#22d3ee" stroke-width="0.9" opacity="0.48"/>
-  <polyline points="51,100 37,112 20,112" stroke="#22d3ee" stroke-width="0.9" opacity="0.48"/>
-  <circle cx="37" cy="88"  r="1.1" fill="#22d3ee" opacity="0.5"/>
-  <circle cx="37" cy="112" r="1.1" fill="#22d3ee" opacity="0.5"/>
-
-  <!-- Right — from eye right edge (129, 100) -->
-  <polyline points="129,100 143,88  160,88"  stroke="#22d3ee" stroke-width="0.9" opacity="0.48"/>
-  <polyline points="129,100 159,100"          stroke="#22d3ee" stroke-width="0.9" opacity="0.48"/>
-  <polyline points="129,100 143,112 160,112" stroke="#22d3ee" stroke-width="0.9" opacity="0.48"/>
-  <circle cx="143" cy="88"  r="1.1" fill="#22d3ee" opacity="0.5"/>
-  <circle cx="143" cy="112" r="1.1" fill="#22d3ee" opacity="0.5"/>
-
-  <!-- Top — from eye top (90, 77) -->
-  <polyline points="90,77 79,57 79,38"  stroke="#22d3ee" stroke-width="0.9" opacity="0.48"/>
-  <polyline points="90,77 90,35"         stroke="#22d3ee" stroke-width="0.9" opacity="0.48"/>
-  <polyline points="90,77 101,57 101,38" stroke="#22d3ee" stroke-width="0.9" opacity="0.48"/>
-  <circle cx="79"  cy="57" r="1.1" fill="#22d3ee" opacity="0.5"/>
-  <circle cx="101" cy="57" r="1.1" fill="#22d3ee" opacity="0.5"/>
-
-  <!-- Bottom — from eye bottom (90, 123) — violet to match bottom shield point -->
-  <polyline points="90,123 80,141 80,157"  stroke="#a855f7" stroke-width="0.9" opacity="0.48"/>
-  <polyline points="90,123 90,170"          stroke="#a855f7" stroke-width="0.9" opacity="0.48"/>
-  <polyline points="90,123 100,141 100,157" stroke="#a855f7" stroke-width="0.9" opacity="0.48"/>
-  <circle cx="80"  cy="141" r="1.1" fill="#a855f7" opacity="0.5"/>
-  <circle cx="100" cy="141" r="1.1" fill="#a855f7" opacity="0.5"/>
+  <!-- ── CRYSTAL CORE ── centred (80,82) -->
+  <g id="crystal-icon">
+    <polygon points="80,62 96,82 80,106 64,82" fill="none" stroke="#22d3ee" stroke-width="2.4" filter="url(#cglow)" opacity="0.8"/>
+    <polygon points="80,62 96,82 80,106 64,82" fill="#0c0820"/>
+    <polygon points="80,62 96,82 80,106 64,82" fill="none" stroke="#22d3ee" stroke-width="1.4"/>
+    <!-- crown facets -->
+    <line x1="80" y1="62" x2="73" y2="71" stroke="#22d3ee" stroke-width="0.7" opacity="0.7"/>
+    <line x1="80" y1="62" x2="87" y2="71" stroke="#22d3ee" stroke-width="0.7" opacity="0.7"/>
+    <line x1="73" y1="71" x2="87" y2="71" stroke="#22d3ee" stroke-width="0.6" opacity="0.55"/>
+    <line x1="73" y1="71" x2="64" y2="82" stroke="#22d3ee" stroke-width="0.5" opacity="0.45"/>
+    <line x1="87" y1="71" x2="96" y2="82" stroke="#22d3ee" stroke-width="0.5" opacity="0.45"/>
+    <!-- girdle -->
+    <line x1="64" y1="82" x2="96" y2="82" stroke="#22d3ee" stroke-width="0.6" opacity="0.5"/>
+    <!-- pavilion facets -->
+    <line x1="80" y1="106" x2="64" y2="82" stroke="#22d3ee" stroke-width="0.5" opacity="0.42"/>
+    <line x1="80" y1="106" x2="96" y2="82" stroke="#22d3ee" stroke-width="0.5" opacity="0.42"/>
+    <line x1="80" y1="106" x2="73" y2="82" stroke="#22d3ee" stroke-width="0.4" opacity="0.32"/>
+    <line x1="80" y1="106" x2="87" y2="82" stroke="#22d3ee" stroke-width="0.4" opacity="0.32"/>
+    <!-- centre line + highlights -->
+    <line x1="80" y1="62" x2="80" y2="106" stroke="#22d3ee" stroke-width="0.4" opacity="0.3"/>
+    <circle cx="75" cy="70" r="3"   fill="#ffffff" opacity="0.85"/>
+    <circle cx="84" cy="86" r="1.4" fill="#a5f3fc" opacity="0.55"/>
+  </g>
 </svg>
