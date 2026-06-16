@@ -14,6 +14,7 @@ import {
   type HistoryEntry,
 } from '@/lib/sync';
 import { PageHeader, EmptyState } from '@/components/ui';
+import { RecoveryHeatmap } from '@/components/recovery-heatmap';
 
 // ── Calendar Heatmap ─────────────────────────────────────────────────────────
 function toYMD(d: Date): string {
@@ -397,8 +398,11 @@ export default function History() {
         subtitle="Track every victory and setback — the whole picture builds discipline."
       />
 
-      {/* Calendar Heatmap */}
-      <CalendarHeatmap entries={entries} />
+      {/* Heatmaps — activity (victory/relapse) + recovery (clean/check-in) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+        <CalendarHeatmap entries={entries} />
+        <RecoveryHeatmap />
+      </div>
 
       {/* Log Entry */}
       <div className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-6 space-y-4 animate-scale-in">

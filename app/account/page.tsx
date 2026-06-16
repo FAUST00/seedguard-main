@@ -19,6 +19,7 @@ import { supabase } from '@/lib/supabase';
 import { playSound, unlockAudio } from '@/lib/sound';
 import { useToast } from '@/components/toast';
 import { AccountSkeleton } from '@/components/skeleton';
+import { EarnedBadges } from '@/components/earned-badges';
 import { ImageBanner } from '@/components/synth-background';
 import { ART } from '@/lib/assets';
 import { useRouter } from 'next/navigation';
@@ -351,6 +352,9 @@ export default function AccountPage() {
             Log Out
           </button>
         </div>
+
+        {/* Earned badges */}
+        <EarnedBadges />
 
         {/* Migrate local data */}
         <div className="rounded-2xl border border-accent/20 glass-effect p-8 space-y-4 animate-scale-in">
