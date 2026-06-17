@@ -33,14 +33,17 @@ export interface RecoveryInputs {
   recentMoodCount: number;    // mood check-ins in the last 14 days
 }
 
-/** Build a GitHub-style heatmap grid of the most recent `weeks` weeks. */
+/** Build a Monday-aligned GitHub-style heatmap grid of the most recent `weeks` weeks. */
 export function buildHeatmap(weeks: number, inp: RecoveryInputs): HeatCell[] {
   const total = weeks * 7;
   const nowMs = Date.now();
   const todayYmd = ymd(nowMs);
   const firstYmd = inp.firstDay ? ymd(inp.firstDay.getTime()) : null;
   const streakYmd = inp.streakStart ? ymd(inp.streakStart.getTime()) : null;
-  const startMs = nowMs - (total - 1) * DAY_MS;
+  // Align grid start to the Monday of the current week so row 0 is always Monday.
+  const todayDow = (new Date(nowMs).getDay() + 6) % 7; // 0=Mon … 6=Sun
+  const thisMonday = nowMs - todayDow * DAY_MS;
+  const startMs = thisMonday - (weeks - 1) * 7 * DAY_MS;
 
   const cells: HeatCell[] = [];
   for (let i = 0; i < total; i++) {
@@ -141,9 +144,20 @@ export function loadRecoveryInputs(): RecoveryInputs {
       if (moodDates.has(ymd(nowMs - i * DAY_MS))) recentMoodCount++;
     }
 
+    const streakStartDate = ss ? new Date(ss) : null;
+    // firstDay should never be later than streakStart — if it is (e.g. the key
+    // was written on a newer build install date rather than the real start), fall
+    // back to streakStart so the heatmap covers the full current streak.
+    let firstDayDate = fd ? new Date(fd) : null;
+    if (streakStartDate) {
+      if (!firstDayDate || firstDayDate > streakStartDate) {
+        firstDayDate = streakStartDate;
+      }
+    }
+
     return {
-      streakStart: ss ? new Date(ss) : null,
-      firstDay: fd ? new Date(fd) : null,
+      streakStart: streakStartDate,
+      firstDay: firstDayDate,
       currentStreak: Number(stats.currentStreak) || 0,
       longestStreak: Number(stats.longestStreak) || 0,
       relapses: Number(stats.relapses) || 0,

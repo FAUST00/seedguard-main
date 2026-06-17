@@ -104,7 +104,9 @@ const CIRC = 2 * Math.PI * 88; // r=88
 function getRingProgress(days: number): { prev: number; next: number; pct: number } {
   const next = MILESTONE_DAYS.find((m) => m > days) ?? MILESTONE_DAYS[MILESTONE_DAYS.length - 1];
   const prev = [...MILESTONE_DAYS].reverse().find((m) => m <= days) ?? 0;
-  const pct = next === prev ? 1 : (days - prev) / (next - prev);
+  // pct = days / next so the ring shows "how far to the next milestone from day 0"
+  // e.g. day 20 → next 30 → 20/30 = 67% (intuitive: ring is 2/3 full heading to Day 30)
+  const pct = next === 0 ? 1 : days / next;
   return { prev, next, pct: Math.min(1, Math.max(0, pct)) };
 }
 
