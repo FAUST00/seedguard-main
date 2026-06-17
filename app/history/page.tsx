@@ -54,7 +54,7 @@ function CalendarHeatmap({ entries }: { entries: HistoryEntry[] }) {
   const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
   return (
-    <div className="rounded-xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-5 space-y-3">
+    <div className="rounded-xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-5 space-y-3 h-full">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-sm uppercase tracking-wider text-secondary neon-text-cyan">
           Activity Heatmap
@@ -399,7 +399,7 @@ export default function History() {
       />
 
       {/* Heatmaps — activity (victory/relapse) + recovery (clean/check-in) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <CalendarHeatmap entries={entries} />
         <RecoveryHeatmap />
       </div>

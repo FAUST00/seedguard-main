@@ -48,7 +48,7 @@ export function RecoveryHeatmap() {
   }
 
   return (
-    <div className="rounded-xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-5 space-y-3">
+    <div className="rounded-xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-5 space-y-3 h-full">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-sm uppercase tracking-wider text-secondary neon-text-cyan flex items-center gap-2">
