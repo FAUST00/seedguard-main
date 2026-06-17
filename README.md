@@ -2,7 +2,7 @@
 
 > A modern, privacy-first semen retention / NoFap tracking app. 100% client-side — your data never leaves your device.
 
-**Live site:** https://faust00.github.io/seedgaurd-tracker/
+**Live site:** (https://faust00.github.io/seedguard-main/)
 
 ---
 
