@@ -292,9 +292,6 @@ export default function SocialPage() {
       {/* ── Friends Tab ────────────────────────────────────────────────────── */}
       {tab === 'friends' && (
         <div className="space-y-6 animate-fade-in" role="tabpanel" aria-label="Friends">
-          {/* Accountability partner — pick a friend to keep you honest */}
-          <AccountabilityPartner />
-
           {/* Search */}
           <div className="rounded-2xl border border-secondary/20 glass-effect p-6 space-y-4">
             <h2 className="text-base font-bold uppercase tracking-wider text-secondary neon-text-cyan flex items-center gap-2">
@@ -409,6 +406,9 @@ export default function SocialPage() {
               </ul>
             )}
           </div>
+
+          {/* Accountability partner — at the bottom of the friends list */}
+          <AccountabilityPartner />
         </div>
       )}
 

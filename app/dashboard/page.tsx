@@ -313,7 +313,7 @@ export default function Dashboard() {
   if (typeof window === 'undefined') return null;
 
   return (
-    <div className="container mx-auto p-4 md:p-8 max-w-6xl space-y-8 page-entry">
+    <div className="container mx-auto p-4 md:p-10 max-w-7xl space-y-10 page-entry">
 
       {/* ── Quick Log Sheet ───────────────────────────────────────────── */}
       {showQuickLog && <QuickLogSheet onClose={() => setShowQuickLog(false)} />}
@@ -527,12 +527,12 @@ export default function Dashboard() {
       <XpBar info={levelInfo} variant="full" className="animate-scale-in" />
 
       {/* ── SVG Progress Ring + Live Timer ────────────────────────────── */}
-      <div className="rounded-xl border border-primary/30 bg-background/60 backdrop-blur-sm p-6 md:p-8 neon-box-pink animate-scale-in">
+      <div className="rounded-2xl border border-primary/30 bg-background/60 backdrop-blur-sm p-6 md:p-10 neon-box-pink animate-scale-in">
         <SectionHeading accent="primary" Icon={Clock} className="mb-6">Live Streak Timer</SectionHeading>
 
         <div className="flex flex-col md:flex-row items-center gap-8 mb-6">
           {/* SVG Ring */}
-          <div className="relative flex-shrink-0 flex items-center justify-center w-48 h-48">
+          <div className="relative flex-shrink-0 flex items-center justify-center w-56 h-56">
             <svg className="-rotate-90 absolute inset-0 w-full h-full" viewBox="0 0 192 192">
               <circle cx="96" cy="96" r="88" fill="none" stroke="hsl(var(--primary)/0.12)" strokeWidth="10" />
               <circle
@@ -545,7 +545,7 @@ export default function Dashboard() {
               />
             </svg>
             <div className="relative z-10 text-center">
-              <div className="text-5xl font-display font-black text-primary neon-text-pink leading-none">{timer.days}</div>
+              <div className="text-6xl md:text-7xl font-display font-black text-primary neon-text-pink leading-none">{timer.days}</div>
               <div className="text-xs text-muted-foreground uppercase tracking-widest mt-1">days</div>
               <div className="text-[10px] text-muted-foreground/50 mt-2">→ Day {ringNext}</div>
             </div>
@@ -553,7 +553,7 @@ export default function Dashboard() {
 
           {/* D/H/M/S */}
           <div className="flex-1 w-full">
-            <div className="grid grid-cols-4 gap-2 md:gap-4">
+            <div className="grid grid-cols-4 gap-3 md:gap-5">
               {[
                 { value: timer.days, label: 'Days' },
                 { value: pad(timer.hours), label: 'Hours' },
@@ -562,7 +562,7 @@ export default function Dashboard() {
               ].map(({ value, label }) => (
                 <div key={label} className="flex flex-col items-center gap-2">
                   <div className="w-full rounded-xl border border-primary/25 bg-background/80 py-4 px-2 flex items-center justify-center">
-                    <span className="text-2xl sm:text-3xl font-extrabold font-mono text-primary neon-text-pink tabular-nums leading-none">{value}</span>
+                    <span className="text-3xl sm:text-4xl font-extrabold font-mono text-primary neon-text-pink tabular-nums leading-none">{value}</span>
                   </div>
                   <span className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">{label}</span>
                 </div>
@@ -609,7 +609,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Stats Grid ────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {([
           { label: 'Current Streak', value: timer.days,          sub: 'days clean',    accent: 'primary',     Icon: Flame },
           { label: 'Total Days',     value: stats.totalDays,     sub: 'tracked',       accent: 'secondary',   Icon: Calendar },
@@ -621,38 +621,38 @@ export default function Dashboard() {
       </div>
 
       {/* ── Daily Quests + Weekly Challenge ───────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <QuestBoard />
         <WeeklyChallenge />
       </div>
 
       {/* ── Recovery Visualization ────────────────────────────────────── */}
       <MilestoneRoadmap currentStreak={timer.days} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <RecoveryScore />
         <WeeklyTrend />
       </div>
 
       {/* ── Quick Actions ─────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Link href="/history" className="rounded-xl border border-primary/20 bg-background/50 backdrop-blur-sm p-8 text-center hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 group animate-scale-in [animation-delay:200ms]">
-          <div className="inline-flex items-center justify-center w-14 h-14 mb-4 group-hover:scale-110 transition-transform">
-            <Flame className="w-7 h-7 text-primary drop-shadow-[0_0_8px_rgba(255,0,255,0.6)]" aria-hidden />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <Link href="/history" className="rounded-2xl border border-primary/20 bg-background/50 backdrop-blur-sm p-8 md:p-10 text-center hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 group animate-scale-in [animation-delay:200ms]">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-5 group-hover:scale-110 transition-transform">
+            <Flame className="w-8 h-8 text-primary drop-shadow-[0_0_8px_rgba(255,0,255,0.6)]" aria-hidden />
           </div>
-          <h3 className="font-bold text-lg mb-2 uppercase tracking-wider">Log Entry</h3>
-          <p className="text-sm text-muted-foreground">Record a victory or log a relapse to keep your streak accurate.</p>
+          <h3 className="font-bold text-xl mb-3 uppercase tracking-wider">Log Entry</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">Record a victory or log a relapse to keep your streak accurate.</p>
         </Link>
-        <Link href="/streaks" className="rounded-xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-8 text-center hover:border-secondary/50 transition-all duration-300 hover:shadow-lg hover:shadow-secondary/10 group animate-scale-in [animation-delay:250ms]">
-          <div className="inline-flex items-center justify-center w-14 h-14 mb-4 group-hover:scale-110 transition-transform">
-            <Users className="w-7 h-7 text-secondary drop-shadow-[0_0_8px_rgba(0,255,255,0.6)]" aria-hidden />
+        <Link href="/streaks" className="rounded-2xl border border-secondary/20 bg-background/50 backdrop-blur-sm p-8 md:p-10 text-center hover:border-secondary/50 transition-all duration-300 hover:shadow-xl hover:shadow-secondary/10 group animate-scale-in [animation-delay:250ms]">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-5 group-hover:scale-110 transition-transform">
+            <Users className="w-8 h-8 text-secondary drop-shadow-[0_0_8px_rgba(0,255,255,0.6)]" aria-hidden />
           </div>
-          <h3 className="font-bold text-lg mb-2 uppercase tracking-wider">Leaderboard</h3>
-          <p className="text-sm text-muted-foreground">Compare streaks with friends, weekly rankings, and global top 50.</p>
+          <h3 className="font-bold text-xl mb-3 uppercase tracking-wider">Leaderboard</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">Compare streaks with friends, weekly rankings, and global top 50.</p>
         </Link>
       </div>
 
       {/* ── Daily Wisdom ──────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-secondary/30 bg-background/50 backdrop-blur-sm p-6 md:p-8 animate-scale-in [animation-delay:300ms] neon-box-cyan">
+      <div className="rounded-2xl border border-secondary/30 bg-background/50 backdrop-blur-sm p-6 md:p-10 animate-scale-in [animation-delay:300ms] neon-box-cyan">
         <div className="flex items-center gap-2 mb-4">
           <Quote className="w-4 h-4 text-secondary/70" aria-hidden />
           <p className="text-xs text-secondary/70 uppercase tracking-widest font-bold">Daily Wisdom</p>
@@ -683,10 +683,10 @@ export default function Dashboard() {
       </div>
 
       {/* ── Footer CTA ───────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-primary/10 bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-sm p-8 text-center animate-scale-in [animation-delay:350ms]">
-        <p className="text-lg text-foreground leading-relaxed">
+      <div className="rounded-2xl border border-primary/10 bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-sm p-8 md:p-12 text-center animate-scale-in [animation-delay:350ms]">
+        <p className="text-xl md:text-2xl text-foreground leading-relaxed">
           Every second <span className="font-bold text-primary neon-text-pink">you hold</span> is a victory.
-          <span className="block mt-4 text-muted-foreground text-base">
+          <span className="block mt-4 text-muted-foreground text-base md:text-lg">
             This is your space to build the discipline and freedom you deserve.
           </span>
         </p>

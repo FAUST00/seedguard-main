@@ -326,6 +326,9 @@ export default function AccountPage() {
           </div>
         </ImageBanner>
 
+        {/* Earned badges */}
+        <EarnedBadges />
+
         {/* Actions */}
         <div className="rounded-2xl border border-primary/20 glass-effect p-8 space-y-4 animate-scale-in">
           <button
@@ -352,9 +355,6 @@ export default function AccountPage() {
             Log Out
           </button>
         </div>
-
-        {/* Earned badges */}
-        <EarnedBadges />
 
         {/* Migrate local data */}
         <div className="rounded-2xl border border-accent/20 glass-effect p-8 space-y-4 animate-scale-in">

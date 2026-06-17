@@ -15,7 +15,6 @@ import {
   Flame,
   Award,
   BookOpen,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   Lock,
@@ -35,7 +34,6 @@ const navigationItems = [
   { href: '/achievements', label: 'Awards', icon: Award },
   { href: '/social',    label: 'Social',    icon: Users },
   { href: '/account',   label: 'Account',   icon: User },
-  { href: '/esoteric',  label: 'Esoteric',  icon: Sparkles },
   { href: '/settings',  label: 'Settings',  icon: Settings },
 ];
 
@@ -112,7 +110,7 @@ export function Sidebar() {
     <>
       {/* ── Desktop Sidebar ───────────────────────────────────────────── */}
       <aside
-        className={`hidden md:flex border-r border-primary/10 glass-effect flex-col gap-6 md:min-h-screen shrink-0 sticky top-0 transition-[width] duration-200 ease-in-out overflow-hidden ${collapsed ? 'w-16 p-3' : 'w-64 p-6'}`}
+        className={`hidden md:flex border-r border-primary/10 glass-effect flex-col gap-6 h-screen shrink-0 sticky top-0 transition-[width] duration-200 ease-in-out overflow-y-auto overflow-x-hidden ${collapsed ? 'w-16 p-3' : 'w-64 p-6'}`}
       >
         {/* Logo */}
         <div className={`flex items-center ${collapsed ? 'justify-center' : ''}`}>

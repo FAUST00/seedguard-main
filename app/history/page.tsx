@@ -399,7 +399,7 @@ export default function History() {
       />
 
       {/* Heatmaps — activity (victory/relapse) + recovery (clean/check-in) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         <CalendarHeatmap entries={entries} />
         <RecoveryHeatmap />
       </div>

@@ -87,7 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ToastProvider>
             <SynthBackground />
             <NotificationListener />
-            <div className="relative z-10 min-h-screen flex flex-col md:flex-row">
+            <div className="relative z-10 min-h-screen md:h-screen flex flex-col md:flex-row md:overflow-hidden">
               <Sidebar />
               {/* pb-20 on mobile leaves room for the fixed bottom tab bar */}
               <main className="flex-1 overflow-y-auto page-entry pb-20 md:pb-0">
