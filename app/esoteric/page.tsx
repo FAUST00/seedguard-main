@@ -247,15 +247,21 @@ export default function EsotericPage() {
       {/* Hero */}
       <div className="relative text-center py-16 px-6 border-b border-primary/10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
-        <Link
-          href="/benefits"
-          className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors mb-8 uppercase tracking-widest font-bold"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Benefits
-        </Link>
-        <div className="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/30 rounded-full px-4 py-1 mb-5">
-          <Eye className="w-3.5 h-3.5 text-secondary" aria-hidden />
-          <span className="text-xs font-bold tracking-widest text-secondary uppercase">Hidden Knowledge</span>
+        {/* Back link — left-aligned above the badge */}
+        <div className="flex justify-start mb-6">
+          <Link
+            href="/benefits"
+            className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to Benefits
+          </Link>
+        </div>
+        {/* Badge — centered on its own row */}
+        <div className="flex justify-center mb-5">
+          <div className="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/30 rounded-full px-4 py-1">
+            <Eye className="w-3.5 h-3.5 text-secondary" aria-hidden />
+            <span className="text-xs font-bold tracking-widest text-secondary uppercase">Hidden Knowledge</span>
+          </div>
         </div>
         <h1 className="text-4xl md:text-6xl font-display font-black italic tracking-tight mb-4 neon-text-cyan text-secondary">
           WESTERN SCIENCE
