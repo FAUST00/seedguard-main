@@ -25,6 +25,7 @@ import { XpBar } from '@/components/xp-bar';
 import { computeXp, levelFromXp, type LevelInfo } from '@/lib/xp';
 import { getQuestXp, QUEST_EVENT } from '@/lib/quests';
 import { computeEarnedBadgeIds } from '@/lib/badges';
+import { getLiveXp, XP_EVENT } from '@/lib/xp-state';
 
 const navigationItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -61,10 +62,15 @@ export function Sidebar() {
     } catch {}
   }, []);
 
-  // Compute level from stored progress; refresh on quest completions + nav.
+  // Mirror the dashboard's canonical XP so the two bars always match.
+  // Falls back to computing from stored progress only if the dashboard hasn't
+  // published a value yet (e.g. before it's been opened this install).
   useEffect(() => {
     const recompute = () => {
       try {
+        const live = getLiveXp();
+        if (live != null) { setLevelInfo(levelFromXp(live)); return; }
+
         const stats = JSON.parse(localStorage.getItem('seedguard_stats') || '{}');
         const history = JSON.parse(localStorage.getItem('seedguard_history') || '[]');
         const totalDays = Number(stats.totalDays) || 0;
@@ -84,7 +90,11 @@ export function Sidebar() {
     };
     recompute();
     window.addEventListener(QUEST_EVENT, recompute);
-    return () => window.removeEventListener(QUEST_EVENT, recompute);
+    window.addEventListener(XP_EVENT, recompute);
+    return () => {
+      window.removeEventListener(QUEST_EVENT, recompute);
+      window.removeEventListener(XP_EVENT, recompute);
+    };
   }, [pathname]);
 
   const toggleCollapse = () => {

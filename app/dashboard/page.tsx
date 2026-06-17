@@ -28,6 +28,7 @@ import { WeeklyChallenge } from '@/components/weekly-challenge';
 import { pullGamification, pushGamification } from '@/lib/gamification-sync';
 import { detectNewAchievements, type Achievement } from '@/lib/achievements';
 import { saveXpToCloud } from '@/lib/streaks';
+import { setLiveXp } from '@/lib/xp-state';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -252,6 +253,7 @@ export default function Dashboard() {
     });
     const level = levelFromXp(xp);
     setLevelInfo(level);
+    setLiveXp(xp); // publish canonical XP so the sidebar mirrors the exact value
     if (hasAccount) saveXpToCloud(xp).catch(() => {}); // feed the levels leaderboard
 
     // Celebrate any newly-unlocked achievements
