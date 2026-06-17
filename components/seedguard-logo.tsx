@@ -35,12 +35,12 @@ export function SeedGuardLogo({ size = 'md', collapsed = false }: SeedGuardLogoP
   }
 
   if (size === 'hero') {
-    // Landing page hero — shield icon only, title/tagline rendered as HTML below
+    // Landing page hero — responsive height: 80px mobile, 176px desktop
     return (
       <img
         src={ICON_SRC}
         alt="SeedGuard shield"
-        style={{ height: 200, width: 'auto', display: 'block', flexShrink: 0, maxWidth: '90vw' }}
+        className="h-20 md:h-44 w-auto block flex-shrink-0 max-w-[90vw]"
       />
     );
   }
