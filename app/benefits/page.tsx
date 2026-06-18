@@ -124,7 +124,7 @@ export default function BenefitsPage() {
             )}
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-start">
             {weekData.map((w) => {
               const isCurrentWeek = currentWeek === w.week;
               return (
@@ -139,7 +139,7 @@ export default function BenefitsPage() {
                   <button
                     onClick={() => setExpandedWeek(expandedWeek === w.week ? null : w.week)}
                     aria-expanded={expandedWeek === w.week}
-                    className="relative z-10 w-full h-full text-left rounded-2xl p-6 cursor-pointer transition-shadow duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="relative z-10 w-full text-left rounded-2xl p-6 cursor-pointer transition-shadow duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     style={{
                       background: w.glow,
                       border: isCurrentWeek ? `2px solid ${w.accent}` : `1px solid ${w.border}`,
