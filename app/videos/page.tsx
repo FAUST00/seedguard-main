@@ -24,10 +24,10 @@ const VIDEOS = [
   },
   {
     id: 'B7SrVqtbwNk',
-    title: 'Testosterone & Retention: What the Research Says',
+    title: 'The Hidden Cost of Esoteric Knowledge',
     description:
-      'A research-backed review of studies linking ejaculation frequency to testosterone fluctuations — including the well-known 7-day peak and what consistent retention does to hormone profiles over time.',
-    category: 'Science',
+      'Occaro Wisdom unpacks what secret societies and mystery schools understood about sexual energy that mainstream culture has deliberately kept hidden — and the price men pay for not knowing.',
+    category: 'Esoteric',
   },
   {
     id: 'nsR6nq_wGE8',
@@ -66,10 +66,10 @@ const VIDEOS = [
   },
   {
     id: '6NMjXIraUPY',
-    title: 'Energy, Focus & Semen Retention',
+    title: 'Semen Retention Esoteric Secret',
     description:
-      'Explores how redirecting sexual energy translates into improved concentration, creative output, athletic drive, and the focused intensity that high performers across history have described.',
-    category: 'Benefits',
+      'Moss breaks down the hidden esoteric truth behind semen retention — why ancient traditions treated it as a sacred practice and how this forgotten knowledge directly applies to modern men seeking transformation.',
+    category: 'Esoteric',
   },
   {
     id: 'z7o_vf0yl_g',
@@ -101,10 +101,10 @@ const VIDEOS = [
   },
   {
     id: 'ioJJb0ujF_4',
-    title: 'The NoFap Brotherhood: Stories from the Front Lines',
+    title: '33 Steps Up: Solomon\'s Temple & Sacred Knowledge',
     description:
-      'Real men share their most challenging moments, rock-bottom relapses, and the turning points that kept them going — a reminder that you are never fighting this battle alone.',
-    category: 'Motivation',
+      'Decode Scripture explores the esoteric symbolism of Solomon\'s Temple and Freemasonry\'s 33 degrees — revealing how the ancient architecture of sacred spaces encoded the path of inner mastery and sexual transmutation.',
+    category: 'Esoteric',
   },
   {
     id: '_ITwQ5ShBLc',
