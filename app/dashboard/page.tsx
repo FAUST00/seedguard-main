@@ -151,7 +151,8 @@ export default function Dashboard() {
       const stats = JSON.parse(localStorage.getItem('seedguard_stats') || '{}');
       const history = JSON.parse(localStorage.getItem('seedguard_history') || '[]');
       const entryCount = Array.isArray(history) ? history.length : 0;
-      const totalDays = Number(stats.totalDays) || 0;
+      // Mirror the effect's totalDays formula exactly so first render matches
+      const totalDays = Math.floor((Date.now() - getFirstDay().getTime()) / 86400000);
       const longestStreak = Number(stats.longestStreak) || 0;
       const relapses = Number(stats.relapses) || 0;
       const currentStreak = Number(stats.currentStreak) || 0;

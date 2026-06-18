@@ -38,10 +38,10 @@ export interface Achievement {
 
 /** Visual tokens per tier — accent drives the shared color map. */
 export const TIER_META: Record<Tier, { label: string; accent: Accent; ring: string }> = {
-  bronze:   { label: 'Bronze',   accent: 'gold',        ring: 'ring-amber-700/50' },
-  silver:   { label: 'Silver',   accent: 'secondary',   ring: 'ring-slate-300/40' },
-  gold:     { label: 'Gold',     accent: 'gold',        ring: 'ring-gold/50' },
-  platinum: { label: 'Platinum', accent: 'primary',     ring: 'ring-primary/50' },
+  bronze:   { label: 'SPARK',  accent: 'gold',      ring: 'ring-amber-700/50' },
+  silver:   { label: 'STEEL',  accent: 'secondary', ring: 'ring-slate-300/40' },
+  gold:     { label: 'SURGE',  accent: 'gold',      ring: 'ring-gold/50' },
+  platinum: { label: 'APEX',   accent: 'primary',   ring: 'ring-primary/50' },
 };
 
 export const CATEGORY_META: Record<Category, { label: string; accent: Accent }> = {
