@@ -145,7 +145,21 @@ export default function Dashboard() {
   const [todayMood, setTodayMood] = useState<number | null>(null);
 
   // XP / level
-  const [levelInfo, setLevelInfo] = useState<LevelInfo>(() => levelFromXp(0));
+  const [levelInfo, setLevelInfo] = useState<LevelInfo>(() => {
+    if (typeof window === 'undefined') return levelFromXp(0);
+    try {
+      const stats = JSON.parse(localStorage.getItem('seedguard_stats') || '{}');
+      const history = JSON.parse(localStorage.getItem('seedguard_history') || '[]');
+      const entryCount = Array.isArray(history) ? history.length : 0;
+      const totalDays = Number(stats.totalDays) || 0;
+      const longestStreak = Number(stats.longestStreak) || 0;
+      const relapses = Number(stats.relapses) || 0;
+      const currentStreak = Number(stats.currentStreak) || 0;
+      const badgeIds = computeEarnedBadgeIds({ streak: currentStreak, totalDays, relapses, entryCount });
+      const xp = computeXp({ totalDays, longestStreak, entryCount, badgeCount: badgeIds.length, questXp: getQuestXp() });
+      return levelFromXp(xp);
+    } catch { return levelFromXp(0); }
+  });
   const [questBump, setQuestBump] = useState(0); // increments when a quest completes → recomputes XP
 
   const prevDaysRef = useRef(0);

@@ -11,6 +11,8 @@ import {
 
 const CATEGORY_ORDER: Category[] = ['streak', 'consistency', 'recovery', 'mastery'];
 
+const TIER_RANK: Record<string, number> = { bronze: 1, silver: 2, gold: 3, platinum: 4 };
+
 type Filter = 'all' | 'progress';
 
 function AchievementTile({ a, stats }: { a: Achievement; stats: AchievementStats }) {
@@ -198,7 +200,7 @@ export default function AchievementsPage() {
         // Tile order: locked (actionable) first, earned second
         const visibleTiles = filter === 'progress'
           ? catLockedItems
-          : [...catLockedItems, ...catEarnedItems];
+          : [...catEarnedItems.sort((a, b) => TIER_RANK[a.tier] - TIER_RANK[b.tier]), ...catLockedItems];
 
         return (
           <section key={cat} className="space-y-3">
