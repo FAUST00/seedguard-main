@@ -13,7 +13,7 @@ const VIDEOS = [
     title: 'Why Semen Retention Changes Everything',
     description:
       'A comprehensive overview of the core science and philosophy behind semen retention — covering how conserved sexual energy influences testosterone, mental clarity, and overall male vitality.',
-    category: 'Science',
+    category: 'Esoteric',
   },
   {
     id: 'TFm--2_RtM8',
@@ -48,7 +48,7 @@ const VIDEOS = [
     title: 'The Porn Addiction Loop — and How to Break It',
     description:
       'A psychological breakdown of compulsive pornography use: how the habit forms, why willpower alone fails, and the evidence-based recovery pathway that actually works.',
-    category: 'Psychology',
+    category: 'Motivation',
   },
   {
     id: '0HhqLdTUKP8',
@@ -62,7 +62,7 @@ const VIDEOS = [
     title: 'The NoFap Benefits Timeline — Week by Week',
     description:
       'A practical week-by-week guide to what the brain and body experience during retention: from the initial detox discomfort through flatline, and into the sustained benefits beyond 30 days.',
-    category: 'Benefits',
+    category: 'Esoteric',
   },
   {
     id: '6NMjXIraUPY',
@@ -83,7 +83,7 @@ const VIDEOS = [
     title: 'Real Talk: 90-Day NoFap Transformation',
     description:
       'First-person account of the physical, mental, and social changes that occurred over a full 90-day streak — from the brutal first week to the clarity and confidence that follow.',
-    category: 'Motivation',
+    category: 'Esoteric',
   },
   {
     id: 'qriz7css2_I',
@@ -111,7 +111,7 @@ const VIDEOS = [
     title: 'Discipline Over Desire: Building the Unbreakable Habit',
     description:
       'A practical framework for turning NoFap from a white-knuckle struggle into a sustainable lifestyle — covering routine stacking, environment design, and identity-based habit change.',
-    category: 'Motivation',
+    category: 'Science',
   },
   {
     id: 'cevA-d7NyNg',
@@ -139,7 +139,7 @@ const VIDEOS = [
     title: 'Testosterone & Semen Retention: What the Science Says',
     description:
       'A research-backed look at how abstinence from ejaculation influences testosterone levels, LH pulses, and androgen receptor sensitivity — separating fact from hype in the NoFap science debate.',
-    category: 'Science',
+    category: 'Esoteric',
   },
   {
     id: 'oKfp2GhaZ9c',
@@ -153,7 +153,7 @@ const VIDEOS = [
     title: 'How to Never Relapse Again',
     description:
       'A no-nonsense guide to building a relapse-proof mindset and environment — covering trigger identification, urge interruption patterns, accountability systems, and the daily habits that make retention the default.',
-    category: 'Motivation',
+    category: 'Benefits',
   },
 ] as const;
 
