@@ -139,7 +139,7 @@ export default function BenefitsPage() {
                   <button
                     onClick={() => setExpandedWeek(expandedWeek === w.week ? null : w.week)}
                     aria-expanded={expandedWeek === w.week}
-                    className="relative z-10 w-full text-left rounded-2xl p-6 cursor-pointer transition-shadow duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="relative z-10 w-full h-full text-left rounded-2xl p-6 cursor-pointer transition-shadow duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     style={{
                       background: w.glow,
                       border: isCurrentWeek ? `2px solid ${w.accent}` : `1px solid ${w.border}`,
