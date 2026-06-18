@@ -94,10 +94,10 @@ const VIDEOS = [
   },
   {
     id: '0KqmvRtQV-E',
-    title: 'Why Community & Accountability Multiply Your Results',
+    title: 'The Ancient Secrets of Semen Retention',
     description:
-      'Examines how accountability partners, streak tracking, and peer support dramatically increase success rates — and why going alone is the single biggest mistake most men make.',
-    category: 'Motivation',
+      'Asangoham reveals what ancient spiritual traditions encoded about semen retention that modern culture has suppressed — and why this knowledge was historically reserved for initiates and seekers of higher consciousness.',
+    category: 'Esoteric',
   },
   {
     id: 'ioJJb0ujF_4',
@@ -126,6 +126,34 @@ const VIDEOS = [
     description:
       'Explores ancient traditions around transmuting sexual energy into creative, spiritual, and intellectual force — from Taoist inner alchemy to Nikola Tesla\'s reported practices of celibacy.',
     category: 'Esoteric',
+  },
+  {
+    id: 'aFcDKFzDzQo',
+    title: 'NoFap: The Real Reason Most Men Fail',
+    description:
+      'A raw, honest breakdown of the psychological traps that derail most men on their NoFap journey — from false starts and boredom relapse to the identity shift required to actually succeed long-term.',
+    category: 'Psychology',
+  },
+  {
+    id: 'nJWd0HkttrE',
+    title: 'Testosterone & Semen Retention: What the Science Says',
+    description:
+      'A research-backed look at how abstinence from ejaculation influences testosterone levels, LH pulses, and androgen receptor sensitivity — separating fact from hype in the NoFap science debate.',
+    category: 'Science',
+  },
+  {
+    id: 'oKfp2GhaZ9c',
+    title: 'The Benefits Nobody Talks About',
+    description:
+      'Beyond the popular talking points — this video covers the subtler, lesser-known shifts men report after sustained retention: improved skin, voice depth, sharper intuition, and heightened creative drive.',
+    category: 'Benefits',
+  },
+  {
+    id: 'Gnf5ZGXl_g4',
+    title: 'How to Never Relapse Again',
+    description:
+      'A no-nonsense guide to building a relapse-proof mindset and environment — covering trigger identification, urge interruption patterns, accountability systems, and the daily habits that make retention the default.',
+    category: 'Motivation',
   },
 ] as const;
 
