@@ -128,18 +128,11 @@ export default function BenefitsPage() {
             {weekData.map((w) => {
               const isCurrentWeek = currentWeek === w.week;
               return (
-                <div key={w.week} className="relative">
-                  {isCurrentWeek && (
-                    <div
-                      className="absolute -inset-px rounded-2xl z-0 animate-pulse"
-                      style={{ background: `linear-gradient(135deg, ${w.accent}55, transparent)`, border: `2px solid ${w.accent}` }}
-                      aria-hidden
-                    />
-                  )}
+                <div key={w.week}>
                   <button
                     onClick={() => setExpandedWeek(expandedWeek === w.week ? null : w.week)}
                     aria-expanded={expandedWeek === w.week}
-                    className="relative z-10 w-full text-left rounded-2xl p-6 cursor-pointer transition-shadow duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="relative w-full text-left rounded-2xl p-6 cursor-pointer transition-shadow duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     style={{
                       background: w.glow,
                       border: isCurrentWeek ? `2px solid ${w.accent}` : `1px solid ${w.border}`,
@@ -148,6 +141,13 @@ export default function BenefitsPage() {
                         : expandedWeek === w.week ? `0 0 32px ${w.border}` : 'none',
                     }}
                   >
+                    {isCurrentWeek && (
+                      <div
+                        className="absolute inset-0 rounded-2xl animate-pulse pointer-events-none"
+                        style={{ background: `linear-gradient(135deg, ${w.accent}33, transparent)` }}
+                        aria-hidden
+                      />
+                    )}
                     {isCurrentWeek && (
                       <div className="mb-2 text-[0.65rem] font-extrabold uppercase tracking-widest" style={{ color: w.accent }}>
                         📍 You are here
