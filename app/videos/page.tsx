@@ -23,11 +23,18 @@ const VIDEOS = [
     category: 'Science',
   },
   {
-    id: 'cevA-d7NyNg',
-    title: 'Semen Retention: Ancient Wisdom Meets Modern Science',
+    id: 'B7SrVqtbwNk',
+    title: 'Testosterone & Retention: What the Research Says',
     description:
-      'Bridges thousands of years of esoteric tradition — Taoism, Ayurveda, Kundalini — with contemporary neuroscience to show why multiple ancient cultures independently arrived at the same conclusion.',
-    category: 'Benefits',
+      'A research-backed review of studies linking ejaculation frequency to testosterone fluctuations — including the well-known 7-day peak and what consistent retention does to hormone profiles over time.',
+    category: 'Science',
+  },
+  {
+    id: 'nsR6nq_wGE8',
+    title: 'PMO Addiction: How Deep Does It Go?',
+    description:
+      'A clinical-style breakdown of pornography\'s grip on the brain and the measurable recovery milestones men experience during abstinence — from acute withdrawal to long-term neurological healing.',
+    category: 'Science',
   },
   {
     id: 'L8hWx1wKhqs',
@@ -37,25 +44,25 @@ const VIDEOS = [
     category: 'Psychology',
   },
   {
-    id: 'B7SrVqtbwNk',
-    title: 'Testosterone & Retention: What the Research Says',
-    description:
-      'A research-backed review of studies linking ejaculation frequency to testosterone fluctuations — including the well-known 7-day peak and what consistent retention does to hormone profiles over time.',
-    category: 'Science',
-  },
-  {
-    id: 'ksQmRbSyG8s',
-    title: 'Real Talk: 90-Day NoFap Transformation',
-    description:
-      'First-person account of the physical, mental, and social changes that occurred over a full 90-day streak — from the brutal first week to the clarity and confidence that follow.',
-    category: 'Motivation',
-  },
-  {
     id: 'Cz_vMThVXdM',
     title: 'The Porn Addiction Loop — and How to Break It',
     description:
       'A psychological breakdown of compulsive pornography use: how the habit forms, why willpower alone fails, and the evidence-based recovery pathway that actually works.',
     category: 'Psychology',
+  },
+  {
+    id: '0HhqLdTUKP8',
+    title: 'NoFap: The Uncomfortable Truth',
+    description:
+      'An honest look at the mental battles, identity shifts, and false relapses men face on the journey — cutting through the hype to explain what actually changes and what takes real work.',
+    category: 'Psychology',
+  },
+  {
+    id: 'C2GGtyI0JoI',
+    title: 'The NoFap Benefits Timeline — Week by Week',
+    description:
+      'A practical week-by-week guide to what the brain and body experience during retention: from the initial detox discomfort through flatline, and into the sustained benefits beyond 30 days.',
+    category: 'Benefits',
   },
   {
     id: '6NMjXIraUPY',
@@ -65,11 +72,18 @@ const VIDEOS = [
     category: 'Benefits',
   },
   {
-    id: 'C2GGtyI0JoI',
-    title: 'The NoFap Benefits Timeline — Week by Week',
+    id: 'z7o_vf0yl_g',
+    title: 'Semen Retention & Magnetism: What Changes in You',
     description:
-      'A practical week-by-week guide to what the brain and body experience during retention: from the initial detox discomfort through flatline, and into the sustained benefits beyond 30 days.',
+      'Examines the widely reported shifts in social presence, eye contact, and personal magnetism that long-term retainers describe — and what science and tradition say about why this happens.',
     category: 'Benefits',
+  },
+  {
+    id: 'ksQmRbSyG8s',
+    title: 'Real Talk: 90-Day NoFap Transformation',
+    description:
+      'First-person account of the physical, mental, and social changes that occurred over a full 90-day streak — from the brutal first week to the clarity and confidence that follow.',
+    category: 'Motivation',
   },
   {
     id: 'qriz7css2_I',
@@ -85,11 +99,39 @@ const VIDEOS = [
       'Examines how accountability partners, streak tracking, and peer support dramatically increase success rates — and why going alone is the single biggest mistake most men make.',
     category: 'Motivation',
   },
+  {
+    id: 'ioJJb0ujF_4',
+    title: 'The NoFap Brotherhood: Stories from the Front Lines',
+    description:
+      'Real men share their most challenging moments, rock-bottom relapses, and the turning points that kept them going — a reminder that you are never fighting this battle alone.',
+    category: 'Motivation',
+  },
+  {
+    id: '_ITwQ5ShBLc',
+    title: 'Discipline Over Desire: Building the Unbreakable Habit',
+    description:
+      'A practical framework for turning NoFap from a white-knuckle struggle into a sustainable lifestyle — covering routine stacking, environment design, and identity-based habit change.',
+    category: 'Motivation',
+  },
+  {
+    id: 'cevA-d7NyNg',
+    title: 'Semen Retention: Ancient Wisdom Meets Modern Science',
+    description:
+      'Bridges thousands of years of esoteric tradition — Taoism, Ayurveda, Kundalini — with contemporary neuroscience to show why multiple ancient cultures independently arrived at the same conclusion.',
+    category: 'Esoteric',
+  },
+  {
+    id: 'l7ImtskJx8c',
+    title: 'The Hidden Power of Sexual Energy',
+    description:
+      'Explores ancient traditions around transmuting sexual energy into creative, spiritual, and intellectual force — from Taoist inner alchemy to Nikola Tesla\'s reported practices of celibacy.',
+    category: 'Esoteric',
+  },
 ] as const;
 
-type Category = 'All' | 'Science' | 'Benefits' | 'Psychology' | 'Motivation';
+type Category = 'All' | 'Science' | 'Benefits' | 'Psychology' | 'Motivation' | 'Esoteric';
 
-const CATEGORIES: Category[] = ['All', 'Science', 'Benefits', 'Psychology', 'Motivation'];
+const CATEGORIES: Category[] = ['All', 'Science', 'Benefits', 'Psychology', 'Motivation', 'Esoteric'];
 
 const CATEGORY_STYLE: Record<Category, string> = {
   All:        'border-primary/50 bg-primary/15 text-primary',
@@ -97,9 +139,9 @@ const CATEGORY_STYLE: Record<Category, string> = {
   Benefits:   'border-accent/50 bg-accent/15 text-accent',
   Psychology: 'border-[#c084fc]/50 bg-[#c084fc]/15 text-[#c084fc]',
   Motivation: 'border-gold/50 bg-gold/15 text-gold',
+  Esoteric:   'border-[#a78bfa]/50 bg-[#a78bfa]/15 text-[#a78bfa]',
 };
 
-// Inactive pill style
 const INACTIVE = 'border-muted/30 bg-muted/10 text-muted-foreground hover:border-muted/50 hover:text-foreground';
 
 export default function VideosPage() {
@@ -142,7 +184,7 @@ export default function VideosPage() {
       </div>
 
       {/* ── Content ──────────────────────────────────────────────────────── */}
-      <div className="max-w-6xl mx-auto px-5 pb-24 pt-10 space-y-8">
+      <div className="max-w-7xl mx-auto px-5 pb-24 pt-10 space-y-8">
 
         {/* Category filter */}
         <div className="flex flex-wrap gap-2 justify-center">
@@ -167,15 +209,15 @@ export default function VideosPage() {
           Showing {filtered.length} video{filtered.length !== 1 ? 's' : ''}
         </p>
 
-        {/* Video grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Video grid — 3 columns on large screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((video) => (
             <div
               key={video.id}
-              className="rounded-2xl border border-primary/20 bg-background/50 backdrop-blur-sm overflow-hidden hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 group"
+              className="rounded-2xl border border-primary/20 bg-background/50 backdrop-blur-sm overflow-hidden hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 group flex flex-col"
             >
               {/* Embed */}
-              <div className="aspect-video w-full">
+              <div className="aspect-video w-full flex-shrink-0">
                 <iframe
                   src={`https://www.youtube-nocookie.com/embed/${video.id}?rel=0&modestbranding=1`}
                   title={video.title}
@@ -187,19 +229,19 @@ export default function VideosPage() {
               </div>
 
               {/* Info */}
-              <div className="p-5 space-y-3">
+              <div className="p-4 space-y-2 flex flex-col flex-1">
                 {/* Category tag */}
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${CATEGORY_STYLE[video.category as Category]}`}>
+                <span className={`self-start inline-flex items-center px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${CATEGORY_STYLE[video.category as Category]}`}>
                   {video.category}
                 </span>
 
                 {/* Title */}
-                <h2 className="font-display font-bold text-base md:text-lg text-foreground leading-snug group-hover:text-primary transition-colors">
+                <h2 className="font-display font-bold text-sm md:text-base text-foreground leading-snug group-hover:text-primary transition-colors">
                   {video.title}
                 </h2>
 
                 {/* Description */}
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed flex-1">
                   {video.description}
                 </p>
               </div>
