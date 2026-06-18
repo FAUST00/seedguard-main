@@ -177,7 +177,7 @@ export default function AchievementsPage() {
             ALL ACHIEVEMENTS UNLOCKED
           </p>
           <p className="text-sm text-muted-foreground">
-            You've completed every challenge. Legendary.
+            You&apos;ve completed every challenge. Legendary.
           </p>
         </div>
       )}
