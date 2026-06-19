@@ -10,6 +10,10 @@
  * Required Supabase config:
  *   Dashboard → Authentication → URL Configuration → Redirect URLs:
  *   https://faust00.github.io/seedguard-main/auth/callback/
+ *
+ * The confirmation email link itself is pointed here explicitly via
+ * emailRedirectTo in lib/sync.ts signUp() — without that it defaults to
+ * the Site URL (the homepage) and never reaches this page at all.
  */
 
 import { useEffect, useState } from 'react';
@@ -34,7 +38,7 @@ export default function AuthCallbackPage() {
       const timer = setInterval(() => {
         n--;
         setCountdown(n);
-        if (n <= 0) { clearInterval(timer); router.push('/account'); }
+        if (n <= 0) { clearInterval(timer); router.push('/dashboard'); }
       }, 1000);
     }
 

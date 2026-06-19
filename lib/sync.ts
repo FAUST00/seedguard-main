@@ -39,7 +39,14 @@ export async function signUp(email: string, password: string, username: string) 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { username } },
+    options: {
+      data: { username },
+      // Without this, the confirmation email defaults to the Site URL (the
+      // homepage), which never runs the session-exchange logic in
+      // app/auth/callback/page.tsx — the link would just land on the
+      // landing page with an unprocessed token in the URL.
+      emailRedirectTo: `${window.location.origin}/seedguard-main/auth/callback/`,
+    },
   });
   if (error) throw error;
   return data;
