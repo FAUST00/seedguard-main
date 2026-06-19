@@ -70,6 +70,28 @@ export async function linkGoogleAccount() {
   if (error) throw error;
 }
 
+/**
+ * Redirects to Discord's OAuth consent screen, then back to /auth/callback.
+ * Requires the Discord provider to be enabled in the Supabase dashboard
+ * (Authentication → Providers → Discord) with a Client ID/Secret from the
+ * Discord Developer Portal — the same Site URL / Redirect URL config
+ * already set up for Google covers this too, no extra URL allowlisting needed.
+ */
+export async function signInWithDiscord() {
+  invalidateUserCache();
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'discord',
+    options: { redirectTo: `${window.location.origin}/seedguard-main/auth/callback/` },
+  });
+  if (error) throw error;
+}
+
+/** Links a Discord identity to the currently signed-in account. */
+export async function linkDiscordAccount() {
+  const { error } = await supabase.auth.linkIdentity({ provider: 'discord' });
+  if (error) throw error;
+}
+
 /** Returns the list of linked OAuth/email identities for the current user. */
 export async function getLinkedIdentities(): Promise<string[]> {
   const { data } = await supabase.auth.getUserIdentities();
