@@ -5,14 +5,15 @@ import { completeQuest } from '@/lib/quests';
 
 /**
  * 4-7-8 breathing technique, developed by Dr. Andrew Weil. Acts as a
- * "natural tranquilizer" for the nervous system: exhale fully, inhale
- * quietly for 4, hold for 7, then exhale completely with a "whoosh" for 8.
+ * "natural tranquilizer" for the nervous system. The repeating cycle is
+ * Inhale 4 -> Hold 7 -> Exhale 8. The "exhale completely with a whoosh"
+ * instruction is a one-time prep step before the first inhale (emptying
+ * the lungs), not a timed phase in the loop, so it isn't represented here.
  */
 const BREATH_PHASES = [
-  { label: 'EXHALE (whoosh)', secs: 4, color: '#ff2d9b', scale: true },
-  { label: 'INHALE',          secs: 4, color: '#00e5ff', scale: true },
-  { label: 'HOLD',            secs: 7, color: '#a855f7', scale: false },
-  { label: 'EXHALE (whoosh)', secs: 8, color: '#ff2d9b', scale: true },
+  { label: 'INHALE', secs: 4, color: '#00e5ff', scale: true },
+  { label: 'HOLD',   secs: 7, color: '#a855f7', scale: false },
+  { label: 'EXHALE', secs: 8, color: '#ff2d9b', scale: true },
 ];
 
 export function BreathingTimer() {
@@ -22,12 +23,8 @@ export function BreathingTimer() {
 
   useEffect(() => {
     if (tick <= 0) {
-      // Phase 0 (the initial cleansing exhale) only ever happens once. Every
-      // later cycle loops INHALE -> HOLD -> EXHALE -> INHALE, so the wrap
-      // point is index 1, not index 0 (which would exhale twice in a row).
-      const isLastPhase = phaseIdx === BREATH_PHASES.length - 1;
-      const next = isLastPhase ? 1 : phaseIdx + 1;
-      if (isLastPhase) setCycles((c) => c + 1);
+      const next = (phaseIdx + 1) % BREATH_PHASES.length;
+      if (next === 0) setCycles((c) => c + 1);
       setPhaseIdx(next);
       setTick(BREATH_PHASES[next].secs);
       return;
@@ -71,7 +68,7 @@ export function BreathingTimer() {
       <div className="flex gap-2 text-xs text-muted-foreground flex-wrap justify-center">
         {BREATH_PHASES.map((p, i) => (
           <span key={i} className={`px-2 py-1 rounded-full font-bold uppercase tracking-wider transition-all ${i === phaseIdx ? 'text-foreground bg-muted/30' : 'opacity-40'}`}>
-            {p.label.replace(' (whoosh)', '')}
+            {p.label}
           </span>
         ))}
       </div>
@@ -83,7 +80,7 @@ export function BreathingTimer() {
       )}
 
       <p className="text-xs text-muted-foreground/60 text-center max-w-xs">
-        4-7-8 breathing (Dr. Andrew Weil). Exhale completely with a whoosh, inhale quietly through your nose for 4, hold for 7, then exhale completely through your mouth with a whoosh for 8. Repeat until the urge passes.
+        4-7-8 breathing (Dr. Andrew Weil). Start by exhaling completely through your mouth with a whoosh, then follow the cycle: inhale quietly through your nose for 4, hold for 7, exhale completely through your mouth with a whoosh for 8. Repeat until the urge passes.
       </p>
     </div>
   );
