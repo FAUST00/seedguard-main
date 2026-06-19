@@ -15,6 +15,8 @@ import {
 } from '@/lib/sync';
 import { PageHeader, EmptyState } from '@/components/ui';
 import { RecoveryHeatmap } from '@/components/recovery-heatmap';
+import { RELAPSE_TRIGGERS } from '@/lib/triggers';
+import { MOODS } from '@/lib/mood';
 
 // ── Calendar Heatmap ─────────────────────────────────────────────────────────
 function toYMD(d: Date): string {
@@ -230,6 +232,12 @@ export default function History() {
   const [entryType, setEntryType] = useState<'victory' | 'relapse'>('victory');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Trigger Analytics fields — only used/shown when entryType === 'relapse'
+  const [trigger, setTrigger] = useState<string>('');
+  const [urgeStrength, setUrgeStrength] = useState(5);
+  const [moodBefore, setMoodBefore] = useState<number | null>(null);
+  const [location, setLocation] = useState('');
+
   // Individual entry accordion
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [allExpanded, setAllExpanded] = useState(false);
@@ -284,12 +292,22 @@ export default function History() {
       date: new Date().toLocaleString(),
       type: entryType,
       note: newNote.trim(),
+      ...(entryType === 'relapse' ? {
+        trigger: trigger || undefined,
+        urgeStrength,
+        moodBefore: moodBefore ?? undefined,
+        location: location.trim() || undefined,
+      } : {}),
     };
 
     const updated = [newEntry, ...entries];
     setEntries(updated);
     localStorage.setItem('seedguard_history', JSON.stringify(updated));
     setNewNote('');
+    setTrigger('');
+    setUrgeStrength(5);
+    setMoodBefore(null);
+    setLocation('');
 
     if (isLoggedIn) {
       setSaving(true);
@@ -451,6 +469,71 @@ export default function History() {
             className="w-full rounded-lg border border-muted/30 bg-background/50 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
             rows={3}
           />
+
+          {entryType === 'relapse' && (
+            <div className="space-y-4 rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">What triggered this?</p>
+                <div className="flex flex-wrap gap-2">
+                  {RELAPSE_TRIGGERS.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setTrigger(t === trigger ? '' : t)}
+                      className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
+                        trigger === t
+                          ? 'bg-destructive/20 text-destructive border-destructive/50'
+                          : 'bg-muted/20 text-muted-foreground border-muted/30 hover:bg-muted/35'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Urge strength: <span className="text-destructive">{urgeStrength}</span>/10</p>
+                <input
+                  type="range" min={1} max={10} step={1} value={urgeStrength}
+                  onChange={(e) => setUrgeStrength(Number(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Mood before</p>
+                <div className="flex gap-2">
+                  {MOODS.map((m) => (
+                    <button
+                      key={m.value}
+                      onClick={() => setMoodBefore(m.value === moodBefore ? null : m.value)}
+                      title={m.label}
+                      aria-label={m.label}
+                      className={`flex-1 py-2 rounded-lg border text-lg transition-all ${
+                        moodBefore === m.value
+                          ? 'bg-destructive/20 border-destructive/50'
+                          : 'bg-muted/20 border-muted/30 hover:bg-muted/35'
+                      }`}
+                    >
+                      {m.emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Location (optional)</p>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. bedroom, work, late at night..."
+                  className="w-full rounded-lg border border-muted/30 bg-background/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-destructive/50"
+                />
+              </div>
+            </div>
+          )}
+
           <button
             onClick={addEntry}
             disabled={saving}

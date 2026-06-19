@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Lock,
+  BarChart3,
 } from 'lucide-react';
 import { SeedGuardLogo } from '@/components/seedguard-logo';
 import { XpBar } from '@/components/xp-bar';
@@ -31,6 +32,7 @@ const navigationItems = [
   { href: '/history',   label: 'History',   icon: History },
   { href: '/benefits',  label: 'Benefits',  icon: MapPin },
   { href: '/streaks',   label: 'Streaks',   icon: Flame },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/achievements', label: 'Awards', icon: Award },
   { href: '/social',    label: 'Social',    icon: Users },
   { href: '/account',   label: 'Account',   icon: User },

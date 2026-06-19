@@ -50,6 +50,32 @@ export async function signOut() {
   await supabase.auth.signOut();
 }
 
+/**
+ * Redirects to Google's OAuth consent screen, then back to /auth/callback.
+ * Requires the Google provider to be enabled in the Supabase dashboard
+ * (Authentication → Providers → Google) with the callback URL whitelisted.
+ */
+export async function signInWithGoogle() {
+  invalidateUserCache();
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${window.location.origin}/seedguard-main/auth/callback/` },
+  });
+  if (error) throw error;
+}
+
+/** Links a Google identity to the currently signed-in account. */
+export async function linkGoogleAccount() {
+  const { error } = await supabase.auth.linkIdentity({ provider: 'google' });
+  if (error) throw error;
+}
+
+/** Returns the list of linked OAuth/email identities for the current user. */
+export async function getLinkedIdentities(): Promise<string[]> {
+  const { data } = await supabase.auth.getUserIdentities();
+  return (data?.identities ?? []).map((i) => i.provider);
+}
+
 // ── Streak ────────────────────────────────────────────────────────────
 
 export async function getStreakFromCloud(): Promise<string | null> {
@@ -135,20 +161,42 @@ export interface HistoryEntry {
   date: string;         // display date string
   type: 'victory' | 'relapse';
   note?: string;
+  // Trigger Analytics fields — only meaningful for type='relapse', and only
+  // synced to the cloud once the migration in supabase/trigger-analytics.sql
+  // has been run. Until then they're stored locally only (see history page).
+  trigger?: string;
+  urgeStrength?: number;
+  moodBefore?: number;
+  location?: string;
+  toolsUsed?: string[];
 }
 
 export async function saveHistoryEntryToCloud(entry: HistoryEntry): Promise<void> {
   // Always get a fresh auth check — don't rely on cached user
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
-  const { error } = await supabase.from('entries').insert({
+  const base = {
     user_id: user.id,
     local_id: entry.id,
     type: entry.type,
     note: entry.note ?? '',
     date: entry.date,
+  };
+  // Trigger Analytics columns may not exist yet (migration not run) — try
+  // with them first, and fall back to the base columns if that fails, so a
+  // missing migration never blocks saving the entry itself.
+  const { error } = await supabase.from('entries').insert({
+    ...base,
+    trigger: entry.trigger ?? null,
+    urge_strength: entry.urgeStrength ?? null,
+    mood_before: entry.moodBefore ?? null,
+    location: entry.location ?? null,
+    tools_used: entry.toolsUsed ?? null,
   });
-  if (error) throw error;
+  if (error) {
+    const { error: fallbackError } = await supabase.from('entries').insert(base);
+    if (fallbackError) throw fallbackError;
+  }
 }
 
 export async function deleteHistoryEntryFromCloud(localId: string): Promise<void> {
