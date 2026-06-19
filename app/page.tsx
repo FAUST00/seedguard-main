@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Trophy, Flame } from 'lucide-react';
+import { ArrowRight, Trophy } from 'lucide-react';
 import { ART } from '@/lib/assets';
 import { UserCountBadge } from '@/components/user-count';
 import { SeedGuardLogo } from '@/components/seedguard-logo';
@@ -122,14 +122,14 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Leaderboard requires an account — point here instead of the gated /streaks page */}
+          {/* Leaderboard requires an account: point here instead of the gated /streaks page. */}
+          {/* Deliberately secondary to the main CTA above: outline style, smaller, no glow. */}
           <Link
             href="/account"
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-gold/65 text-gold bg-gold/20 hover:bg-gold/35 text-sm font-bold transition-all shadow-lg shadow-gold/20"
+            className="w-full flex items-center justify-center gap-2 px-4 min-h-[40px] rounded-xl border border-gold/50 bg-gold/10 text-gold text-xs font-bold hover:bg-gold/20 transition-all"
           >
-            <Trophy className="w-4 h-4" aria-hidden />
-            Create Free Account → Join the Leaderboard
-            <Flame className="w-4 h-4 flame-glow" aria-hidden />
+            <Trophy className="w-3.5 h-3.5" aria-hidden />
+            Join the Ranks: Free
           </Link>
         </div>
       </div>
