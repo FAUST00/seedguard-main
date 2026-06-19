@@ -46,6 +46,8 @@ export function EmergencyToolkitModal({ streakDays, onClose }: Props) {
   const stage = getStage(streakDays);
   const tier = intensityTier(intensity);
   const recommended = useMemo(() => recommendedTools(intensity), [intensity]);
+  const recommendedIds = useMemo(() => new Set(recommended.map((t) => t.id)), [recommended]);
+  const moreTools = useMemo(() => TOOLS.filter((t) => !recommendedIds.has(t.id)), [recommendedIds]);
 
   // Stable per-open quote (not re-randomized every render)
   const [motivationQuoteIdx] = useState(() => Math.floor(Math.random() * QUOTES.length));
@@ -81,6 +83,11 @@ export function EmergencyToolkitModal({ streakDays, onClose }: Props) {
               <button onClick={() => setActiveTool(null)} className="flex items-center gap-1.5 text-secondary hover:text-secondary/80">
                 <ArrowLeft className="w-4 h-4" aria-hidden />
                 <span className="text-sm font-bold uppercase tracking-wider">{getTool(activeTool).name}</span>
+              </button>
+            ) : phase === 'tools' ? (
+              <button onClick={() => setPhase('intensity')} className="flex items-center gap-1.5 text-secondary hover:text-secondary/80">
+                <ArrowLeft className="w-4 h-4" aria-hidden />
+                <span className="text-sm font-bold uppercase tracking-wider">Toolkit</span>
               </button>
             ) : (
               <>
@@ -130,35 +137,37 @@ export function EmergencyToolkitModal({ streakDays, onClose }: Props) {
           <div className="space-y-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">Recommended for {tier}</p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {recommended.map((t) => (
                   <button
                     key={t.id}
                     onClick={() => openTool(t.id)}
-                    className="text-left p-3 rounded-xl border border-secondary/40 bg-secondary/10 hover:bg-secondary/20 transition-all"
+                    className="text-center p-2.5 rounded-xl border border-secondary/40 bg-secondary/10 hover:bg-secondary/20 transition-all"
                   >
-                    <span className="text-lg">{t.emoji}</span>
-                    <p className="text-xs font-bold mt-1 text-foreground">{t.name}</p>
+                    <span className="text-base">{t.emoji}</span>
+                    <p className="text-[9px] font-bold mt-1 text-foreground leading-tight">{t.name}</p>
                   </button>
                 ))}
               </div>
             </div>
 
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">All tools</p>
-              <div className="grid grid-cols-3 gap-2">
-                {TOOLS.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => openTool(t.id)}
-                    className="text-center p-2.5 rounded-xl border border-muted/30 bg-muted/10 hover:bg-muted/20 transition-all"
-                  >
-                    <span className="text-base">{t.emoji}</span>
-                    <p className="text-[9px] font-semibold mt-1 text-muted-foreground leading-tight">{t.name}</p>
-                  </button>
-                ))}
+            {moreTools.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">More tools</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {moreTools.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => openTool(t.id)}
+                      className="text-center p-2.5 rounded-xl border border-muted/30 bg-muted/10 hover:bg-muted/20 transition-all"
+                    >
+                      <span className="text-base">{t.emoji}</span>
+                      <p className="text-[9px] font-semibold mt-1 text-muted-foreground leading-tight">{t.name}</p>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { BarChart3 } from 'lucide-react';
 import { PageHeader, SectionHeading, EmptyState } from '@/components/ui';
-import type { HistoryEntry } from '@/lib/sync';
+import { getUser, getHistoryFromCloud, type HistoryEntry } from '@/lib/sync';
 
 const TIME_BLOCKS = ['Late Night', 'Morning', 'Afternoon', 'Evening'] as const;
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -19,9 +19,19 @@ export default function AnalyticsPage() {
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
 
   useEffect(() => {
-    try {
-      setEntries(JSON.parse(localStorage.getItem('seedguard_history') || '[]'));
-    } catch {}
+    async function load() {
+      try {
+        const saved = localStorage.getItem('seedguard_history');
+        if (saved) setEntries(JSON.parse(saved));
+
+        const user = await getUser();
+        if (user) {
+          const cloudEntries = await getHistoryFromCloud();
+          if (cloudEntries.length > 0) setEntries(cloudEntries);
+        }
+      } catch {}
+    }
+    load();
   }, []);
 
   const relapses = useMemo(

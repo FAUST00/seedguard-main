@@ -122,13 +122,13 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Leaderboard CTA */}
+          {/* Leaderboard requires an account — point here instead of the gated /streaks page */}
           <Link
-            href="/streaks"
+            href="/account"
             className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-gold/65 text-gold bg-gold/20 hover:bg-gold/35 text-sm font-bold transition-all shadow-lg shadow-gold/20"
           >
             <Trophy className="w-4 h-4" aria-hidden />
-            View Streak Leaderboard
+            Create Free Account → Join the Leaderboard
             <Flame className="w-4 h-4 flame-glow" aria-hidden />
           </Link>
         </div>

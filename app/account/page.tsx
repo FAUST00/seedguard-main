@@ -12,7 +12,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { User, LogOut, Copy, Check, Shield, ExternalLink, Mail, Pencil, X, Loader2 } from 'lucide-react';
+import { User, LogOut, Copy, Check, Shield, ExternalLink, Mail, Pencil, X, Loader2, Camera } from 'lucide-react';
 import { signIn, signUp, signOut, getUser, getProfile, migrateLocalToCloud, updateProfile, signInWithGoogle, linkGoogleAccount, getLinkedIdentities } from '@/lib/sync';
 import { syncProfileStreak } from '@/lib/social';
 import { supabase } from '@/lib/supabase';
@@ -23,6 +23,8 @@ import { EarnedBadges } from '@/components/earned-badges';
 import { ImageBanner } from '@/components/synth-background';
 import { ART } from '@/lib/assets';
 import { useRouter } from 'next/navigation';
+import { AVATAR_PRESETS } from '@/lib/avatar-presets';
+import { resizeImageToDataUri } from '@/lib/avatar-upload';
 
 const USERNAME_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const USERNAME_LS_KEY = 'seedguard_username_changed_at';
@@ -73,6 +75,10 @@ export default function AccountPage() {
   const [newUsername, setNewUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [usernameSaving, setUsernameSaving] = useState(false);
+
+  // Avatar
+  const [avatarSaving, setAvatarSaving] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   // ── Initial auth check ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -236,6 +242,38 @@ export default function AccountPage() {
     }
   }
 
+  async function saveAvatar(dataUri: string) {
+    setAvatarSaving(true);
+    try {
+      await updateProfile({ avatar_url: dataUri });
+      const refreshed = await getProfile();
+      setProfile(refreshed ?? { ...profile, avatar_url: dataUri });
+      setShowAvatarPicker(false);
+      playSound('success');
+      toast('Profile picture updated!', 'success');
+    } catch (err: unknown) {
+      toast((err as Error).message ?? 'Failed to save profile picture.', 'error');
+      playSound('error');
+    } finally {
+      setAvatarSaving(false);
+    }
+  }
+
+  async function handleAvatarFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setAvatarSaving(true);
+    try {
+      const dataUri = await resizeImageToDataUri(file);
+      await saveAvatar(dataUri);
+    } catch (err: unknown) {
+      toast((err as Error).message ?? 'Failed to process that image.', 'error');
+      playSound('error');
+      setAvatarSaving(false);
+    }
+  }
+
   // ── Loading ────────────────────────────────────────────────────────────────
   if (step === 'loading') {
     return <AccountSkeleton />;
@@ -285,9 +323,20 @@ export default function AccountPage() {
         {/* Banner */}
         <ImageBanner src={ART.heroCity}>
           <div className="p-6 md:p-8 flex items-center gap-5">
-            <div className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/50 flex items-center justify-center flex-shrink-0">
-              <User className="w-8 h-8 text-primary" aria-hidden />
-            </div>
+            <button
+              onClick={() => setShowAvatarPicker((v) => !v)}
+              className="relative w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/50 flex items-center justify-center flex-shrink-0 overflow-hidden hover:border-primary/80 transition-colors"
+              aria-label="Change profile picture"
+            >
+              {profile.avatar_url ? (
+                <img src={profile.avatar_url as string} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-8 h-8 text-primary" aria-hidden />
+              )}
+              <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-primary border border-background flex items-center justify-center">
+                <Camera className="w-3 h-3 text-white" aria-hidden />
+              </span>
+            </button>
             <div className="flex-1 min-w-0">
               {editingUsername ? (
                 <div className="space-y-2">
@@ -351,6 +400,34 @@ export default function AccountPage() {
             </div>
           </div>
         </ImageBanner>
+
+        {showAvatarPicker && (
+          <div className="rounded-2xl border border-primary/20 glass-effect p-6 space-y-4 animate-scale-in">
+            <p className="text-sm font-bold uppercase tracking-wider text-primary">Profile Picture</p>
+            <label className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-primary/50 bg-primary/10 text-primary text-sm font-bold uppercase tracking-wider hover:bg-primary/20 transition-all cursor-pointer">
+              {avatarSaving ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> : <Camera className="w-4 h-4" aria-hidden />}
+              Upload Photo
+              <input type="file" accept="image/*" onChange={handleAvatarFile} disabled={avatarSaving} className="hidden" />
+            </label>
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">Or pick a default that matches the SeedGuard look:</p>
+              <div className="grid grid-cols-6 gap-2">
+                {AVATAR_PRESETS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    onClick={() => saveAvatar(preset.dataUri)}
+                    disabled={avatarSaving}
+                    title={preset.label}
+                    aria-label={preset.label}
+                    className="aspect-square rounded-full overflow-hidden border-2 border-muted/30 hover:border-primary/60 transition-all disabled:opacity-50"
+                  >
+                    <img src={preset.dataUri} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Earned badges */}
         <EarnedBadges />

@@ -213,13 +213,37 @@ export async function deleteHistoryEntryFromCloud(localId: string): Promise<void
 export async function getHistoryFromCloud(): Promise<HistoryEntry[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
+
+  // Trigger Analytics columns may not exist yet (migration not run) — try
+  // selecting them first, and fall back to the base columns if that errors,
+  // so a missing migration never blocks loading history at all.
   const { data, error } = await supabase
+    .from('entries')
+    .select('local_id, type, note, date, trigger, urge_strength, mood_before, location, tools_used')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (!error && data) {
+    return data.map((row) => ({
+      id: row.local_id,
+      type: row.type as 'victory' | 'relapse',
+      note: row.note,
+      date: row.date,
+      trigger: row.trigger ?? undefined,
+      urgeStrength: row.urge_strength ?? undefined,
+      moodBefore: row.mood_before ?? undefined,
+      location: row.location ?? undefined,
+      toolsUsed: row.tools_used ?? undefined,
+    }));
+  }
+
+  const { data: fallbackData, error: fallbackError } = await supabase
     .from('entries')
     .select('local_id, type, note, date')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
-  if (error || !data) return [];
-  return data.map((row) => ({
+  if (fallbackError || !fallbackData) return [];
+  return fallbackData.map((row) => ({
     id: row.local_id,
     type: row.type as 'victory' | 'relapse',
     note: row.note,
