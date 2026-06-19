@@ -75,7 +75,7 @@ export function EmergencyToolkitModal({ streakDays, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/85" onClick={onClose}>
       <div className="w-full max-w-sm max-h-[90vh] overflow-y-auto rounded-2xl border border-destructive/40 bg-background/97 p-6 space-y-5 animate-scale-in" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
