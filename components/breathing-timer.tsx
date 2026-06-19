@@ -79,9 +79,14 @@ export function BreathingTimer() {
         </p>
       )}
 
-      <p className="text-xs text-muted-foreground/60 text-center max-w-xs">
-        4-7-8 breathing (Dr. Andrew Weil). Start by exhaling completely through your mouth with a whoosh, then follow the cycle: inhale quietly through your nose for 4, hold for 7, exhale completely through your mouth with a whoosh for 8. Repeat until the urge passes.
-      </p>
+      <div className="text-xs text-muted-foreground/60 max-w-xs space-y-1">
+        <p className="text-center font-bold uppercase tracking-wider text-muted-foreground/80 mb-1.5">4-7-8 Breathing (Dr. Andrew Weil)</p>
+        <p>1. Exhale completely through your mouth with a whoosh, to start.</p>
+        <p>2. Inhale quietly through your nose for 4.</p>
+        <p>3. Hold your breath for 7.</p>
+        <p>4. Exhale completely through your mouth with a whoosh for 8.</p>
+        <p className="pt-1 text-center italic">Repeat the cycle until the urge passes.</p>
+      </div>
     </div>
   );
 }
