@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import { Flame, Trophy, Medal, Crown, RefreshCw, Loader2, Globe, Users, Calendar, Clock, Star } from 'lucide-react';
 import { ImageBanner } from '@/components/synth-background';
 import { LeaderboardRowSkeleton } from '@/components/skeleton';
@@ -143,6 +144,7 @@ export default function StreaksPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const fetchEntries = useCallback(async () => {
     try {
@@ -177,7 +179,7 @@ export default function StreaksPage() {
   }, [view, toast]);
 
   useEffect(() => {
-    getUser().then((u) => setLoggedIn(!!u));
+    getUser().then((u) => { setLoggedIn(!!u); setAuthChecked(true); });
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -201,6 +203,35 @@ export default function StreaksPage() {
 
   const myEntry = entries.find((e) => e.isMe);
   const activeTab = TABS.find((t) => t.id === view)!;
+
+  // ── Loading / no-auth guards ──────────────────────────────────────────────
+  if (!authChecked) {
+    return (
+      <div className="container mx-auto p-4 md:p-8 max-w-3xl space-y-4 page-entry">
+        {[1, 2, 3].map((i) => <LeaderboardRowSkeleton key={i} />)}
+      </div>
+    );
+  }
+
+  if (!loggedIn) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-5 p-8 text-center page-entry">
+        <Trophy className="w-12 h-12 text-gold" aria-hidden />
+        <h2 className="text-2xl font-bold neon-text-gold text-gold uppercase tracking-wider">
+          Sign in to use Streaks
+        </h2>
+        <p className="text-muted-foreground max-w-sm">
+          Create a free account to track your streak, climb the leaderboard, and compete with friends.
+        </p>
+        <Link
+          href="/account"
+          className="px-6 py-3 rounded-xl border border-gold/50 bg-gold/10 text-gold font-bold uppercase tracking-wider neon-hover"
+        >
+          Go to Account
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-3xl space-y-6 page-entry">
@@ -294,7 +325,7 @@ export default function StreaksPage() {
               Icon={Flame}
               accent="gold"
               title="No data yet"
-              description="Be the first — create an account and start your streak to claim the top spot."
+              description="Be the first to start a streak and claim the top spot."
             />
           )}
         </div>
@@ -325,7 +356,7 @@ export default function StreaksPage() {
 
       <div className="rounded-xl border border-muted/15 bg-muted/5 p-5 text-xs text-muted-foreground space-y-1.5">
         <p className="font-bold text-foreground uppercase tracking-wider text-xs">How it updates</p>
-        <p>Your streak syncs every time you open this tab or the Dashboard. Friends appear once connected in the Social tab. Weekly and Monthly boards reset automatically — a fresh start still earns you a place.</p>
+        <p>Your streak syncs every time you open this tab or the Dashboard. Friends appear once connected in the Social tab. Weekly and Monthly boards reset automatically, a fresh start still earns you a place.</p>
       </div>
     </div>
   );

@@ -110,7 +110,7 @@ function PullQuote({ text, author, accent = '#ff2d9b' }: { text: string; author:
       style={{ borderLeft: `3px solid ${accent}`, background: accent + '10' }}
     >
       <p className="italic text-base text-foreground/90 leading-relaxed">&ldquo;{text}&rdquo;</p>
-      <p className="mt-2 text-xs font-bold uppercase tracking-widest" style={{ color: accent }}>— {author}</p>
+      <p className="mt-2 text-xs font-bold uppercase tracking-widest" style={{ color: accent }}>~ {author}</p>
     </div>
   );
 }
@@ -162,7 +162,7 @@ const PRACTITIONERS = [
     years: '1856 – 1943',
     accent: '#00e5ff',
     quote: 'I do not think you can name many great inventions that have been made by married men.',
-    body: 'Tesla was a lifelong celibate who explicitly credited his abstinence for his extraordinary creative output. He stated that sexual energy, when not discharged, converts itself into mental and creative energy. He held over 300 patents, invented alternating current, and conceptualized wireless energy transmission — all while working alone and remaining celibate until his death at 86.',
+    body: 'Tesla was a lifelong celibate who explicitly credited his abstinence for his extraordinary creative output. He stated that sexual energy, when not discharged, converts itself into mental and creative energy. He held over 300 patents, invented alternating current, and conceptualized wireless energy transmission, all while working alone and remaining celibate until his death at 86.',
     img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Tesla_circa_1890.jpeg/250px-Tesla_circa_1890.jpeg',
     imgAlt: 'Nikola Tesla portrait, circa 1890',
     imgCaption: 'Tesla, circa 1890. Public domain.',
@@ -551,7 +551,7 @@ export default function EsotericPage() {
                 </p>
                 <PullQuote
                   text="As above, so below. As within, so without. The creative energy of the universe and the creative seed of man are one and the same force operating at different scales."
-                  author="The Kybalion — Three Initiates (Hermetic Philosophy)"
+                  author="The Kybalion, Three Initiates (Hermetic Philosophy)"
                   accent="#fbbf24"
                 />
                 {/* Three Rosicrucian/Hermetic images as a centered gallery */}
@@ -775,7 +775,7 @@ export default function EsotericPage() {
                 </p>
                 <PullQuote
                   text="The most powerful force in the universe is the sexual energy of man. Those who control their own will always rule those who do not."
-                  author="Napoleon Hill, Think and Grow Rich — Chapter 11"
+                  author="Napoleon Hill, Think and Grow Rich, Chapter 11"
                   accent="#fbbf24"
                 />
                 <p>

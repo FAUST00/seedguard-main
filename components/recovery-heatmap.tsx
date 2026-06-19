@@ -83,7 +83,7 @@ export function RecoveryHeatmap() {
                 {week.map((cell) => (
                   <div
                     key={cell.date}
-                    title={`${cell.label}${cell.relapse ? ' — relapse logged' : cell.level >= 3 ? ' — clean' : cell.level === 2 ? ' — tracked' : ''}`}
+                    title={`${cell.label}${cell.relapse ? ': relapse logged' : cell.level >= 3 ? ': clean' : cell.level === 2 ? ': tracked' : ''}`}
                     className={`w-3 h-3 rounded-sm transition-all ${LEVEL_CLASS[cell.level]}`}
                   />
                 ))}

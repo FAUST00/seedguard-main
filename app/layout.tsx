@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: '%s | SeedGuard',
   },
   description:
-    'The #1 NoFap streak tracker and semen retention counter. Build discipline, compete on the leaderboard, and reclaim your freedom — synced across all your devices.',
+    'The #1 NoFap streak tracker and semen retention counter. Build discipline, compete on the leaderboard, and reclaim your freedom, synced across all your devices.',
   keywords: [
     'nofap tracker', 'semen retention tracker', 'PMO streak counter',
     'nofap streak app', 'no fap counter', 'PMO recovery app',
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
         url: '/seedguard-main/images/wp4787824-retrowave-night-wallpapers.jpg',
         width: 1920,
         height: 1080,
-        alt: 'SeedGuard — NoFap & PMO Freedom Tracker',
+        alt: 'SeedGuard: NoFap & PMO Freedom Tracker',
       },
     ],
   },

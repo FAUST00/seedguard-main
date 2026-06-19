@@ -4,7 +4,7 @@ export const dynamic = 'force-static';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'SeedGuard — PMO Freedom Tracker',
+    name: 'SeedGuard: PMO Freedom Tracker',
     short_name: 'SeedGuard',
     description: 'Track streaks, compete with friends, and reclaim your freedom.',
     start_url: '/seedguard-main/',

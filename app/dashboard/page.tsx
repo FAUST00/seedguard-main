@@ -137,8 +137,10 @@ export default function Dashboard() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [achUnlocked, setAchUnlocked] = useState<Achievement | null>(null);
 
-  // Urge surfing modal
+  // Urge surfing modal: quote is picked once when the modal opens, not on
+  // every render, otherwise it re-randomizes every second from the live timer
   const [showUrge, setShowUrge] = useState(false);
+  const [urgeQuoteIndex, setUrgeQuoteIndex] = useState(0);
 
   // Mood check-in
   const [showMood, setShowMood] = useState(false);
@@ -260,7 +262,7 @@ export default function Dashboard() {
     };
     const badgeIds = computeEarnedBadgeIds(badgeStats);
 
-    // XP / level — derived from progress + banked quest XP
+    // XP / level: derived from progress + banked quest XP
     const xp = computeXp({
       totalDays: updated.totalDays,
       longestStreak: updated.longestStreak,
@@ -349,7 +351,7 @@ export default function Dashboard() {
         <div className="rounded-xl border border-muted/30 bg-muted/10 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground flex-1">
             <Lock className="w-4 h-4 flex-shrink-0" aria-hidden />
-            <span><strong className="text-foreground">Anonymous Mode</strong> — data stored on this device only.</span>
+            <span><strong className="text-foreground">Anonymous Mode</strong>: data stored on this device only.</span>
           </div>
           <div className="flex gap-2 flex-shrink-0">
             <Link href="/account" className="text-xs px-3 py-1.5 rounded-lg border border-secondary/50 bg-secondary/10 text-secondary hover:bg-secondary/20 font-semibold transition-all flex items-center gap-1">
@@ -470,7 +472,7 @@ export default function Dashboard() {
                 </button>
               ))}
             </div>
-            <p className="text-[10px] text-muted-foreground/50 text-center">Logged once per day — tracks your emotional journey.</p>
+            <p className="text-[10px] text-muted-foreground/50 text-center">Logged once per day, tracks your emotional journey.</p>
           </div>
         </div>
       )}
@@ -478,7 +480,7 @@ export default function Dashboard() {
       {/* ── Urge Surfing Modal ────────────────────────────────────────── */}
       {showUrge && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border border-destructive/40 bg-background/97 p-6 space-y-5 animate-scale-in">
+          <div className="w-full max-w-sm max-h-[90vh] overflow-y-auto rounded-2xl border border-destructive/40 bg-background/97 p-6 space-y-5 animate-scale-in">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wind className="w-5 h-5 text-secondary" aria-hidden />
@@ -488,14 +490,14 @@ export default function Dashboard() {
             </div>
 
             <p className="text-sm text-muted-foreground leading-relaxed">
-              An urge lasts <strong className="text-foreground">90 seconds</strong> at peak intensity. Breathe through it. You have survived every urge so far — this one is no different.
+              An urge lasts <strong className="text-foreground">90 seconds</strong> at peak intensity. Breathe through it. You have survived every urge so far, this one is no different.
             </p>
 
             <BreathingTimer />
 
             <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
               <p className="text-xs text-muted-foreground italic text-center">
-                &ldquo;{QUOTES[Math.floor(Math.random() * QUOTES.length)].text}&rdquo;
+                &ldquo;{QUOTES[urgeQuoteIndex].text}&rdquo;
               </p>
             </div>
 
@@ -504,7 +506,7 @@ export default function Dashboard() {
               onClick={() => setShowUrge(false)}
               className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/20 text-sm font-medium transition-all"
             >
-              I made it — Log a Victory ✓
+              I made it: Log a Victory ✓
             </Link>
           </div>
         </div>
@@ -515,7 +517,7 @@ export default function Dashboard() {
         title="Dashboard"
         subtitle={timer.days === 0
           ? 'Every journey starts with a single day. Today is that day.'
-          : `Day ${timer.days} — every second you hold is a victory.`}
+          : `Day ${timer.days}: every second you hold is a victory.`}
         actions={
           <>
             {todayMood && (
@@ -524,7 +526,10 @@ export default function Dashboard() {
               </span>
             )}
             <button
-              onClick={() => setShowUrge(true)}
+              onClick={() => {
+                setUrgeQuoteIndex(Math.floor(Math.random() * QUOTES.length));
+                setShowUrge(true);
+              }}
               className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-destructive/50 bg-destructive/10 text-destructive hover:bg-destructive/20 font-bold uppercase tracking-wider text-xs transition-all"
             >
               <AlertTriangle className="w-4 h-4" aria-hidden />
@@ -683,7 +688,7 @@ export default function Dashboard() {
         </blockquote>
 
         {currentQuote.author ? (
-          <p className="text-sm text-secondary font-semibold neon-text-cyan">— {currentQuote.author}</p>
+          <p className="text-sm text-secondary font-semibold neon-text-cyan">~ {currentQuote.author}</p>
         ) : null}
 
         <button

@@ -7,6 +7,13 @@ import { Shield, ArrowRight, Check, Lock, Cloud } from 'lucide-react';
 
 const MODES = [
   {
+    id: 'monk',
+    name: 'Monk Mode',
+    emoji: '🔱',
+    desc: 'No PMO + no social media + daily exercise. Full discipline.',
+    color: 'border-gold/60 bg-gold/10 text-gold',
+  },
+  {
     id: 'hard',
     name: 'Hard Mode',
     emoji: '⚔️',
@@ -19,13 +26,6 @@ const MODES = [
     emoji: '🛡️',
     desc: 'No pornography. Masturbation occasionally allowed.',
     color: 'border-secondary/60 bg-secondary/10 text-secondary',
-  },
-  {
-    id: 'monk',
-    name: 'Monk Mode',
-    emoji: '🔱',
-    desc: 'No PMO + no social media + daily exercise. Full discipline.',
-    color: 'border-gold/60 bg-gold/10 text-gold',
   },
 ] as const;
 
@@ -43,7 +43,7 @@ export default function Onboarding() {
     if (step < TOTAL_STEPS - 1) {
       setStep(step + 1);
     } else if (step === TOTAL_STEPS - 1) {
-      // Step 3 — show the local-vs-cloud fork (step 4)
+      // Step 3: show the local-vs-cloud fork (step 4)
       setStep(TOTAL_STEPS);
     }
   };
@@ -113,7 +113,7 @@ export default function Onboarding() {
               </div>
               <div className="space-y-3">
                 {[
-                  'Live streak timer — counts every second',
+                  'Live streak timer, counts every second',
                   'Leaderboard to compete with friends',
                   'Cloud sync across all your devices',
                   'Badges & milestones to celebrate progress',
@@ -190,9 +190,9 @@ export default function Onboarding() {
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
                   {name ? `${name}, your` : 'Your'} journey to freedom starts now.
-                  {mode === 'monk' && ' Monk Mode — maximum discipline. 🔱'}
-                  {mode === 'hard' && ' Hard Mode — the standard. ⚔️'}
-                  {mode === 'easy' && ' Easy Mode — step by step. 🛡️'}
+                  {mode === 'monk' && ' Monk Mode: maximum discipline. 🔱'}
+                  {mode === 'hard' && ' Hard Mode: the standard. ⚔️'}
+                  {mode === 'easy' && ' Easy Mode: step by step. 🛡️'}
                 </p>
               </div>
               <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4 text-sm text-muted-foreground text-left space-y-1.5">
@@ -250,7 +250,7 @@ export default function Onboarding() {
           )}
         </div>
 
-        {/* Nav buttons — hidden on step 4 (has its own fork buttons) */}
+        {/* Nav buttons: hidden on step 4 (has its own fork buttons) */}
         {step < 4 && (
           <div className="flex gap-3 pt-2">
             {step > 1 && (

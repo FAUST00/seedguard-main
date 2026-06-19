@@ -158,9 +158,9 @@ export async function getMonthlyLeaderboard(): Promise<StreakEntry[]> {
 
 /** Format an ISO date string for display. */
 export function fmtDate(iso: string | null): string {
-  if (!iso) return '—';
+  if (!iso) return '·';
   const d = new Date(iso);
-  if (isNaN(d.getTime())) return '—';
+  if (isNaN(d.getTime())) return '·';
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 

@@ -3,17 +3,21 @@
 import { useState, useEffect } from 'react';
 import { completeQuest } from '@/lib/quests';
 
-/** 4-4-4-4 box-breathing guide used in the urge-surfing tool. */
+/**
+ * 4-7-8 breathing technique, developed by Dr. Andrew Weil. Acts as a
+ * "natural tranquilizer" for the nervous system: exhale fully, inhale
+ * quietly for 4, hold for 7, then exhale completely with a "whoosh" for 8.
+ */
 const BREATH_PHASES = [
-  { label: 'INHALE', secs: 4, color: '#00e5ff', scale: true },
-  { label: 'HOLD',   secs: 4, color: '#a855f7', scale: false },
-  { label: 'EXHALE', secs: 4, color: '#ff2d9b', scale: true },
-  { label: 'HOLD',   secs: 4, color: '#a855f7', scale: false },
+  { label: 'EXHALE (whoosh)', secs: 4, color: '#ff2d9b', scale: true },
+  { label: 'INHALE',          secs: 4, color: '#00e5ff', scale: true },
+  { label: 'HOLD',            secs: 7, color: '#a855f7', scale: false },
+  { label: 'EXHALE (whoosh)', secs: 8, color: '#ff2d9b', scale: true },
 ];
 
 export function BreathingTimer() {
   const [phaseIdx, setPhaseIdx] = useState(0);
-  const [tick, setTick] = useState(4);
+  const [tick, setTick] = useState(BREATH_PHASES[0].secs);
   const [cycles, setCycles] = useState(0);
 
   useEffect(() => {
@@ -56,26 +60,26 @@ export function BreathingTimer() {
           style={{ transform: phase.scale ? `scale(${1 + (1 - pct) * 0.15})` : 'scale(1)' }}
         >
           <span className="text-4xl font-extrabold font-mono" style={{ color: phase.color }}>{tick}</span>
-          <span className="text-xs font-bold uppercase tracking-widest mt-1" style={{ color: phase.color }}>{phase.label}</span>
+          <span className="text-xs font-bold uppercase tracking-widest mt-1 text-center px-2" style={{ color: phase.color }}>{phase.label}</span>
         </div>
       </div>
 
-      <div className="flex gap-3 text-xs text-muted-foreground">
+      <div className="flex gap-2 text-xs text-muted-foreground flex-wrap justify-center">
         {BREATH_PHASES.map((p, i) => (
           <span key={i} className={`px-2 py-1 rounded-full font-bold uppercase tracking-wider transition-all ${i === phaseIdx ? 'text-foreground bg-muted/30' : 'opacity-40'}`}>
-            {p.label}
+            {p.label.replace(' (whoosh)', '')}
           </span>
         ))}
       </div>
 
       {cycles > 0 && (
         <p className="text-xs text-muted-foreground">
-          Cycle {cycles} complete — you&apos;re doing great.
+          Cycle {cycles} complete, you&apos;re doing great.
         </p>
       )}
 
       <p className="text-xs text-muted-foreground/60 text-center max-w-xs">
-        4-4-4-4 box breathing. Inhale for 4 — hold for 4 — exhale for 4 — hold for 4. Repeat until the urge passes.
+        4-7-8 breathing (Dr. Andrew Weil). Exhale completely with a whoosh, inhale quietly through your nose for 4, hold for 7, then exhale completely through your mouth with a whoosh for 8. Repeat until the urge passes.
       </p>
     </div>
   );

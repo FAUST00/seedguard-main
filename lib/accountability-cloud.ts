@@ -95,5 +95,5 @@ export async function getMyCloudPartner(): Promise<CloudPartner | null> {
 
 /** Send a canned accountability nudge to the partner via DM. */
 export async function nudgePartner(partnerId: string): Promise<void> {
-  await sendMessage(partnerId, '👊 Accountability nudge — how’s your streak holding up today?');
+  await sendMessage(partnerId, '👊 Accountability nudge: how’s your streak holding up today?');
 }

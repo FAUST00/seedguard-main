@@ -56,18 +56,18 @@ describe('streakTier', () => {
 // fmtDate ─────────────────────────────────────────────────────────────────────
 
 describe('fmtDate', () => {
-  test('null returns em-dash', () => {
-    expect(fmtDate(null)).toBe('—');
+  test('null returns placeholder', () => {
+    expect(fmtDate(null)).toBe('·');
   });
 
   test('valid ISO string returns formatted date with digits', () => {
     const result = fmtDate('2026-01-15T00:00:00.000Z');
     expect(result).toMatch(/\d/);
-    expect(result).not.toBe('—');
+    expect(result).not.toBe('·');
   });
 
-  test('invalid string returns em-dash', () => {
-    expect(fmtDate('not-a-date')).toBe('—');
+  test('invalid string returns placeholder', () => {
+    expect(fmtDate('not-a-date')).toBe('·');
   });
 });
 

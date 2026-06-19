@@ -64,7 +64,7 @@ export function MilestoneRoadmap({ currentStreak }: { currentStreak: number }) {
       {nextIdx !== -1 && (
         <p className="mt-4 text-xs text-muted-foreground/70 text-center">
           Next: <span className="text-primary font-bold">Day {MILESTONES[nextIdx].day}</span>
-          {' '}— {MILESTONES[nextIdx].day - currentStreak} day{MILESTONES[nextIdx].day - currentStreak !== 1 ? 's' : ''} to go
+          {' '}({MILESTONES[nextIdx].day - currentStreak} day{MILESTONES[nextIdx].day - currentStreak !== 1 ? 's' : ''} to go)
         </p>
       )}
     </Card>

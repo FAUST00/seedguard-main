@@ -100,7 +100,7 @@ function CalendarHeatmap({ entries }: { entries: HistoryEntry[] }) {
                 return (
                   <div
                     key={di}
-                    title={`${day.toDateString()}${type ? ` — ${type}` : ''}`}
+                    title={`${day.toDateString()}${type ? `: ${type}` : ''}`}
                     className={`w-3 h-3 rounded-sm transition-all ${bg} ${isToday ? 'ring-1 ring-secondary' : ''} ${isFuture ? 'opacity-20' : ''}`}
                   />
                 );
@@ -173,7 +173,7 @@ function LogEntry({
         />
       </button>
 
-      {/* ── Expanded body — smooth max-height transition ── */}
+      {/* ── Expanded body: smooth max-height transition ── */}
       <div
         className="overflow-hidden transition-all duration-300 ease-in-out"
         style={{ maxHeight: expanded ? '500px' : '0px' }}
@@ -395,10 +395,10 @@ export default function History() {
     <div className="container mx-auto p-4 md:p-8 max-w-6xl space-y-8 page-entry">
       <PageHeader
         title="History"
-        subtitle="Track every victory and setback — the whole picture builds discipline."
+        subtitle="Track every victory and setback: the whole picture builds discipline."
       />
 
-      {/* Heatmaps — activity (victory/relapse) + recovery (clean/check-in) */}
+      {/* Heatmaps: activity (victory/relapse) + recovery (clean/check-in) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <CalendarHeatmap entries={entries} />
         <RecoveryHeatmap />
@@ -523,10 +523,10 @@ export default function History() {
             />
           </button>
           <div
-            className="overflow-hidden transition-all duration-400 ease-in-out"
-            style={{ maxHeight: victoriesOpen ? '99999px' : '0px' }}
+            className="overflow-y-auto transition-all duration-400 ease-in-out"
+            style={{ maxHeight: victoriesOpen ? '480px' : '0px' }}
           >
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2 pt-1 pr-1">
               {victories.length === 0 ? (
                 entries.length === 0 ? (
                   <EmptyState
@@ -573,17 +573,17 @@ export default function History() {
             />
           </button>
           <div
-            className="overflow-hidden transition-all duration-400 ease-in-out"
-            style={{ maxHeight: relapsesOpen ? '99999px' : '0px' }}
+            className="overflow-y-auto transition-all duration-400 ease-in-out"
+            style={{ maxHeight: relapsesOpen ? '480px' : '0px' }}
           >
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2 pt-1 pr-1">
               {relapses.length === 0 ? (
                 entries.length === 0 ? (
                   <EmptyState
                     emoji="✨"
                     accent="secondary"
                     title="Clean slate"
-                    description="No relapses logged. Keep holding the line — every clean day compounds."
+                    description="No relapses logged. Keep holding the line, every clean day compounds."
                   />
                 ) : (
                   <div className="text-sm text-muted-foreground italic border border-dashed border-muted/50 rounded-lg p-6 text-center">

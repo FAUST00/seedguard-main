@@ -73,7 +73,7 @@ export function QuestBoard() {
 
       {allDone && (
         <p className="mt-4 text-center text-xs font-bold text-secondary neon-text-cyan uppercase tracking-wider">
-          🔥 All quests complete — come back tomorrow
+          🔥 All quests complete, come back tomorrow
         </p>
       )}
     </div>

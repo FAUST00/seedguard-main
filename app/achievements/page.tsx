@@ -285,7 +285,7 @@ export default function AchievementsPage() {
                   )}>
                     <Trophy className={cn('w-3.5 h-3.5', t.text)} />
                     <span className={cn('text-[11px] font-bold uppercase tracking-wider', t.text)}>
-                      Category complete — well done
+                      Category complete: well done
                     </span>
                   </div>
                 )}

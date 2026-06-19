@@ -38,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
               Something glitched in the grid
             </h2>
             <p className="text-sm text-muted-foreground mt-2 max-w-sm">
-              An unexpected error occurred. Your data is safe — try reloading this section.
+              An unexpected error occurred. Your data is safe, try reloading this section.
             </p>
             {this.state.message && (
               <p className="text-xs text-muted-foreground/60 mt-2 font-mono">{this.state.message}</p>

@@ -113,7 +113,7 @@ export default function SettingsPage() {
 
   async function handleDeleteAccount() {
     if (deletionPhrase !== DELETION_PHRASE) {
-      toast('Phrase does not match — try again.', 'error');
+      toast('Phrase does not match, try again.', 'error');
       return;
     }
     setDeleting(true);
@@ -126,7 +126,7 @@ export default function SettingsPage() {
       toast('Account permanently deleted. Redirecting…', 'info');
       setTimeout(() => { window.location.href = '/'; }, 2000);
     } catch (err: unknown) {
-      toast((err as Error).message ?? 'Deletion failed — please try again.', 'error');
+      toast((err as Error).message ?? 'Deletion failed, please try again.', 'error');
       setDeleting(false);
     }
   }
@@ -226,7 +226,7 @@ export default function SettingsPage() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground leading-snug">
-                Cranked-up neons — vivid cyan, magenta, electric blue. High-contrast daymode.
+                Cranked-up neons: vivid cyan, magenta, electric blue. High-contrast daymode.
               </p>
               <div className="flex gap-1.5 mt-3" aria-hidden>
                 <span className="w-4 h-4 rounded-full bg-[hsl(308,100%,68%)]" />
@@ -332,7 +332,7 @@ export default function SettingsPage() {
         </button>
         {hasAccount && (
           <p className="text-xs text-muted-foreground/70 text-center -mt-3">
-            You&apos;re logged in — this will also reset your cloud streak to zero.
+            You&apos;re logged in, this will also reset your cloud streak to zero.
           </p>
         )}
 

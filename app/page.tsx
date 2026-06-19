@@ -101,7 +101,7 @@ export default function Home() {
         <div className="hidden md:flex flex-col items-center space-y-5 w-full md:w-auto md:max-w-xs">
           {/* Feature grid */}
           <div className="w-full rounded-2xl bg-background/60 backdrop-blur-md border border-primary/20 p-6 shadow-2xl space-y-4">
-            <p className="text-xs text-secondary/80 uppercase tracking-wider font-bold text-center">What you get — free</p>
+            <p className="text-xs text-secondary/80 uppercase tracking-wider font-bold text-center">What you get, free</p>
             <div className="grid grid-cols-2 gap-4">
               {[
                 { icon: '📊', label: 'Streak Tracking',  sub: 'Live second-by-second' },

@@ -135,7 +135,7 @@ export function Sidebar() {
 
         {/* Level / XP — expanded only */}
         {!collapsed && levelInfo && (
-          <Link href="/dashboard" className="block hover:opacity-90 transition-opacity" aria-label={`Level ${levelInfo.level} — ${levelInfo.title}`}>
+          <Link href="/dashboard" className="block hover:opacity-90 transition-opacity" aria-label={`Level ${levelInfo.level}: ${levelInfo.title}`}>
             <XpBar info={levelInfo} variant="compact" />
           </Link>
         )}

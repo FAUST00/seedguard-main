@@ -17,7 +17,7 @@ const weekData = [
     accent: '#22d3ee', border: 'rgba(34,211,238,0.3)', glow: 'rgba(34,211,238,0.08)',
     number: '02', phase: 'FLATLINE',
     benefits: ['Urge intensity starts decreasing', 'Internal calm begins building', 'Brain starts rewiring pathways', 'Clarity in moments of stillness'],
-    challenges: ['Low energy & motivation', 'Emotional numbness (flatline)', 'Brain fog & apathy', 'Reduced libido — this is normal', 'Hardest week for most men'],
+    challenges: ['Low energy & motivation', 'Emotional numbness (flatline)', 'Brain fog & apathy', 'Reduced libido (this is normal)', 'Hardest week for most men'],
   },
   {
     week: 3, label: 'WEEK 3', subtitle: 'Days 15–21 · Energy Returns',
@@ -31,20 +31,20 @@ const weekData = [
     accent: '#34d399', border: 'rgba(52,211,153,0.3)', glow: 'rgba(52,211,153,0.08)',
     number: '04', phase: 'CLARITY',
     benefits: ['Mental clarity noticeably sharper', 'Confidence grows daily', 'Emotional stability improving', 'Gym performance peak', 'Skin clearing up', 'Social presence elevated'],
-    challenges: ['Second flatline possible', 'Discipline required — no coasting', 'Urges tied to stress triggers'],
+    challenges: ['Second flatline possible', 'Discipline required, no coasting', 'Urges tied to stress triggers'],
   },
 ];
 
 const monthData = [
   { period: '~2 Months', title: 'EMOTIONAL STABILITY', icon: Heart,      accent: '#e879f9', border: 'rgba(232,121,249,0.25)', bg: 'rgba(232,121,249,0.05)', points: ['Reduced social anxiety', 'Deeper emotional regulation', 'Relationship improvements begin', 'Genuine self-respect & dignity', 'Consistent, clean daily energy'] },
   { period: '~3 Months', title: 'DOPAMINE REWIRING',  icon: Brain,      accent: '#22d3ee', border: 'rgba(34,211,238,0.25)',  bg: 'rgba(34,211,238,0.05)',  points: ['Life feels naturally enjoyable again', 'Motivation is now your default state', '"Magnetism" & social presence', 'Better discipline across all areas', 'Spiritual awareness deepens'] },
-  { period: '4–6 Months', title: 'PEAK PERFORMANCE',  icon: Zap,        accent: '#a78bfa', border: 'rgba(167,139,250,0.25)', bg: 'rgba(167,139,250,0.05)', points: ['Full mental clarity unlocked', 'Genuine joy & presence', 'Strong urge control — automatic', 'Productivity at an all-time high', 'Deeper voice & clearer skin', 'Relationships transform'] },
-  { period: '6+ Months', title: 'LIFE TRANSFORMATION',icon: Trophy,     accent: '#fbbf24', border: 'rgba(251,191,36,0.25)',  bg: 'rgba(251,191,36,0.05)',  points: ['Unbreakable, earned confidence', 'Intuition & creativity amplified', 'Sustained mastery — no struggle', 'Inner peace & clear purpose', 'Life feels fundamentally different'] },
+  { period: '4–6 Months', title: 'PEAK PERFORMANCE',  icon: Zap,        accent: '#a78bfa', border: 'rgba(167,139,250,0.25)', bg: 'rgba(167,139,250,0.05)', points: ['Full mental clarity unlocked', 'Genuine joy & presence', 'Strong urge control, automatic', 'Productivity at an all-time high', 'Deeper voice & clearer skin', 'Relationships transform'] },
+  { period: '6+ Months', title: 'LIFE TRANSFORMATION',icon: Trophy,     accent: '#fbbf24', border: 'rgba(251,191,36,0.25)',  bg: 'rgba(251,191,36,0.05)',  points: ['Unbreakable, earned confidence', 'Intuition & creativity amplified', 'Sustained mastery, no struggle', 'Inner peace & clear purpose', 'Life feels fundamentally different'] },
   { period: '2–6 Months', title: 'PHYSICAL UPGRADES', icon: TrendingUp, accent: '#34d399', border: 'rgba(52,211,153,0.25)',  bg: 'rgba(52,211,153,0.05)',  points: ['Testosterone levels optimised', 'Stronger, faster gym recovery', 'Better posture & body language', 'Clearer skin & sharper eyes', 'More restful, deeper sleep'] },
   { period: '3–6 Months', title: 'MENTAL CLARITY',    icon: Eye,        accent: '#fb923c', border: 'rgba(251,146,60,0.25)',  bg: 'rgba(251,146,60,0.05)',  points: ['Laser focus on demand', 'Creative breakthroughs', 'Sharper memory & recall', 'Better problem-solving instinct', 'Reduced brain fog permanently'] },
 ];
 
-const milestones = ['Day 7 — Feel the shift', 'Day 14 — Survive flatline', 'Day 30 — Clarity hits', 'Day 90 — Rewired', 'Day 180 — Transformed'];
+const milestones = ['Day 7: Feel the shift', 'Day 14: Survive flatline', 'Day 30: Clarity hits', 'Day 90: Rewired', 'Day 180: Transformed'];
 
 export default function BenefitsPage() {
   const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
@@ -99,7 +99,7 @@ export default function BenefitsPage() {
         </p>
         {currentStreak > 0 && (
           <div className="mt-4 inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-5 py-2">
-            <span className="text-sm font-bold text-primary neon-text-pink">🔥 Day {currentStreak} — keep going</span>
+            <span className="text-sm font-bold text-primary neon-text-pink">🔥 Day {currentStreak}, keep going</span>
           </div>
         )}
       </div>
@@ -116,7 +116,7 @@ export default function BenefitsPage() {
             <div className="flex-1 h-px bg-gradient-to-l from-transparent to-primary/40" />
           </div>
           <p className="text-center text-muted-foreground text-sm mb-9">
-            The first 30 days — what to expect, honestly.
+            The first 30 days: what to expect, honestly.
             {currentWeek > 0 && (
               <span className="block mt-1 text-primary/80 font-semibold text-xs uppercase tracking-wider">
                 You are currently in Week {currentWeek}

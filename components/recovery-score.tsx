@@ -43,7 +43,7 @@ export function RecoveryScore() {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className={`text-4xl font-display font-black tabular-nums ${accent.text} ${accent.neonText}`}>
-              {score ?? '—'}
+              {score ?? '·'}
             </span>
             <span className="text-[9px] text-muted-foreground uppercase tracking-widest">/ 100</span>
           </div>

@@ -12,7 +12,7 @@ const VIDEOS = [
     id: 'LcV0CY6Xerw',
     title: 'Why Semen Retention Changes Everything',
     description:
-      'A comprehensive overview of the core science and philosophy behind semen retention — covering how conserved sexual energy influences testosterone, mental clarity, and overall male vitality.',
+      'A comprehensive overview of the core science and philosophy behind semen retention, covering how conserved sexual energy influences testosterone, mental clarity, and overall male vitality.',
     category: 'Esoteric',
   },
   {
@@ -26,14 +26,14 @@ const VIDEOS = [
     id: 'B7SrVqtbwNk',
     title: 'The Hidden Cost of Esoteric Knowledge',
     description:
-      'Occaro Wisdom unpacks what secret societies and mystery schools understood about sexual energy that mainstream culture has deliberately kept hidden — and the price men pay for not knowing.',
+      'Occaro Wisdom unpacks what secret societies and mystery schools understood about sexual energy that mainstream culture has deliberately kept hidden, and the price men pay for not knowing.',
     category: 'Esoteric',
   },
   {
     id: 'nsR6nq_wGE8',
     title: 'PMO Addiction: How Deep Does It Go?',
     description:
-      'A clinical-style breakdown of pornography\'s grip on the brain and the measurable recovery milestones men experience during abstinence — from acute withdrawal to long-term neurological healing.',
+      'A clinical-style breakdown of pornography\'s grip on the brain and the measurable recovery milestones men experience during abstinence: from acute withdrawal to long-term neurological healing.',
     category: 'Science',
   },
   {
@@ -45,7 +45,7 @@ const VIDEOS = [
   },
   {
     id: 'Cz_vMThVXdM',
-    title: 'The Porn Addiction Loop — and How to Break It',
+    title: 'The Porn Addiction Loop, and How to Break It',
     description:
       'A psychological breakdown of compulsive pornography use: how the habit forms, why willpower alone fails, and the evidence-based recovery pathway that actually works.',
     category: 'Motivation',
@@ -54,12 +54,12 @@ const VIDEOS = [
     id: '0HhqLdTUKP8',
     title: 'NoFap: The Uncomfortable Truth',
     description:
-      'An honest look at the mental battles, identity shifts, and false relapses men face on the journey — cutting through the hype to explain what actually changes and what takes real work.',
+      'An honest look at the mental battles, identity shifts, and false relapses men face on the journey, cutting through the hype to explain what actually changes and what takes real work.',
     category: 'Psychology',
   },
   {
     id: 'C2GGtyI0JoI',
-    title: 'The NoFap Benefits Timeline — Week by Week',
+    title: 'The NoFap Benefits Timeline: Week by Week',
     description:
       'A practical week-by-week guide to what the brain and body experience during retention: from the initial detox discomfort through flatline, and into the sustained benefits beyond 30 days.',
     category: 'Esoteric',
@@ -68,91 +68,91 @@ const VIDEOS = [
     id: '6NMjXIraUPY',
     title: 'Semen Retention Esoteric Secret',
     description:
-      'Moss breaks down the hidden esoteric truth behind semen retention — why ancient traditions treated it as a sacred practice and how this forgotten knowledge directly applies to modern men seeking transformation.',
+      'Moss breaks down the hidden esoteric truth behind semen retention: why ancient traditions treated it as a sacred practice and how this forgotten knowledge directly applies to modern men seeking transformation.',
     category: 'Esoteric',
   },
   {
     id: 'z7o_vf0yl_g',
     title: 'Semen Retention & Magnetism: What Changes in You',
     description:
-      'Examines the widely reported shifts in social presence, eye contact, and personal magnetism that long-term retainers describe — and what science and tradition say about why this happens.',
+      'Examines the widely reported shifts in social presence, eye contact, and personal magnetism that long-term retainers describe, and what science and tradition say about why this happens.',
     category: 'Benefits',
   },
   {
     id: 'ksQmRbSyG8s',
     title: 'Real Talk: 90-Day NoFap Transformation',
     description:
-      'First-person account of the physical, mental, and social changes that occurred over a full 90-day streak — from the brutal first week to the clarity and confidence that follow.',
+      'First-person account of the physical, mental, and social changes that occurred over a full 90-day streak: from the brutal first week to the clarity and confidence that follow.',
     category: 'Esoteric',
   },
   {
     id: 'qriz7css2_I',
     title: 'Overcoming Urges: Practical Strategies That Work',
     description:
-      'Evidence-based tools for managing urges and preventing relapse — breathing techniques, urge surfing, environment design, and the mindset shifts that separate those who make it from those who don\'t.',
+      'Evidence-based tools for managing urges and preventing relapse: breathing techniques, urge surfing, environment design, and the mindset shifts that separate those who make it from those who don\'t.',
     category: 'Motivation',
   },
   {
     id: '0KqmvRtQV-E',
     title: 'The Ancient Secrets of Semen Retention',
     description:
-      'Asangoham reveals what ancient spiritual traditions encoded about semen retention that modern culture has suppressed — and why this knowledge was historically reserved for initiates and seekers of higher consciousness.',
+      'Asangoham reveals what ancient spiritual traditions encoded about semen retention that modern culture has suppressed, and why this knowledge was historically reserved for initiates and seekers of higher consciousness.',
     category: 'Esoteric',
   },
   {
     id: 'ioJJb0ujF_4',
     title: '33 Steps Up: Solomon\'s Temple & Sacred Knowledge',
     description:
-      'Decode Scripture explores the esoteric symbolism of Solomon\'s Temple and Freemasonry\'s 33 degrees — revealing how the ancient architecture of sacred spaces encoded the path of inner mastery and sexual transmutation.',
+      'Decode Scripture explores the esoteric symbolism of Solomon\'s Temple and Freemasonry\'s 33 degrees, revealing how the ancient architecture of sacred spaces encoded the path of inner mastery and sexual transmutation.',
     category: 'Esoteric',
   },
   {
     id: '_ITwQ5ShBLc',
     title: 'Discipline Over Desire: Building the Unbreakable Habit',
     description:
-      'A practical framework for turning NoFap from a white-knuckle struggle into a sustainable lifestyle — covering routine stacking, environment design, and identity-based habit change.',
+      'A practical framework for turning NoFap from a white-knuckle struggle into a sustainable lifestyle: covering routine stacking, environment design, and identity-based habit change.',
     category: 'Science',
   },
   {
     id: 'cevA-d7NyNg',
     title: 'Semen Retention: Ancient Wisdom Meets Modern Science',
     description:
-      'Bridges thousands of years of esoteric tradition — Taoism, Ayurveda, Kundalini — with contemporary neuroscience to show why multiple ancient cultures independently arrived at the same conclusion.',
+      'Bridges thousands of years of esoteric tradition (Taoism, Ayurveda, Kundalini) with contemporary neuroscience to show why multiple ancient cultures independently arrived at the same conclusion.',
     category: 'Esoteric',
   },
   {
     id: 'l7ImtskJx8c',
     title: 'The Hidden Power of Sexual Energy',
     description:
-      'Explores ancient traditions around transmuting sexual energy into creative, spiritual, and intellectual force — from Taoist inner alchemy to Nikola Tesla\'s reported practices of celibacy.',
+      'Explores ancient traditions around transmuting sexual energy into creative, spiritual, and intellectual force: from Taoist inner alchemy to Nikola Tesla\'s reported practices of celibacy.',
     category: 'Esoteric',
   },
   {
     id: 'aFcDKFzDzQo',
     title: 'NoFap: The Real Reason Most Men Fail',
     description:
-      'A raw, honest breakdown of the psychological traps that derail most men on their NoFap journey — from false starts and boredom relapse to the identity shift required to actually succeed long-term.',
+      'A raw, honest breakdown of the psychological traps that derail most men on their NoFap journey: from false starts and boredom relapse to the identity shift required to actually succeed long-term.',
     category: 'Psychology',
   },
   {
     id: 'nJWd0HkttrE',
     title: 'Testosterone & Semen Retention: What the Science Says',
     description:
-      'A research-backed look at how abstinence from ejaculation influences testosterone levels, LH pulses, and androgen receptor sensitivity — separating fact from hype in the NoFap science debate.',
+      'A research-backed look at how abstinence from ejaculation influences testosterone levels, LH pulses, and androgen receptor sensitivity, separating fact from hype in the NoFap science debate.',
     category: 'Esoteric',
   },
   {
     id: 'oKfp2GhaZ9c',
     title: 'The Benefits Nobody Talks About',
     description:
-      'Beyond the popular talking points — this video covers the subtler, lesser-known shifts men report after sustained retention: improved skin, voice depth, sharper intuition, and heightened creative drive.',
+      'Beyond the popular talking points, this video covers the subtler, lesser-known shifts men report after sustained retention: improved skin, voice depth, sharper intuition, and heightened creative drive.',
     category: 'Benefits',
   },
   {
     id: 'Gnf5ZGXl_g4',
     title: 'How to Never Relapse Again',
     description:
-      'A no-nonsense guide to building a relapse-proof mindset and environment — covering trigger identification, urge interruption patterns, accountability systems, and the daily habits that make retention the default.',
+      'A no-nonsense guide to building a relapse-proof mindset and environment: covering trigger identification, urge interruption patterns, accountability systems, and the daily habits that make retention the default.',
     category: 'Benefits',
   },
 ] as const;
