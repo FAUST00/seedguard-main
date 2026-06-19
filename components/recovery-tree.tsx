@@ -24,6 +24,7 @@ const ACCENT_COLOR: Record<TreeStage['accent'], string> = {
   green: '#34d399',
   gold: 'hsl(var(--gold))',
   legendary: 'hsl(var(--primary))',
+  world: '#a78bfa',
 };
 
 export function RecoveryTree({ stage, variant = 'compact', className }: RecoveryTreeProps) {
