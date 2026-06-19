@@ -22,8 +22,12 @@ export function BreathingTimer() {
 
   useEffect(() => {
     if (tick <= 0) {
-      const next = (phaseIdx + 1) % BREATH_PHASES.length;
-      if (next === 0) setCycles((c) => c + 1);
+      // Phase 0 (the initial cleansing exhale) only ever happens once. Every
+      // later cycle loops INHALE -> HOLD -> EXHALE -> INHALE, so the wrap
+      // point is index 1, not index 0 (which would exhale twice in a row).
+      const isLastPhase = phaseIdx === BREATH_PHASES.length - 1;
+      const next = isLastPhase ? 1 : phaseIdx + 1;
+      if (isLastPhase) setCycles((c) => c + 1);
       setPhaseIdx(next);
       setTick(BREATH_PHASES[next].secs);
       return;
