@@ -7,7 +7,7 @@ import {
   Flame, TrendingUp, Award, Calendar, Clock, Users, ChevronRight,
   Quote, AlertTriangle, X, Lock, Cloud, Plus,
 } from 'lucide-react';
-import { syncWithCloud, getStreakFromCloud, getUser } from '@/lib/sync';
+import { syncWithCloud, getStreakFromCloud, getUser, saveStreakToCloud } from '@/lib/sync';
 import { playSound } from '@/lib/sound';
 import { computeEarnedBadgeIds, type BadgeStats } from '@/lib/badges';
 import { StatCard, PageHeader, SectionHeading } from '@/components/ui';
@@ -58,15 +58,40 @@ function countMoodCheckins(): number {
 
 
 // ── Streak start resolver ──────────────────────────────────────────────────
-async function resolveStreakStart(): Promise<Date> {
+interface ResolvedStreak {
+  date: Date;
+  // True when this is an authenticated account that has never set a cloud
+  // streak before — i.e. genuinely brand new, not "no cloud data yet but
+  // local data exists". Used to skip the local-storage-derived totalDays
+  // calc too, since local storage may belong to an unrelated session.
+  freshAccount: boolean;
+}
+
+async function resolveStreakStart(): Promise<ResolvedStreak> {
   try {
     const cloudStart = await getStreakFromCloud();
     if (cloudStart) {
       if (typeof window !== 'undefined') localStorage.setItem('seedguard_streak_start', cloudStart);
-      return new Date(cloudStart);
+      return { date: new Date(cloudStart), freshAccount: false };
     }
+
+    const user = await getUser();
+    if (user) {
+      // Authenticated, but this account has never set a cloud streak.
+      // Local storage is NOT trusted here — it may belong to a different
+      // account/session sharing this browser (e.g. an email confirmation
+      // link opened in a different profile than the one that signed up).
+      // Local data is left completely untouched so the explicit "Import My
+      // Local Data" flow on the Account page can still find and use it.
+      const now = new Date().toISOString();
+      await saveStreakToCloud(now).catch(() => {});
+      return { date: new Date(now), freshAccount: true };
+    }
+
+    // Not authenticated (anonymous/local-only): local storage genuinely is
+    // this session's own data, so the existing fallback chain is correct.
     const local = typeof window !== 'undefined' ? localStorage.getItem('seedguard_streak_start') : null;
-    if (local) return new Date(local);
+    if (local) return { date: new Date(local), freshAccount: false };
 
     const relapses = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('seedguard_relapses') || '[]' : '[]');
     if (relapses.length > 0) {
@@ -75,13 +100,13 @@ async function resolveStreakStart(): Promise<Date> {
       )[0];
       const d = new Date(latest.relapse_time);
       localStorage.setItem('seedguard_streak_start', d.toISOString());
-      return d;
+      return { date: d, freshAccount: false };
     }
     const profile = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('seedguard_profile') || 'null' : 'null');
     if (profile?.created_at) {
       const d = new Date(profile.created_at);
       localStorage.setItem('seedguard_streak_start', d.toISOString());
-      return d;
+      return { date: d, freshAccount: false };
     }
   } catch {}
   const now = new Date().toISOString();
@@ -89,7 +114,7 @@ async function resolveStreakStart(): Promise<Date> {
     localStorage.setItem('seedguard_streak_start', now);
     localStorage.setItem('seedguard_first_day', now);
   }
-  return new Date(now);
+  return { date: new Date(now), freshAccount: false };
 }
 
 function getFirstDay(): Date {
@@ -167,6 +192,7 @@ export default function Dashboard() {
 
   const prevDaysRef = useRef(0);
   const streakStartRef = useRef<Date | null>(null);
+  const freshAccountRef = useRef(false);
 
   // Check onboarding + anon mode on first render
   useEffect(() => {
@@ -195,8 +221,14 @@ export default function Dashboard() {
       } catch {}
       const user = await getUser();
       setHasAccount(!!(user || (typeof window !== 'undefined' && localStorage.getItem('seedguard_account'))));
-      const start = await resolveStreakStart();
+      const { date: start, freshAccount } = await resolveStreakStart();
       streakStartRef.current = start;
+      freshAccountRef.current = freshAccount;
+      if (freshAccount) {
+        // Brand-new authenticated account: don't show stats that may belong
+        // to a different session sharing this browser (see resolveStreakStart).
+        setStats({ currentStreak: 0, totalDays: 0, longestStreak: 0, relapses: 0 });
+      }
       setStreakDisplayDate(start.toLocaleDateString());
       setLoading(false);
       // Pull cloud gamification + merge (no-op when logged out / column absent)
@@ -227,7 +259,12 @@ export default function Dashboard() {
   useEffect(() => {
     if (loading) return;
     const updated = (() => {
-      const firstDay = getFirstDay();
+      // Fresh authenticated accounts use their own streak start as "day
+      // one" instead of getFirstDay(), which may hold an unrelated
+      // session's value on a shared browser (see resolveStreakStart).
+      const firstDay = freshAccountRef.current && streakStartRef.current
+        ? streakStartRef.current
+        : getFirstDay();
       const totalDays = Math.floor((Date.now() - firstDay.getTime()) / 86400000);
       const longestStreak = Math.max(stats.longestStreak, timer.days);
       return { ...stats, currentStreak: timer.days, totalDays, longestStreak };
