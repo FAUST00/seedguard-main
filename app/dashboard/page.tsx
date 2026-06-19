@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Flame, TrendingUp, Award, Calendar, Clock, Users, ChevronRight,
-  Quote, AlertTriangle, X, Wind, Lock, Cloud, Plus,
+  Quote, AlertTriangle, X, Lock, Cloud, Plus,
 } from 'lucide-react';
 import { syncWithCloud, getStreakFromCloud, getUser } from '@/lib/sync';
 import { playSound } from '@/lib/sound';
@@ -22,13 +22,15 @@ import { QUOTES, randomQuoteIndex } from '@/lib/quotes';
 import { MILESTONE_DAYS, MILESTONE_MESSAGES } from '@/lib/milestones';
 import { MOODS, todayMoodKey } from '@/lib/mood';
 import { Confetti } from '@/components/confetti';
-import { BreathingTimer } from '@/components/breathing-timer';
 import { QuickLogSheet } from '@/components/quick-log-sheet';
+import { EmergencyToolkitModal } from '@/components/emergency-toolkit-modal';
 import { WeeklyChallenge } from '@/components/weekly-challenge';
 import { pullGamification, pushGamification } from '@/lib/gamification-sync';
 import { detectNewAchievements, type Achievement } from '@/lib/achievements';
 import { saveXpToCloud } from '@/lib/streaks';
 import { setLiveXp } from '@/lib/xp-state';
+import { RecoveryTree } from '@/components/recovery-tree';
+import { getStage, getNextStage, daysToNextStage } from '@/lib/recovery-tree';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -137,10 +139,8 @@ export default function Dashboard() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [achUnlocked, setAchUnlocked] = useState<Achievement | null>(null);
 
-  // Urge surfing modal: quote is picked once when the modal opens, not on
-  // every render, otherwise it re-randomizes every second from the live timer
+  // Emergency Recovery Toolkit (urge surfing) modal
   const [showUrge, setShowUrge] = useState(false);
-  const [urgeQuoteIndex, setUrgeQuoteIndex] = useState(0);
 
   // Mood check-in
   const [showMood, setShowMood] = useState(false);
@@ -477,39 +477,9 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ── Urge Surfing Modal ────────────────────────────────────────── */}
+      {/* ── Emergency Recovery Toolkit ───────────────────────────────── */}
       {showUrge && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="w-full max-w-sm max-h-[90vh] overflow-y-auto rounded-2xl border border-destructive/40 bg-background/97 p-6 space-y-5 animate-scale-in">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Wind className="w-5 h-5 text-secondary" aria-hidden />
-                <h3 className="font-bold uppercase tracking-wider text-secondary text-sm neon-text-cyan">Urge Surfing</h3>
-              </div>
-              <button onClick={() => setShowUrge(false)} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
-            </div>
-
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              An urge lasts <strong className="text-foreground">90 seconds</strong> at peak intensity. Breathe through it. You have survived every urge so far, this one is no different.
-            </p>
-
-            <BreathingTimer />
-
-            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-              <p className="text-xs text-muted-foreground italic text-center">
-                &ldquo;{QUOTES[urgeQuoteIndex].text}&rdquo;
-              </p>
-            </div>
-
-            <Link
-              href="/history"
-              onClick={() => setShowUrge(false)}
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/20 text-sm font-medium transition-all"
-            >
-              I made it: Log a Victory ✓
-            </Link>
-          </div>
-        </div>
+        <EmergencyToolkitModal streakDays={timer.days} onClose={() => setShowUrge(false)} />
       )}
 
       {/* ── Page Header ───────────────────────────────────────────────── */}
@@ -526,10 +496,7 @@ export default function Dashboard() {
               </span>
             )}
             <button
-              onClick={() => {
-                setUrgeQuoteIndex(Math.floor(Math.random() * QUOTES.length));
-                setShowUrge(true);
-              }}
+              onClick={() => setShowUrge(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-destructive/50 bg-destructive/10 text-destructive hover:bg-destructive/20 font-bold uppercase tracking-wider text-xs transition-all"
             >
               <AlertTriangle className="w-4 h-4" aria-hidden />
@@ -628,6 +595,24 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* ── Recovery Tree ─────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-secondary/20 bg-background/60 backdrop-blur-sm p-5 flex items-center gap-5 animate-scale-in">
+        <RecoveryTree stage={getStage(timer.days)} variant="compact" className="flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-secondary neon-text-cyan mb-1">Recovery Tree</p>
+          <p className="font-bold text-foreground">{getStage(timer.days).name}</p>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{getStage(timer.days).blurb}</p>
+          {getNextStage(timer.days) && (
+            <p className="text-[10px] text-muted-foreground/60 mt-1.5">
+              {daysToNextStage(timer.days)} day{daysToNextStage(timer.days) !== 1 ? 's' : ''} to {getNextStage(timer.days)!.name}
+            </p>
+          )}
+          <Link href="/growth" className="inline-block mt-2 text-xs font-bold text-secondary hover:underline">
+            View Growth Journey →
+          </Link>
+        </div>
       </div>
 
       {/* ── Stats Grid ────────────────────────────────────────────────── */}
