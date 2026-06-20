@@ -23,6 +23,7 @@ import {
 import { SeedGuardLogo } from '@/components/seedguard-logo';
 import { XpBar } from '@/components/xp-bar';
 import { computeXp, levelFromXp, type LevelInfo } from '@/lib/xp';
+import { APP_VERSION } from '@/lib/version';
 import { getQuestXp, QUEST_EVENT } from '@/lib/quests';
 import { computeEarnedBadgeIds } from '@/lib/badges';
 import { getLiveXp, XP_EVENT } from '@/lib/xp-state';
@@ -170,7 +171,7 @@ export function Sidebar() {
 
         {/* Collapse toggle + version */}
         <div className={`pt-4 border-t border-primary/10 flex ${collapsed ? 'justify-center' : 'items-center justify-between'}`}>
-          {!collapsed && <p className="text-xs text-muted-foreground">v3.2.0</p>}
+          {!collapsed && <p className="text-xs text-muted-foreground">v{APP_VERSION}</p>}
           <button
             onClick={toggleCollapse}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}

@@ -15,6 +15,7 @@ import {
   Trash2, Download, AlertTriangle, Loader2,
 } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
+import { APP_VERSION } from '@/lib/version';
 import { useToast } from '@/components/toast';
 import { ImageBanner } from '@/components/synth-background';
 import { ART } from '@/lib/assets';
@@ -394,7 +395,7 @@ export default function SettingsPage() {
       <section className="rounded-2xl border border-primary/10 bg-gradient-to-br from-primary/5 to-secondary/5 p-8 text-center space-y-3 animate-scale-in [animation-delay:400ms]">
         <h3 className="font-bold text-base uppercase tracking-wider">About SeedGuard</h3>
         <div className="space-y-1 text-sm text-muted-foreground">
-          <p><span className="font-semibold text-foreground">Version</span> 3.1.0</p>
+          <p><span className="font-semibold text-foreground">Version</span> {APP_VERSION}</p>
           <p><span className="font-semibold text-foreground">Made for</span> PMO Recovery</p>
           <p className="pt-1">Your local data never leaves your browser. Cloud sync requires an account.</p>
         </div>
