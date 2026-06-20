@@ -111,7 +111,7 @@ export default function Home() {
         </div>
 
         {/* ── Right column — feature grid + leaderboard (desktop only) ──── */}
-        <div className="hidden md:flex flex-col items-center space-y-5 w-full md:w-auto md:max-w-xs">
+        <div className="hidden md:flex flex-col items-center space-y-5 w-full md:w-auto md:max-w-sm">
           {/* Feature grid */}
           <div className="w-full rounded-2xl bg-background/60 backdrop-blur-md border border-primary/20 p-6 shadow-2xl space-y-4">
             <p className="text-xs text-secondary/80 uppercase tracking-wider font-bold text-center">What you get, free</p>
@@ -119,11 +119,11 @@ export default function Home() {
               {FEATURES.map(({ Icon, label, sub }) => (
                 <div
                   key={label}
-                  className="rounded-xl bg-background/60 p-3 border border-primary/25 hover:border-primary/50 transition-colors text-left"
+                  className="rounded-xl bg-background/60 p-4 border border-primary/25 hover:border-primary/50 transition-colors text-left"
                 >
-                  <div className="flex items-center gap-1 mb-1">
-                    <Icon className="w-3 h-3 text-secondary shrink-0" aria-hidden />
-                    <span className="text-xs font-bold text-white leading-tight whitespace-nowrap">{label}</span>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Icon className="w-4 h-4 text-secondary shrink-0" aria-hidden />
+                    <span className="text-sm font-bold text-white leading-tight">{label}</span>
                   </div>
                   <div className="text-xs text-foreground/60 leading-snug">{sub}</div>
                 </div>
