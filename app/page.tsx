@@ -121,9 +121,9 @@ export default function Home() {
                   key={label}
                   className="rounded-xl bg-background/60 p-4 border border-primary/25 hover:border-primary/50 transition-colors text-left"
                 >
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-1.5 mb-1">
                     <Icon className="w-4 h-4 text-secondary shrink-0" aria-hidden />
-                    <span className="text-sm font-bold text-white">{label}</span>
+                    <span className="text-sm font-bold text-white leading-tight">{label}</span>
                   </div>
                   <div className="text-xs text-foreground/60 leading-snug">{sub}</div>
                 </div>
@@ -135,10 +135,10 @@ export default function Home() {
           {/* Deliberately secondary to the main CTA above: outline style, smaller, no glow. */}
           <Link
             href="/account"
-            className="w-full flex items-center justify-center gap-2 px-4 min-h-[40px] rounded-xl border border-gold/50 bg-gold/10 text-gold text-xs font-bold hover:bg-gold/20 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 min-h-[40px] rounded-xl border border-gold/50 bg-gold/10 text-gold text-xs font-bold hover:bg-gold/20 transition-all whitespace-nowrap"
           >
-            <Trophy className="w-3.5 h-3.5" aria-hidden />
-            Join the Ranks: Free
+            <Trophy className="w-3.5 h-3.5 shrink-0" aria-hidden />
+            Join the Ranks (Account Required)
           </Link>
         </div>
       </div>
