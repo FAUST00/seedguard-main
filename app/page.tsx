@@ -1,8 +1,21 @@
 import Link from 'next/link';
-import { ArrowRight, Trophy } from 'lucide-react';
+import { ArrowRight, Trophy, Activity, Cloud, Award, MessageSquare, LifeBuoy } from 'lucide-react';
 import { ART } from '@/lib/assets';
 import { UserCountBadge } from '@/components/user-count';
 import { SeedGuardLogo } from '@/components/seedguard-logo';
+import AnonModeButton from '@/components/anon-mode-button';
+
+// Feature highlights shown in the desktop right-column grid. Lucide icons
+// (not emoji) so they render identically across every OS/browser and match
+// the rest of the app's iconography.
+const FEATURES = [
+  { Icon: Activity,       label: 'Streak Tracking',  sub: 'Live second-by-second' },
+  { Icon: Cloud,          label: 'Cloud Sync',       sub: 'Any device, always' },
+  { Icon: Trophy,         label: 'Leaderboards',     sub: 'Friends + Global + Weekly' },
+  { Icon: Award,          label: 'Badges & Rewards', sub: 'Milestones celebrated' },
+  { Icon: MessageSquare,  label: 'Direct Messages',  sub: 'Chat with friends' },
+  { Icon: LifeBuoy,       label: 'Urge Support',     sub: 'Emergency breathing tool' },
+] as const;
 
 export default function Home() {
   return (
@@ -103,19 +116,15 @@ export default function Home() {
           <div className="w-full rounded-2xl bg-background/60 backdrop-blur-md border border-primary/20 p-6 shadow-2xl space-y-4">
             <p className="text-xs text-secondary/80 uppercase tracking-wider font-bold text-center">What you get, free</p>
             <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: '📊', label: 'Streak Tracking',  sub: 'Live second-by-second' },
-                { icon: '☁️', label: 'Cloud Sync',       sub: 'Any device, always' },
-                { icon: '🏆', label: 'Leaderboards',     sub: 'Friends + Global + Weekly' },
-                { icon: '🔥', label: 'Badges & Rewards', sub: 'Milestones celebrated' },
-                { icon: '💬', label: 'Direct Messages',  sub: 'Chat with friends' },
-                { icon: '🆘', label: 'Urge Support',     sub: 'Emergency breathing tool' },
-              ].map(({ icon, label, sub }) => (
+              {FEATURES.map(({ Icon, label, sub }) => (
                 <div
                   key={label}
                   className="rounded-xl bg-background/60 p-4 border border-primary/25 hover:border-primary/50 transition-colors text-left"
                 >
-                  <div className="text-sm font-bold mb-1 text-white">{icon} {label}</div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Icon className="w-4 h-4 text-secondary shrink-0" aria-hidden />
+                    <span className="text-sm font-bold text-white">{label}</span>
+                  </div>
                   <div className="text-xs text-foreground/60 leading-snug">{sub}</div>
                 </div>
               ))}
@@ -136,6 +145,3 @@ export default function Home() {
     </div>
   );
 }
-
-// Client island for anonymous mode — keeps landing page a server component
-import AnonModeButton from '@/components/anon-mode-button';
