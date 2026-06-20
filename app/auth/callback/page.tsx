@@ -100,7 +100,8 @@ export default function AuthCallbackPage() {
 
     run();
     return () => { cancelled = true; };
-  }, []);
+    // router from useRouter() is stable; listed to satisfy exhaustive-deps.
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

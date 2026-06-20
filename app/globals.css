@@ -284,9 +284,18 @@ button, a, input, select, textarea {
 }
 .page-entry { animation: pageEntry 0.3s ease-out; }
 
-/* Respect users who prefer less motion */
+/* Respect users who prefer less motion. Global sweep: kill all animations,
+   transitions, and smooth scrolling, while keeping content fully visible
+   (no opacity:0 left hanging from an entry animation). Specific atmosphere
+   layers are also pinned to a static frame. */
 @media (prefers-reduced-motion: reduce) {
-  .synth-grid, .synth-stars, .flame-glow, .skeleton::after {
-    animation: none !important;
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
+  html { scroll-behavior: auto; }
+  .page-entry { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .synth-grid, .synth-stars, .flame-glow, .skeleton::after { animation: none !important; }
 }
